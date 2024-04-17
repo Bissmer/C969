@@ -5,8 +5,6 @@ VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C969", "C969\C969.csproj", "{79801073-B518-4A6C-8007-D9E4B974412A}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "client_schedule", "client_schedule\client_schedule.sqlproj", "{D827FB76-C198-4CD1-9C34-EA5AF4A27AE2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +15,6 @@ Global
 		{79801073-B518-4A6C-8007-D9E4B974412A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79801073-B518-4A6C-8007-D9E4B974412A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79801073-B518-4A6C-8007-D9E4B974412A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D827FB76-C198-4CD1-9C34-EA5AF4A27AE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D827FB76-C198-4CD1-9C34-EA5AF4A27AE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D827FB76-C198-4CD1-9C34-EA5AF4A27AE2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{D827FB76-C198-4CD1-9C34-EA5AF4A27AE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D827FB76-C198-4CD1-9C34-EA5AF4A27AE2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D827FB76-C198-4CD1-9C34-EA5AF4A27AE2}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
