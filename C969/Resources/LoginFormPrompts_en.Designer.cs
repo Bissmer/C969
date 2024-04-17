@@ -61,11 +61,29 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t establish connection with the database. Check if SQL server is up..
+        /// </summary>
+        public static string DBConnectionFailureMessage {
+            get {
+                return ResourceManager.GetString("DBConnectionFailureMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sceduling App Login Window.
         /// </summary>
         public static string Login {
             get {
                 return ResourceManager.GetString("Login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Login Failed. Please check your credentials and try again..
+        /// </summary>
+        public static string LoginFailedMessage {
+            get {
+                return ResourceManager.GetString("LoginFailedMessage", resourceCulture);
             }
         }
         
@@ -106,11 +124,29 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Login Successful..
+        /// </summary>
+        public static string LoginSuccessMessage {
+            get {
+                return ResourceManager.GetString("LoginSuccessMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Username.
         /// </summary>
         public static string loginUsernameLabel {
             get {
                 return ResourceManager.GetString("loginUsernameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username and password cannot be empty..
+        /// </summary>
+        public static string UsernamePwdEmptyMessage {
+            get {
+                return ResourceManager.GetString("UsernamePwdEmptyMessage", resourceCulture);
             }
         }
     }

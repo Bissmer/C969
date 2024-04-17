@@ -120,6 +120,9 @@
   <data name="Login" xml:space="preserve">
     <value>Окно для входа в приложение расписаний</value>
   </data>
+  <data name="LoginFailedMessage" xml:space="preserve">
+    <value>Вход не был выполнен. Пожалуйста проверьте логин и пароль.</value>
+  </data>
   <data name="loginHeaderLabel" xml:space="preserve">
     <value>Пожалуйста введите данные для входа</value>
   </data>
@@ -132,7 +135,13 @@
   <data name="loginQuitButton" xml:space="preserve">
     <value>Выход</value>
   </data>
+  <data name="LoginSuccessMessage" xml:space="preserve">
+    <value>Вход выполнен успешно.</value>
+  </data>
   <data name="loginUsernameLabel" xml:space="preserve">
     <value>Юзернейм</value>
+  </data>
+  <data name="UsernamePwdEmptyMessage" xml:space="preserve">
+    <value>Юзернейм и пароль не могут быть пустыми.</value>
   </data>
 </root>

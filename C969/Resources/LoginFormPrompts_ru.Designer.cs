@@ -70,6 +70,15 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Вход не был выполнен. Пожалуйста проверьте логин и пароль..
+        /// </summary>
+        internal static string LoginFailedMessage {
+            get {
+                return ResourceManager.GetString("LoginFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Пожалуйста введите данные для входа.
         /// </summary>
         internal static string loginHeaderLabel {
@@ -106,11 +115,29 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Вход выполнен успешно..
+        /// </summary>
+        internal static string LoginSuccessMessage {
+            get {
+                return ResourceManager.GetString("LoginSuccessMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Юзернейм.
         /// </summary>
         internal static string loginUsernameLabel {
             get {
                 return ResourceManager.GetString("loginUsernameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Юзернейм и пароль не могут быть пустыми..
+        /// </summary>
+        internal static string UsernamePwdEmptyMessage {
+            get {
+                return ResourceManager.GetString("UsernamePwdEmptyMessage", resourceCulture);
             }
         }
     }

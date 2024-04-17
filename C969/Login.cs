@@ -1,9 +1,9 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -18,32 +18,37 @@ namespace C969
     {
         public Login()
         {
+            
             InitializeComponent();
             SetLanguage(CultureInfo.CurrentCulture);
 
         }
 
+        CultureInfo currentCulture = CultureInfo.CurrentUICulture;
+        ResourceManager _rm;
+        
         //Localization using ResourceManager and CultureInfo
         private void SetLanguage(CultureInfo culture)
         {
-            ResourceManager rm = new ResourceManager("C969.Resources.LoginFormPrompts_en", typeof(Login).Assembly);
-            loginHeaderLabel.Text = rm.GetString("loginHeaderLabel", culture);
-            loginHeaderLabel.Text = rm.GetString("loginHeaderLabel", culture);
-            loginLoginButton.Text = rm.GetString("loginLoginButton", culture);
-            loginPasswordLabel.Text = rm.GetString("loginPasswordLabel", culture);
-            loginUsernameLabel.Text = rm.GetString("loginUsernameLabel", culture);
-            loginQuitButton.Text = rm.GetString("loginQuitButton", culture);
-            this.Text = rm.GetString("Login", culture);
 
             //check culture and set the appropriate resource file
-            if(culture.TwoLetterISOLanguageName == "ru")
+            if (culture.TwoLetterISOLanguageName == "en")
             {
-                rm = new ResourceManager("C969.Resources.LoginFormPrompts_ru", typeof(Login).Assembly);
+                _rm = new ResourceManager("C969.Resources.LoginFormPrompts_ru", typeof(Login).Assembly);
             }
             else
             {
-                rm = new ResourceManager("C969.Resources.LoginFormPrompts_en", typeof(Login).Assembly);
+                _rm = new ResourceManager("C969.Resources.LoginFormPrompts_en", typeof(Login).Assembly);
             }
+         
+            loginHeaderLabel.Text = _rm.GetString("loginHeaderLabel", culture);
+            loginHeaderLabel.Text = _rm.GetString("loginHeaderLabel", culture);
+            loginLoginButton.Text = _rm.GetString("loginLoginButton", culture);
+            loginPasswordLabel.Text = _rm.GetString("loginPasswordLabel", culture);
+            loginUsernameLabel.Text = _rm.GetString("loginUsernameLabel", culture);
+            loginQuitButton.Text = _rm.GetString("loginQuitButton", culture);
+            this.Text = _rm.GetString("Login", culture);
+
         }
 
         private bool AuthenticateUser(string username, string password)
@@ -51,21 +56,22 @@ namespace C969
             bool isAuthenticated = false;
 
             string connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
-            using (SqlConnection connection = new SqlConnection(connString))
+            using (MySqlConnection connection = new MySqlConnection(connString))
             {
                 string query = "SELECT userId FROM user WHERE userName = @username AND password = @password";
-                SqlCommand cmd = new SqlCommand(query, connection);
+                MySqlCommand cmd = new MySqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@username", username);
                 cmd.Parameters.AddWithValue("@password", password);
 
                 try
                 {
                     connection.Open();
-                    isAuthenticated = (int)cmd.ExecuteScalar() > 0;
+                    object result = cmd.ExecuteScalar();
+                    isAuthenticated = result != null && Convert.ToInt32(result) == 1;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show(_rm.GetString("DBConnectionFailure", currentCulture));
                 }
             }
             return isAuthenticated;
@@ -77,13 +83,18 @@ namespace C969
             string username = loginUserName.Text;
             string password = loginPassword.Text;
 
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show(_rm.GetString("UsernamePwdEmptyMessage", currentCulture));
+                return;
+            }
             if (AuthenticateUser(username, password))
             {
-                MessageBox.Show("Login Successful");
+                MessageBox.Show(_rm.GetString("LoginSuccessMessage", currentCulture));
             }
             else
             {
-                MessageBox.Show("Login Failed");
+                MessageBox.Show(_rm.GetString("LoginFailedMessage", currentCulture));
             }
         }
     }
