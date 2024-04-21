@@ -34,11 +34,11 @@ namespace C969
             //check culture and set the appropriate resource file
             if (culture.TwoLetterISOLanguageName == "en")
             {
-                _rm = new ResourceManager("C969.Resources.LoginFormPrompts_ru", typeof(Login).Assembly);
+                _rm = new ResourceManager("C969.Resources.LoginFormPrompts_en", typeof(Login).Assembly);
             }
             else
             {
-                _rm = new ResourceManager("C969.Resources.LoginFormPrompts_en", typeof(Login).Assembly);
+                _rm = new ResourceManager("C969.Resources.LoginFormPrompts_ru", typeof(Login).Assembly);
             }
          
             loginHeaderLabel.Text = _rm.GetString("loginHeaderLabel", culture);
