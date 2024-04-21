@@ -11,12 +11,12 @@ namespace C969.Controllers
 {
     public class CustomerController
     {
-        private string connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
         // Add a new customer to the database
         public void AddCustomer(Customer customer)
         {
-            using (MySqlConnection connection = new MySqlConnection(connString))
+            using (MySqlConnection connection = new MySqlConnection(_connString))
             {
                 string query = @"INSERT INTO customer (customerName, addressID, active, createDate, createdBy, lastUpdate, lastUpdateBy)
                                 VALUES (@customerName, @addressID, @active, @createDate, @createdBy, @lastUpdate, @lastUpdateBy)";
@@ -42,7 +42,7 @@ namespace C969.Controllers
 
         public void UpdateCustomer(Customer customer)
         {
-            using (MySqlConnection connection = new MySqlConnection(connString))
+            using (MySqlConnection connection = new MySqlConnection(_connString))
             {
                 string query = @"UPDATE customer
                                 SET customerName = @customerName, addressID = @addressID, active = @active, createDate = @createDate, createdBy = @createdBy, lastUpdate = @lastUpdate, lastUpdateBy = @lastUpdateBy
@@ -70,7 +70,7 @@ namespace C969.Controllers
 
         public void DeleteCustomer (int customerID)
         {
-            using (MySqlConnection connection = new MySqlConnection(connString))
+            using (MySqlConnection connection = new MySqlConnection(_connString))
             {
                 string query = "DELETE FROM customer WHERE customerID = @customerID";
 
@@ -89,12 +89,69 @@ namespace C969.Controllers
         {
             Customer customer = null;
 
-            using (MySqlConnection connection = new MySqlConnection(connString))
+            using (MySqlConnection connection = new MySqlConnection(_connString))
             {
+                string query = "SELECT * FROM customer WHERE customerID = @customerID";
+                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@customerID", customerID);
 
+                    connection.Open();
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            customer = new Customer(
+
+                                Convert.ToInt32(reader["customerID"]),
+                                reader["customerName"].ToString(),
+                                Convert.ToInt32(reader["addressID"]),
+                                Convert.ToInt32(reader["active"]),
+                                Convert.ToDateTime(reader["createDate"]),
+                                reader["createdBy"].ToString(),
+                                Convert.ToDateTime(reader["lastUpdate"]),
+                                reader["lastUpdateBy"].ToString()
+                                );
+                        }
+                    }
+                }
             }
 
+            return customer;
+        }
+        // Retrieve all customers from the database
+        public List<Customer> GetAllCustomers()
+        {
+            List<Customer> customers = new List<Customer>();
 
+            using (MySqlConnection connection = new MySqlConnection(_connString))
+            {
+                string query = "SELECT * FROM customer";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, connection))
+                {
+                    connection.Open();
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Customer customer = new Customer(
+                                Convert.ToInt32(reader["customerID"]),
+                                reader["customerName"].ToString(),
+                                Convert.ToInt32(reader["addressID"]),
+                                Convert.ToInt32(reader["active"]),
+                                Convert.ToDateTime(reader["createDate"]),
+                                reader["createdBy"].ToString(),
+                                Convert.ToDateTime(reader["lastUpdate"]),
+                                reader["lastUpdateBy"].ToString()
+                                );
+                            customers.Add(customer);
+                        }
+                    }
+                }
+
+            }
+            return customers;
         }
     }
 

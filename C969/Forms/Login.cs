@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using C969.Forms;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -90,7 +91,9 @@ namespace C969
             }
             if (AuthenticateUser(username, password))
             {
-                MessageBox.Show(_rm.GetString("LoginSuccessMessage", currentCulture));
+                CustomerManagementForm customerManagementForm = new CustomerManagementForm();
+                customerManagementForm.Show();
+                this.Hide();
             }
             else
             {

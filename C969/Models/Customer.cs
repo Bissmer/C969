@@ -33,7 +33,7 @@ namespace C969.Models
 
         // Constructor for existing customer records where CustomerID is known
 
-        public Customer(int customerID, string customerName, int addressID, int active, string createdBy, DateTime createDate, DateTime lastUpdate,
+        public Customer(int customerID, string customerName, int addressID, int active, DateTime createDate, string createdBy, DateTime lastUpdate,
             string lastUpdateBy)
         {
             CustomerID = customerID;
