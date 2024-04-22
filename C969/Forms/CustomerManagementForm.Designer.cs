@@ -53,6 +53,7 @@
             this.cusMgmtEditCustomerButton.TabIndex = 1;
             this.cusMgmtEditCustomerButton.Text = "Edit Customer";
             this.cusMgmtEditCustomerButton.UseVisualStyleBackColor = true;
+            this.cusMgmtEditCustomerButton.Click += new System.EventHandler(this.cusMgmtEditCustomerButton_Click);
             // 
             // cusMgmtDeleteCustomerButton
             // 
@@ -62,6 +63,7 @@
             this.cusMgmtDeleteCustomerButton.TabIndex = 2;
             this.cusMgmtDeleteCustomerButton.Text = "Delete Customer";
             this.cusMgmtDeleteCustomerButton.UseVisualStyleBackColor = true;
+            this.cusMgmtDeleteCustomerButton.Click += new System.EventHandler(this.cusMgmtDeleteCustomerButton_Click);
             // 
             // cusMgmtDgvCustomers
             // 

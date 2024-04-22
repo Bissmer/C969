@@ -24,7 +24,9 @@ namespace C969.Forms
 
         private void cusMgmtAddCustomerButton_Click(object sender, EventArgs e)
         {
-
+            var addForm = new AddCustomerForm();
+            addForm.ShowDialog();
+            LoadCustomers();
         }
 
         private void LoadCustomers()
@@ -32,6 +34,28 @@ namespace C969.Forms
             var customers = _customerController.GetAllCustomers();
             cusMgmtDgvCustomers.DataSource = customers;
             cusMgmtDgvCustomers.Refresh();
+        }
+
+        private void cusMgmtEditCustomerButton_Click(object sender, EventArgs e)
+        {
+            if (cusMgmtDgvCustomers.CurrentRow != null)
+            {
+                //int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
+                //var editForm = new EditCustomerForm(customerId);
+                //editForm.ShowDialog();
+                //LoadCustomers();
+                MessageBox.Show("Edit Customer functionality is not implemented yet.");
+            }
+        }
+
+        private void cusMgmtDeleteCustomerButton_Click(object sender, EventArgs e)
+        {
+            if (cusMgmtDgvCustomers.CurrentRow != null)
+            {
+                int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
+                _customerController.DeleteCustomer(customerId);
+                LoadCustomers();
+            }
         }
     }
 }

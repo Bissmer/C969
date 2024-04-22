@@ -12,6 +12,7 @@ using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using C969.Models;
 
 namespace C969
 {
@@ -92,6 +93,7 @@ namespace C969
             if (AuthenticateUser(username, password))
             {
                 CustomerManagementForm customerManagementForm = new CustomerManagementForm();
+                UserSession.SetCurrentUser(username);
                 customerManagementForm.Show();
                 this.Hide();
             }
