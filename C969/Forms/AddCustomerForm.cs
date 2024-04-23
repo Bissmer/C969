@@ -19,5 +19,10 @@ namespace C969.Forms
             InitializeComponent();
             _customerController = new CustomerController();
         }
+
+        private void addCustomerSaveBtn_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

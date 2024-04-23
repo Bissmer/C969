@@ -32,6 +32,7 @@
             this.cusMgmtEditCustomerButton = new System.Windows.Forms.Button();
             this.cusMgmtDeleteCustomerButton = new System.Windows.Forms.Button();
             this.cusMgmtDgvCustomers = new System.Windows.Forms.DataGridView();
+            this.cusMgmCurrentUserlbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvCustomers)).BeginInit();
             this.SuspendLayout();
             // 
@@ -73,11 +74,21 @@
             this.cusMgmtDgvCustomers.Size = new System.Drawing.Size(923, 226);
             this.cusMgmtDgvCustomers.TabIndex = 3;
             // 
+            // cusMgmCurrentUserlbl
+            // 
+            this.cusMgmCurrentUserlbl.AutoSize = true;
+            this.cusMgmCurrentUserlbl.Location = new System.Drawing.Point(933, 25);
+            this.cusMgmCurrentUserlbl.Name = "cusMgmCurrentUserlbl";
+            this.cusMgmCurrentUserlbl.Size = new System.Drawing.Size(35, 13);
+            this.cusMgmCurrentUserlbl.TabIndex = 4;
+            this.cusMgmCurrentUserlbl.Text = "label1";
+            // 
             // CustomerManagementForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1056, 553);
+            this.Controls.Add(this.cusMgmCurrentUserlbl);
             this.Controls.Add(this.cusMgmtDgvCustomers);
             this.Controls.Add(this.cusMgmtDeleteCustomerButton);
             this.Controls.Add(this.cusMgmtEditCustomerButton);
@@ -86,6 +97,7 @@
             this.Text = "CustomerManagementForm";
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvCustomers)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -95,5 +107,6 @@
         private System.Windows.Forms.Button cusMgmtEditCustomerButton;
         private System.Windows.Forms.Button cusMgmtDeleteCustomerButton;
         private System.Windows.Forms.DataGridView cusMgmtDgvCustomers;
+        private System.Windows.Forms.Label cusMgmCurrentUserlbl;
     }
 }
