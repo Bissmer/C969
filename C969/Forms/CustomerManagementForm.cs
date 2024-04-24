@@ -53,11 +53,13 @@ namespace C969.Forms
         {
             if (cusMgmtDgvCustomers.CurrentRow != null)
             {
-                //int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
-                //var editForm = new EditCustomerForm(customerId);
-                //editForm.ShowDialog();
-                //LoadCustomers();
-                MessageBox.Show("Edit Customer functionality is not implemented yet.");
+                int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
+                var customer = _customerController.GetCustomerByID(customerId);
+                var editForm = new EditCustomerForm(customer);
+                if (editForm.ShowDialog() == DialogResult.OK)
+                {
+                    LoadCustomers();
+                }
             }
         }
 

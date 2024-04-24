@@ -79,7 +79,7 @@
             // 
             // addCustomerSaveBtn
             // 
-            this.addCustomerSaveBtn.Location = new System.Drawing.Point(243, 356);
+            this.addCustomerSaveBtn.Location = new System.Drawing.Point(205, 353);
             this.addCustomerSaveBtn.Name = "addCustomerSaveBtn";
             this.addCustomerSaveBtn.Size = new System.Drawing.Size(75, 23);
             this.addCustomerSaveBtn.TabIndex = 7;
@@ -89,7 +89,7 @@
             // 
             // addCustomerCanceBtn
             // 
-            this.addCustomerCanceBtn.Location = new System.Drawing.Point(243, 413);
+            this.addCustomerCanceBtn.Location = new System.Drawing.Point(205, 406);
             this.addCustomerCanceBtn.Name = "addCustomerCanceBtn";
             this.addCustomerCanceBtn.Size = new System.Drawing.Size(75, 23);
             this.addCustomerCanceBtn.TabIndex = 8;
@@ -119,7 +119,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(597, 678);
+            this.ClientSize = new System.Drawing.Size(485, 533);
             this.Controls.Add(this.addCustomerActiveLabel);
             this.Controls.Add(this.addCustomerActiveCheck);
             this.Controls.Add(this.addCustomerCanceBtn);
@@ -129,7 +129,7 @@
             this.Controls.Add(this.addCustomerAddressIDtxt);
             this.Controls.Add(this.addCustomerCustomerNametxt);
             this.Name = "AddCustomerForm";
-            this.Text = "AddCustomerForm";
+            this.Text = "Add a Customer";
             this.ResumeLayout(false);
             this.PerformLayout();
 
