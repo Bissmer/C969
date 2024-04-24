@@ -153,6 +153,20 @@ namespace C969.Controllers
             }
             return customers;
         }
+
+        public bool AddressExists(int addressID)
+        {
+            using (MySqlConnection connection = new MySqlConnection(_connString))
+            {
+                string query = "SELECT COUNT(1) FROM Address WHERE AddressID = @AddressID";
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@AddressID", addressID);
+
+                connection.Open();
+                int count = Convert.ToInt32(cmd.ExecuteScalar());
+                return count > 0;
+            }
+        }
     }
 
 }

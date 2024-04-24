@@ -95,6 +95,7 @@
             this.addCustomerCanceBtn.TabIndex = 8;
             this.addCustomerCanceBtn.Text = "Cancel";
             this.addCustomerCanceBtn.UseVisualStyleBackColor = true;
+            this.addCustomerCanceBtn.Click += new System.EventHandler(this.addCustomerCanceBtn_Click);
             // 
             // addCustomerActiveCheck
             // 

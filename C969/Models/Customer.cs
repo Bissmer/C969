@@ -12,7 +12,10 @@ namespace C969.Models
         public string CustomerName { get; set; }
         public int AddressID { get; set; }
         public int Active { get; set; }
-        public DateTime CreateDate { get; set; }
+        private DateTime createDate;
+        public DateTime CreateDate { 
+            get => createDate; 
+            set => createDate = value.Date; } //Truncate the time portion of the date
         public string CreatedBy { get; set; }
         public DateTime LastUpdate { get; set; }
         public string LastUpdateBy { get; set; }
