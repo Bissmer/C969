@@ -18,10 +18,23 @@ namespace C969.Forms
         {
             InitializeComponent();
             _customerController = new CustomerController();
+            LoadCurrentUser();
             LoadCustomers();
             
         }
 
+        //debug label to show current user
+        private void LoadCurrentUser()
+        {
+            if (!string.IsNullOrEmpty(Models.UserSession.CurrentUser))
+            {
+                cusMgmCurrentUserlbl.Text = $"Logged user: {Models.UserSession.CurrentUser}";
+            }
+            else
+            {
+                cusMgmCurrentUserlbl.Text = "Unknown";
+            }
+        }
         private void cusMgmtAddCustomerButton_Click(object sender, EventArgs e)
         {
             var addForm = new AddCustomerForm();
@@ -40,11 +53,13 @@ namespace C969.Forms
         {
             if (cusMgmtDgvCustomers.CurrentRow != null)
             {
-                //int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
-                //var editForm = new EditCustomerForm(customerId);
-                //editForm.ShowDialog();
-                //LoadCustomers();
-                MessageBox.Show("Edit Customer functionality is not implemented yet.");
+                int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
+                var customer = _customerController.GetCustomerByID(customerId);
+                var editForm = new EditCustomerForm(customer);
+                if (editForm.ShowDialog() == DialogResult.OK)
+                {
+                    LoadCustomers();
+                }
             }
         }
 

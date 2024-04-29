@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.loginHeaderLabel = new System.Windows.Forms.Label();
-            this.loginUserName = new System.Windows.Forms.TextBox();
-            this.loginPassword = new System.Windows.Forms.TextBox();
+            this.loginUserNametxt = new System.Windows.Forms.TextBox();
+            this.loginPasswordtxt = new System.Windows.Forms.TextBox();
             this.loginLoginButton = new System.Windows.Forms.Button();
             this.loginQuitButton = new System.Windows.Forms.Button();
             this.loginUsernameLabel = new System.Windows.Forms.Label();
@@ -46,19 +46,19 @@
             this.loginHeaderLabel.TabIndex = 0;
             this.loginHeaderLabel.Text = "Please log in";
             // 
-            // loginUserName
+            // loginUserNametxt
             // 
-            this.loginUserName.Location = new System.Drawing.Point(225, 183);
-            this.loginUserName.Name = "loginUserName";
-            this.loginUserName.Size = new System.Drawing.Size(100, 20);
-            this.loginUserName.TabIndex = 1;
+            this.loginUserNametxt.Location = new System.Drawing.Point(225, 183);
+            this.loginUserNametxt.Name = "loginUserNametxt";
+            this.loginUserNametxt.Size = new System.Drawing.Size(100, 20);
+            this.loginUserNametxt.TabIndex = 1;
             // 
-            // loginPassword
+            // loginPasswordtxt
             // 
-            this.loginPassword.Location = new System.Drawing.Point(225, 222);
-            this.loginPassword.Name = "loginPassword";
-            this.loginPassword.Size = new System.Drawing.Size(100, 20);
-            this.loginPassword.TabIndex = 2;
+            this.loginPasswordtxt.Location = new System.Drawing.Point(225, 222);
+            this.loginPasswordtxt.Name = "loginPasswordtxt";
+            this.loginPasswordtxt.Size = new System.Drawing.Size(100, 20);
+            this.loginPasswordtxt.TabIndex = 2;
             // 
             // loginLoginButton
             // 
@@ -106,8 +106,8 @@
             this.Controls.Add(this.loginUsernameLabel);
             this.Controls.Add(this.loginQuitButton);
             this.Controls.Add(this.loginLoginButton);
-            this.Controls.Add(this.loginPassword);
-            this.Controls.Add(this.loginUserName);
+            this.Controls.Add(this.loginPasswordtxt);
+            this.Controls.Add(this.loginUserNametxt);
             this.Controls.Add(this.loginHeaderLabel);
             this.Name = "Login";
             this.Text = "Sceduling App Login Window";
@@ -119,8 +119,8 @@
         #endregion
 
         private System.Windows.Forms.Label loginHeaderLabel;
-        private System.Windows.Forms.TextBox loginUserName;
-        private System.Windows.Forms.TextBox loginPassword;
+        private System.Windows.Forms.TextBox loginUserNametxt;
+        private System.Windows.Forms.TextBox loginPasswordtxt;
         private System.Windows.Forms.Button loginLoginButton;
         private System.Windows.Forms.Button loginQuitButton;
         private System.Windows.Forms.Label loginUsernameLabel;

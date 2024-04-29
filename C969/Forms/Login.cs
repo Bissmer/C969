@@ -82,8 +82,8 @@ namespace C969
 
         private void loginLoginButton_Click(object sender, EventArgs e)
         {
-            string username = loginUserName.Text;
-            string password = loginPassword.Text;
+            string username = loginUserNametxt.Text;
+            string password = loginPasswordtxt.Text;
 
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
@@ -92,8 +92,8 @@ namespace C969
             }
             if (AuthenticateUser(username, password))
             {
-                CustomerManagementForm customerManagementForm = new CustomerManagementForm();
                 UserSession.SetCurrentUser(username);
+                CustomerManagementForm customerManagementForm = new CustomerManagementForm();
                 customerManagementForm.Show();
                 this.Hide();
             }
