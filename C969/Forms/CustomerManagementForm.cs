@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -14,10 +15,14 @@ namespace C969.Forms
     public partial class CustomerManagementForm : Form
     {
         private CustomerController _customerController;
+        private CustomerDataHandler _customerDataHandler;
+        private string _currentUser = Models.UserSession.CurrentUser;
+        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         public CustomerManagementForm()
         {
             InitializeComponent();
             _customerController = new CustomerController();
+            _customerDataHandler = new CustomerDataHandler(_currentUser,_connString);
             LoadCurrentUser();
             LoadCustomers();
             
@@ -53,9 +58,8 @@ namespace C969.Forms
         {
             if (cusMgmtDgvCustomers.CurrentRow != null)
             {
-                int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
-                var customer = _customerController.GetCustomerByID(customerId);
-                var editForm = new EditCustomerForm(customer);
+                int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["CustomerID"].Value);
+                var editForm = new EditCustomerForm(customerId, _customerDataHandler);
                 if (editForm.ShowDialog() == DialogResult.OK)
                 {
                     LoadCustomers();

@@ -9,74 +9,100 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using System.Configuration;
 
 namespace C969.Forms
 {
     public partial class EditCustomerForm : Form
     {
-        private CustomerController _customerController;
-        private Customer _currentCustomer;
-        public EditCustomerForm(Customer customer)
+        private int _customerId;
+        private CustomerDataHandler _customerDataHandler;
+        private string _currentUser = UserSession.CurrentUser;
+        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        public EditCustomerForm(int customerId, CustomerDataHandler customerDataHandler)
         {
             InitializeComponent();
-            _customerController = new CustomerController();
-            _currentCustomer = customer;
-            PopulateCustomerDetails();
+            _customerId = customerId;
+            _customerDataHandler = customerDataHandler;
+            LoadCustomerData();
+            LoadCountries();
+
         }
 
-        private void PopulateCustomerDetails()
+        private void LoadCountries()
         {
-            editCustomerCustomerNametxt.Text = _currentCustomer.CustomerName;
-            editCustomerAddressIDtxt.Text = _currentCustomer.AddressID.ToString();
-            editCustomerActiveCheck.Checked = _currentCustomer.Active == 1;
+            using (var connection = new MySqlConnection(_connString))
+            {
+                connection.Open();
+                var query = "SELECT country FROM country";
+                using (var cmd = new MySqlCommand(query, connection))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            editCustomerCountryCombo.Items.Add(reader["country"].ToString());
+                        }
+                    }
+                }
+            }
+        }
+
+        private void LoadCustomerData()
+        {
+            var customerDetails = _customerDataHandler.GetCustomerDetails(_customerId);
+            if (customerDetails != null)
+            {
+                editCustomerNameText.Text = customerDetails.CustomerName;
+                editCustomerAddresText.Text = customerDetails.Address;
+                editCustomerAddress2Text.Text = customerDetails.Address2;
+                editCustomerPhoneText.Text = customerDetails.Phone;
+                editCustomerCityText.Text = customerDetails.City;
+                editCustomerZipText.Text = customerDetails.PostalCode;
+                editCustomerCountryCombo.Text = customerDetails.Country;
+                editCustomerActiveCheck.Checked = customerDetails.IsActive;
+            }
+            else
+            {
+                MessageBox.Show("Customer not found.");
+                this.Close();
+            }
+
+           
         }
 
         private void editCustomerSaveBtn_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(editCustomerCustomerNametxt.Text) ||
-                string.IsNullOrEmpty(editCustomerAddressIDtxt.Text))
-            {
-                MessageBox.Show("Please enter a customer name and address ID.");
-                return;
-            }
-
-            if (!int.TryParse(editCustomerAddressIDtxt.Text, out var addressID))
-            {
-                MessageBox.Show("Address ID must be a number.");
-                return;
-            }
-
-            // Check if the AddressID exists in the database
-            if (!_customerController.AddressExists(addressID))
-            {
-                MessageBox.Show("No address found with the given Address ID. Please enter a valid Address ID.");
-                return;
-            }
-
-            // Update the customer object and save it to the database
-            _currentCustomer.CustomerName = editCustomerCustomerNametxt.Text.Trim();
-            _currentCustomer.AddressID = addressID;
-            _currentCustomer.Active = editCustomerActiveCheck.Checked ? 1 : 0;
-            _currentCustomer.LastUpdate = DateTime.Now;
-            _currentCustomer.LastUpdateBy = UserSession.CurrentUser;
-
             try
             {
-                _customerController.UpdateCustomer(_currentCustomer);
-                MessageBox.Show("Customer updated successfully.");
-                DialogResult = DialogResult.OK;
-                this.Close();
+                CustomerDetails customer = new CustomerDetails()
+                {
+                    CustomerID = _customerId,
+                    CustomerName = editCustomerNameText.Text,
+                    Address = editCustomerAddresText.Text,
+                    Address2 = editCustomerAddress2Text.Text,
+                    Phone = editCustomerPhoneText.Text,
+                    City = editCustomerCityText.Text,
+                    PostalCode = editCustomerZipText.Text,
+                    Country = editCustomerCountryCombo.SelectedItem.ToString(),
+                    IsActive = editCustomerActiveCheck.Checked
+                };
+                if (_customerDataHandler.UpdateCustomerDetails(customer))
+                {
+                    MessageBox.Show("Customer updated successfully.");
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to update customer.");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred while updating the customer: {ex.Message}");
+                MessageBox.Show($"An error occurred: {ex.Message}");
             }
-        }
-
-        private void editCustomerCanceBtn_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
         }
     }
 }

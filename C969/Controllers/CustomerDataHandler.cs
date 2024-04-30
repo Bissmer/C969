@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Common;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using C969.Models;
 using MySql.Data.MySqlClient;
 
@@ -138,5 +140,145 @@ namespace C969.Controllers
                 cmd.ExecuteNonQuery();
             }
         }
+
+        public CustomerDetails GetCustomerDetails(int customerId)
+        {
+            CustomerDetails details = null;
+
+            string query = @"
+            SELECT c.customerId, c.customerName, a.address, a.address2, a.phone, ct.city, a.postalCode, co.country, c.active
+            FROM Customer c
+            JOIN Address a ON c.addressId = a.addressId
+            JOIN City ct ON a.cityId = ct.cityId
+            JOIN Country co ON ct.countryId = co.countryId
+            WHERE c.customerId = @customerId";
+
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@customerId", customerId);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            details = new CustomerDetails
+                            {
+                                CustomerID = reader.GetInt32("customerId"),
+                                CustomerName = reader["customerName"].ToString(),
+                                Address = reader["address"].ToString(),
+                                Address2 = reader["address2"].ToString(),
+                                Phone = reader["phone"].ToString(),
+                                City = reader["city"].ToString(),
+                                PostalCode = reader["postalCode"].ToString(),
+                                Country = reader["country"].ToString(),
+                                IsActive = reader.GetBoolean("active")
+                            };
+                        }
+                    }
+                }
+            }
+            return details;
+        }
+
+        public bool UpdateCustomerDetails(CustomerDetails customer)
+        {
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                using (var trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Update the city first to get the cityId
+                        int cityId = EnsureCity(customer.City, customer.Country, conn, trans);
+
+                        // Update the Address
+                        string updateAddress = @"
+                        UPDATE Address
+                        SET address = @address, address2 = @address2, phone = @phone, postalCode = @postalCode, cityId = @cityId
+                        WHERE addressId = (SELECT addressId FROM Customer WHERE customerId = @customerId);";
+                        using (var cmd = new MySqlCommand(updateAddress, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@address", customer.Address);
+                            cmd.Parameters.AddWithValue("@address2", customer.Address2);
+                            cmd.Parameters.AddWithValue("@phone", customer.Phone);
+                            cmd.Parameters.AddWithValue("@postalCode", customer.PostalCode);
+                            cmd.Parameters.AddWithValue("@cityId", cityId);
+                            cmd.Parameters.AddWithValue("@customerId", customer.CustomerID);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Update the Customer record
+                        string updateCustomer = @"
+                        UPDATE Customer
+                        SET customerName = @customerName, active = @active
+                        WHERE customerId = @customerId;";
+                        using (var cmd = new MySqlCommand(updateCustomer, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@customerName", customer.CustomerName);
+                            cmd.Parameters.AddWithValue("@active", customer.IsActive);
+                            cmd.Parameters.AddWithValue("@customerId", customer.CustomerID);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        trans.Commit();
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        Console.WriteLine($"An error occurred: {ex.Message}");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        private int EnsureCity(string cityName, string countryName, MySqlConnection conn, MySqlTransaction trans)
+        {
+            int cityId = GetCityId(cityName, countryName, conn, trans);
+            if (cityId == 0)
+            {
+                string insertCity =
+                    "INSERT INTO City (city, countryId) VALUES (@cityName, (SELECT countryId FROM Country WHERE country = @countryName)); SELECT LAST_INSERT_ID();";
+                using (var cmd = new MySqlCommand(insertCity, conn, trans))
+                {
+                    cmd.Parameters.AddWithValue("@cityName", cityName); 
+                    cmd.Parameters.AddWithValue("@countryName", countryName);
+                    cityId = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+            return cityId;
+        }
+
+        private int GetCityId(string cityName, string countryName, MySqlConnection conn, MySqlTransaction trans)
+        {
+            string query = "SELECT cityId FROM City INNER JOIN Country ON City.countryId = Country.countryId WHERE City.city = @cityName AND Country.country = @countryName;";
+            using (var cmd = new MySqlCommand(query, conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@cityName", cityName);
+                cmd.Parameters.AddWithValue("@countryName", countryName);
+                var result = cmd.ExecuteScalar();
+                return result != null ? Convert.ToInt32(result) : 0;
+            }
+        }
+
+        private int EnsureCountry(string countryName, MySqlConnection conn, MySqlTransaction trans)
+        {
+            int countryId = GetCountryId(countryName, conn, trans);
+            if (countryId == 0)
+            {
+                string insertCountry = "INSERT INTO Country (country) VALUES (@countryName); SELECT LAST_INSERT_ID();";
+                using (var cmd = new MySqlCommand(insertCountry, conn, trans))
+                {
+                    cmd.Parameters.AddWithValue("@countryName", countryName);
+                    countryId = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+            return countryId;
+        }
+
     }
 }

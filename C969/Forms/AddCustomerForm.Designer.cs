@@ -45,7 +45,7 @@
             this.addCustomerPostalLabel = new System.Windows.Forms.Label();
             this.addCustomerCountryLabel = new System.Windows.Forms.Label();
             this.addCustomerZipText = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.addCustomerActiveLabel = new System.Windows.Forms.Label();
             this.addCustomerActiveCheck = new System.Windows.Forms.CheckBox();
             this.addCustomerCountryCombo = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
@@ -180,14 +180,14 @@
             this.addCustomerZipText.Size = new System.Drawing.Size(100, 20);
             this.addCustomerZipText.TabIndex = 15;
             // 
-            // label1
+            // addCustomerActiveLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(196, 354);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 13);
-            this.label1.TabIndex = 17;
-            this.label1.Text = "Active?";
+            this.addCustomerActiveLabel.AutoSize = true;
+            this.addCustomerActiveLabel.Location = new System.Drawing.Point(196, 354);
+            this.addCustomerActiveLabel.Name = "addCustomerActiveLabel";
+            this.addCustomerActiveLabel.Size = new System.Drawing.Size(43, 13);
+            this.addCustomerActiveLabel.TabIndex = 17;
+            this.addCustomerActiveLabel.Text = "Active?";
             // 
             // addCustomerActiveCheck
             // 
@@ -213,7 +213,7 @@
             this.ClientSize = new System.Drawing.Size(597, 678);
             this.Controls.Add(this.addCustomerCountryCombo);
             this.Controls.Add(this.addCustomerActiveCheck);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.addCustomerActiveLabel);
             this.Controls.Add(this.addCustomerZipText);
             this.Controls.Add(this.addCustomerCountryLabel);
             this.Controls.Add(this.addCustomerPostalLabel);
@@ -253,7 +253,7 @@
         private System.Windows.Forms.Label addCustomerPostalLabel;
         private System.Windows.Forms.Label addCustomerCountryLabel;
         private System.Windows.Forms.TextBox addCustomerZipText;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label addCustomerActiveLabel;
         private System.Windows.Forms.CheckBox addCustomerActiveCheck;
         private System.Windows.Forms.ComboBox addCustomerCountryCombo;
     }
