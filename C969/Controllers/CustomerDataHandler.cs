@@ -191,8 +191,10 @@ namespace C969.Controllers
                 {
                     try
                     {
+                        // Update or add the country first to get the countryId
+                        int countryId = EnsureCountry(customer.Country, conn, trans);
                         // Update the city first to get the cityId
-                        int cityId = EnsureCity(customer.City, customer.Country, conn, trans);
+                        int cityId = EnsureCity(customer.City, countryId, conn, trans);
 
                         // Update the Address
                         string updateAddress = @"
@@ -215,6 +217,7 @@ namespace C969.Controllers
                         UPDATE Customer
                         SET customerName = @customerName, active = @active
                         WHERE customerId = @customerId;";
+
                         using (var cmd = new MySqlCommand(updateCustomer, conn, trans))
                         {
                             cmd.Parameters.AddWithValue("@customerName", customer.CustomerName);
@@ -236,30 +239,35 @@ namespace C969.Controllers
             }
         }
 
-        private int EnsureCity(string cityName, string countryName, MySqlConnection conn, MySqlTransaction trans)
+        private int EnsureCity(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
         {
-            int cityId = GetCityId(cityName, countryName, conn, trans);
+            int cityId = GetCityId(cityName, countryId, conn, trans);
             if (cityId == 0)
             {
-                string insertCity =
-                    "INSERT INTO City (city, countryId) VALUES (@cityName, (SELECT countryId FROM Country WHERE country = @countryName)); SELECT LAST_INSERT_ID();";
+                string insertCity = @"
+                    INSERT INTO City (city, countryId, createDate, createdBy)
+                    VALUES (@cityName, @countryId, @createDate, @createdBy);
+                    SELECT LAST_INSERT_ID();";
+
                 using (var cmd = new MySqlCommand(insertCity, conn, trans))
                 {
                     cmd.Parameters.AddWithValue("@cityName", cityName); 
-                    cmd.Parameters.AddWithValue("@countryName", countryName);
+                    cmd.Parameters.AddWithValue("@countryId", countryId);
+                    cmd.Parameters.AddWithValue("@createDate", DateTime.UtcNow);
+                    cmd.Parameters.AddWithValue("@createdBy", _currentUser);
                     cityId = Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
             return cityId;
         }
 
-        private int GetCityId(string cityName, string countryName, MySqlConnection conn, MySqlTransaction trans)
+        private int GetCityId(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
         {
-            string query = "SELECT cityId FROM City INNER JOIN Country ON City.countryId = Country.countryId WHERE City.city = @cityName AND Country.country = @countryName;";
+            string query = "SELECT cityId FROM City WHERE city = @cityName AND countryId = @countryId;";
             using (var cmd = new MySqlCommand(query, conn, trans))
             {
                 cmd.Parameters.AddWithValue("@cityName", cityName);
-                cmd.Parameters.AddWithValue("@countryName", countryName);
+                cmd.Parameters.AddWithValue("@countryId", countryId);
                 var result = cmd.ExecuteScalar();
                 return result != null ? Convert.ToInt32(result) : 0;
             }
@@ -278,6 +286,17 @@ namespace C969.Controllers
                 }
             }
             return countryId;
+        }
+
+        public int GetCountryId(string countryName, MySqlConnection conn, MySqlTransaction trans)
+        {
+            string query = "SELECT countryId FROM Country WHERE country = @countryName;";
+            using (var cmd = new MySqlCommand(query, conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@countryName", countryName);
+                var result = cmd.ExecuteScalar();
+                return result != null ? Convert.ToInt32(result) : 0;
+            }
         }
 
     }

@@ -76,6 +76,12 @@ namespace C969.Forms
         {
             try
             {
+                if (editCustomerCountryCombo.SelectedItem == null)
+                {
+                    MessageBox.Show("Please select a country.");
+                    return; // Stop further execution
+                }
+
                 CustomerDetails customer = new CustomerDetails()
                 {
                     CustomerID = _customerId,
