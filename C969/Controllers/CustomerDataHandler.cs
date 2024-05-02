@@ -16,13 +16,13 @@ namespace C969.Controllers
     {
         private MySqlConnection _connection;
         private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
-        private string _currentUser = UserSession.CurrentUser;
+        private string _currentUser;
 
 
-        public CustomerDataHandler(string connString, string currentUser)
+        public CustomerDataHandler(string _connString)
         {
             _connection = new MySqlConnection(_connString);
-            _currentUser = currentUser;
+            _currentUser = UserSession.CurrentUser;
         }
 
         /// <summary>
@@ -245,8 +245,8 @@ namespace C969.Controllers
             if (cityId == 0)
             {
                 string insertCity = @"
-                    INSERT INTO City (city, countryId, createDate, createdBy)
-                    VALUES (@cityName, @countryId, @createDate, @createdBy);
+                    INSERT INTO City (city, countryId, createDate, createdBy, lastUpdate, lastUpdateBy)
+                    VALUES (@cityName, @countryId, NOW(), @createdBy, NOW(), @lastUpdateBy);
                     SELECT LAST_INSERT_ID();";
 
                 using (var cmd = new MySqlCommand(insertCity, conn, trans))
@@ -255,6 +255,7 @@ namespace C969.Controllers
                     cmd.Parameters.AddWithValue("@countryId", countryId);
                     cmd.Parameters.AddWithValue("@createDate", DateTime.UtcNow);
                     cmd.Parameters.AddWithValue("@createdBy", _currentUser);
+                    cmd.Parameters.AddWithValue("@lastUpdateBy", _currentUser);
                     cityId = Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
@@ -297,6 +298,28 @@ namespace C969.Controllers
                 var result = cmd.ExecuteScalar();
                 return result != null ? Convert.ToInt32(result) : 0;
             }
+        }
+
+        public List<string> GetCountries()
+        {
+            List<string> countries = new List<string>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT country FROM Country ORDER BY country;";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            countries.Add(reader["country"].ToString());
+                        }
+                    }
+                }
+            }
+
+            return countries;
         }
 
     }

@@ -22,7 +22,7 @@ namespace C969.Forms
         {
             InitializeComponent();
             _customerController = new CustomerController();
-            _customerDataHandler = new CustomerDataHandler(_currentUser,_connString);
+            _customerDataHandler = new CustomerDataHandler(_connString);
             LoadCurrentUser();
             LoadCustomers();
             

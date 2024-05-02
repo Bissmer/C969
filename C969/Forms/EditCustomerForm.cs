@@ -20,13 +20,14 @@ namespace C969.Forms
         private CustomerDataHandler _customerDataHandler;
         private string _currentUser = UserSession.CurrentUser;
         private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+
         public EditCustomerForm(int customerId, CustomerDataHandler customerDataHandler)
         {
             InitializeComponent();
             _customerId = customerId;
             _customerDataHandler = customerDataHandler;
             LoadCustomerData();
-            LoadCountries();
+
 
         }
 
@@ -60,8 +61,10 @@ namespace C969.Forms
                 editCustomerPhoneText.Text = customerDetails.Phone;
                 editCustomerCityText.Text = customerDetails.City;
                 editCustomerZipText.Text = customerDetails.PostalCode;
-                editCustomerCountryCombo.Text = customerDetails.Country;
                 editCustomerActiveCheck.Checked = customerDetails.IsActive;
+
+                editCustomerCountryCombo.DataSource = _customerDataHandler.GetCountries();
+                editCustomerCountryCombo.SelectedItem = customerDetails.Country;
             }
             else
             {
@@ -109,6 +112,18 @@ namespace C969.Forms
             {
                 MessageBox.Show($"An error occurred: {ex.Message}");
             }
+        }
+
+        private void InitializeCountryCombo()
+        {
+            editCustomerCountryCombo.DataSource = _customerDataHandler.GetCountries();
+            editCustomerCountryCombo.DropDownStyle = ComboBoxStyle.DropDownList;
+
+        }
+
+        private void editCustomerCancelBtn_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

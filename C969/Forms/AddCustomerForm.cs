@@ -25,7 +25,7 @@ namespace C969.Forms
         {
             InitializeComponent();
             _customerController = new CustomerController();
-            _customerDataHandler = new CustomerDataHandler(_connString, _currentUser);
+            _customerDataHandler = new CustomerDataHandler(_connString);
             LoadCountries();
         }
 

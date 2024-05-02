@@ -194,6 +194,7 @@
             this.editCustomerCancelBtn.TabIndex = 21;
             this.editCustomerCancelBtn.Text = "Cancel";
             this.editCustomerCancelBtn.UseVisualStyleBackColor = true;
+            this.editCustomerCancelBtn.Click += new System.EventHandler(this.editCustomerCancelBtn_Click);
             // 
             // editCustomerSaveBtn
             // 
