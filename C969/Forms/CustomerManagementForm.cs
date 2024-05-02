@@ -49,7 +49,7 @@ namespace C969.Forms
 
         private void LoadCustomers()
         {
-            var customers = _customerController.GetAllCustomers();
+            var customers = _customerDataHandler.GetAllCustomers();
             cusMgmtDgvCustomers.DataSource = customers;
             cusMgmtDgvCustomers.Refresh();
         }
@@ -72,7 +72,7 @@ namespace C969.Forms
             if (cusMgmtDgvCustomers.CurrentRow != null)
             {
                 int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
-                _customerController.DeleteCustomer(customerId);
+                _customerDataHandler.DeleteCustomer(customerId);
                 LoadCustomers();
             }
         }

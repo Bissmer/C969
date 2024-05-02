@@ -114,12 +114,6 @@ namespace C969.Forms
             }
         }
 
-        private void InitializeCountryCombo()
-        {
-            editCustomerCountryCombo.DataSource = _customerDataHandler.GetCountries();
-            editCustomerCountryCombo.DropDownStyle = ComboBoxStyle.DropDownList;
-
-        }
 
         private void editCustomerCancelBtn_Click(object sender, EventArgs e)
         {

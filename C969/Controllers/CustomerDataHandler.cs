@@ -227,6 +227,7 @@ namespace C969.Controllers
                         }
 
                         trans.Commit();
+                        Console.WriteLine($"Updating Customer ID: {customer.CustomerID}");
                         return true;
                     }
                     catch (Exception ex)
@@ -320,6 +321,59 @@ namespace C969.Controllers
             }
 
             return countries;
+        }
+
+        public List<CustomerDetails> GetAllCustomers()
+        {
+            List<CustomerDetails> customers = new List<CustomerDetails>();
+            using (MySqlConnection conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+                SELECT c.customerId, c.customerName, a.address, a.address2, a.phone, ct.city, a.postalCode, co.country, c.active
+                FROM Customer c
+                JOIN Address a ON c.addressId = a.addressId
+                JOIN City ct ON a.cityId = ct.cityId
+                JOIN Country co ON ct.countryId = co.countryId";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            customers.Add(new CustomerDetails
+                            {
+                                CustomerID = reader.GetInt32("customerId"),
+                                CustomerName = reader.GetString("customerName"),
+                                Address = reader.GetString("address"),
+                                Address2 = reader.IsDBNull(reader.GetOrdinal("address2")) ? null : reader.GetString("address2"),
+                                Phone = reader.GetString("phone"),
+                                PostalCode = reader.GetString("postalCode"),
+                                City = reader.GetString("city"),
+                                Country = reader.GetString("country"),
+                                IsActive = reader.GetBoolean("active")
+                            });
+                        }
+                    }
+                }
+            }
+            return customers;
+        }
+
+        public bool DeleteCustomer(int customerId)
+        {
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                var query = "DELETE FROM Customer WHERE CustomerID = @customerId";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@customerId", customerId);
+                    int result = cmd.ExecuteNonQuery();
+                    return result > 0;
+                }
+            }
         }
 
     }
