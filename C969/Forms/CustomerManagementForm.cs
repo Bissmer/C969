@@ -14,18 +14,18 @@ namespace C969.Forms
 {
     public partial class CustomerManagementForm : Form
     {
-        private CustomerController _customerController;
         private CustomerDataHandler _customerDataHandler;
         private string _currentUser = Models.UserSession.CurrentUser;
         private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         public CustomerManagementForm()
         {
             InitializeComponent();
-            _customerController = new CustomerController();
             _customerDataHandler = new CustomerDataHandler(_connString);
             LoadCurrentUser();
             LoadCustomers();
-            
+            LoadAppointments();
+
+
         }
 
         //debug label to show current user
@@ -54,6 +54,23 @@ namespace C969.Forms
             cusMgmtDgvCustomers.Refresh();
         }
 
+        private void LoadAppointments()
+        {
+            var appointments = _customerDataHandler.GetAllAppointments();
+            cusMgmtDgvAppontments.DataSource = appointments;
+            cusMgmtDgvAppontments.Refresh();
+        }
+
+        private void ExitApplication()
+        {
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to end the session and exit?", "End Session", 
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialogResult == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+        }
+
         private void cusMgmtEditCustomerButton_Click(object sender, EventArgs e)
         {
             if (cusMgmtDgvCustomers.CurrentRow != null)
@@ -75,6 +92,11 @@ namespace C969.Forms
                 _customerDataHandler.DeleteCustomer(customerId);
                 LoadCustomers();
             }
+        }
+
+        private void cusMgmtEndSessionButton_Click(object sender, EventArgs e)
+        {
+            ExitApplication();
         }
     }
 }

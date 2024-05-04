@@ -16,7 +16,6 @@ namespace C969.Forms
 {
     public partial class AddCustomerForm : Form
     {
-        private CustomerController _customerController;
         private CustomerDataHandler _customerDataHandler;
         private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         private string _currentUser = UserSession.CurrentUser;
@@ -24,7 +23,6 @@ namespace C969.Forms
         public AddCustomerForm()
         {
             InitializeComponent();
-            _customerController = new CustomerController();
             _customerDataHandler = new CustomerDataHandler(_connString);
             LoadCountries();
         }

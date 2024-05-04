@@ -115,7 +115,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\CustomerDataHandler.cs" />
     <Compile Include="Forms\AddCustomerForm.cs">
       <SubType>Form</SubType>
@@ -141,6 +140,7 @@
     <Compile Include="Forms\Login.Designer.cs">
       <DependentUpon>Login.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\AppointmentDetails.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\CustomerDetails.cs" />
     <Compile Include="Models\User.cs" />

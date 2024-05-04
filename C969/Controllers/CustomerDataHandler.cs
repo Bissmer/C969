@@ -376,5 +376,47 @@ namespace C969.Controllers
             }
         }
 
+        public List<AppointmentDetails> GetAllAppointments()
+        {
+            List<AppointmentDetails> appointments = new List<AppointmentDetails>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+                SELECT appointmentId, customerId, userId, title, description, location, contact, type, url,
+                   start, end, createDate, createdBy, lastUpdate, lastUpdateBy
+                FROM appointment";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            appointments.Add(new AppointmentDetails
+                            {
+                                AppointmentId = reader.GetInt32("appointmentId"),
+                                CustomerId = reader.GetInt32("customerId"),
+                                UserId = reader.GetInt32("userId"),
+                                Title = reader.GetString("title"),
+                                Description = reader.GetString("description"),
+                                Location = reader.GetString("location"),
+                                Contact = reader.GetString("contact"),
+                                Type = reader.GetString("type"),
+                                Url = reader.GetString("url"),
+                                Start = reader.GetDateTime("start"),
+                                End = reader.GetDateTime("end"),
+                                CreateDate = reader.GetDateTime("createDate"),
+                                CreatedBy = reader.GetString("createdBy"),
+                                LastUpdate = reader.GetDateTime("lastUpdate"),
+                                LastUpdateBy = reader.GetString("lastUpdateBy")
+                            });
+                        }
+                    }
+                }
+            }
+            return appointments;
+        }
+
     }
 }
