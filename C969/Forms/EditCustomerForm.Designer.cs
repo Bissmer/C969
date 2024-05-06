@@ -48,6 +48,7 @@
             this.editCustomerNameText = new System.Windows.Forms.TextBox();
             this.editCustomerCancelBtn = new System.Windows.Forms.Button();
             this.editCustomerSaveBtn = new System.Windows.Forms.Button();
+            this.editCustomerFormLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // contextMenuStrip1
@@ -58,15 +59,15 @@
             // editCustomerCountryCombo
             // 
             this.editCustomerCountryCombo.FormattingEnabled = true;
-            this.editCustomerCountryCombo.Location = new System.Drawing.Point(215, 271);
+            this.editCustomerCountryCombo.Location = new System.Drawing.Point(171, 330);
             this.editCustomerCountryCombo.Name = "editCustomerCountryCombo";
-            this.editCustomerCountryCombo.Size = new System.Drawing.Size(121, 21);
+            this.editCustomerCountryCombo.Size = new System.Drawing.Size(171, 21);
             this.editCustomerCountryCombo.TabIndex = 37;
             // 
             // editCustomerActiveCheck
             // 
             this.editCustomerActiveCheck.AutoSize = true;
-            this.editCustomerActiveCheck.Location = new System.Drawing.Point(215, 305);
+            this.editCustomerActiveCheck.Location = new System.Drawing.Point(171, 364);
             this.editCustomerActiveCheck.Name = "editCustomerActiveCheck";
             this.editCustomerActiveCheck.Size = new System.Drawing.Size(15, 14);
             this.editCustomerActiveCheck.TabIndex = 36;
@@ -75,7 +76,7 @@
             // editCustomerActiveLabel
             // 
             this.editCustomerActiveLabel.AutoSize = true;
-            this.editCustomerActiveLabel.Location = new System.Drawing.Point(124, 305);
+            this.editCustomerActiveLabel.Location = new System.Drawing.Point(74, 364);
             this.editCustomerActiveLabel.Name = "editCustomerActiveLabel";
             this.editCustomerActiveLabel.Size = new System.Drawing.Size(43, 13);
             this.editCustomerActiveLabel.TabIndex = 35;
@@ -83,15 +84,15 @@
             // 
             // editCustomerZipText
             // 
-            this.editCustomerZipText.Location = new System.Drawing.Point(215, 238);
+            this.editCustomerZipText.Location = new System.Drawing.Point(171, 297);
             this.editCustomerZipText.Name = "editCustomerZipText";
-            this.editCustomerZipText.Size = new System.Drawing.Size(100, 20);
+            this.editCustomerZipText.Size = new System.Drawing.Size(171, 20);
             this.editCustomerZipText.TabIndex = 34;
             // 
             // editCustomerCountryLabel
             // 
             this.editCustomerCountryLabel.AutoSize = true;
-            this.editCustomerCountryLabel.Location = new System.Drawing.Point(121, 274);
+            this.editCustomerCountryLabel.Location = new System.Drawing.Point(71, 333);
             this.editCustomerCountryLabel.Name = "editCustomerCountryLabel";
             this.editCustomerCountryLabel.Size = new System.Drawing.Size(43, 13);
             this.editCustomerCountryLabel.TabIndex = 33;
@@ -100,7 +101,7 @@
             // editCustomerPostalLabel
             // 
             this.editCustomerPostalLabel.AutoSize = true;
-            this.editCustomerPostalLabel.Location = new System.Drawing.Point(118, 238);
+            this.editCustomerPostalLabel.Location = new System.Drawing.Point(71, 297);
             this.editCustomerPostalLabel.Name = "editCustomerPostalLabel";
             this.editCustomerPostalLabel.Size = new System.Drawing.Size(64, 13);
             this.editCustomerPostalLabel.TabIndex = 32;
@@ -109,7 +110,7 @@
             // editCustomerCityLabel
             // 
             this.editCustomerCityLabel.AutoSize = true;
-            this.editCustomerCityLabel.Location = new System.Drawing.Point(118, 207);
+            this.editCustomerCityLabel.Location = new System.Drawing.Point(71, 267);
             this.editCustomerCityLabel.Name = "editCustomerCityLabel";
             this.editCustomerCityLabel.Size = new System.Drawing.Size(24, 13);
             this.editCustomerCityLabel.TabIndex = 31;
@@ -118,7 +119,7 @@
             // editCustomerPhoneLabel
             // 
             this.editCustomerPhoneLabel.AutoSize = true;
-            this.editCustomerPhoneLabel.Location = new System.Drawing.Point(118, 171);
+            this.editCustomerPhoneLabel.Location = new System.Drawing.Point(71, 231);
             this.editCustomerPhoneLabel.Name = "editCustomerPhoneLabel";
             this.editCustomerPhoneLabel.Size = new System.Drawing.Size(38, 13);
             this.editCustomerPhoneLabel.TabIndex = 30;
@@ -127,7 +128,7 @@
             // editCustomerAddress2Label
             // 
             this.editCustomerAddress2Label.AutoSize = true;
-            this.editCustomerAddress2Label.Location = new System.Drawing.Point(118, 130);
+            this.editCustomerAddress2Label.Location = new System.Drawing.Point(71, 190);
             this.editCustomerAddress2Label.Name = "editCustomerAddress2Label";
             this.editCustomerAddress2Label.Size = new System.Drawing.Size(54, 13);
             this.editCustomerAddress2Label.TabIndex = 29;
@@ -136,7 +137,7 @@
             // editCustomerAddressLabel
             // 
             this.editCustomerAddressLabel.AutoSize = true;
-            this.editCustomerAddressLabel.Location = new System.Drawing.Point(118, 91);
+            this.editCustomerAddressLabel.Location = new System.Drawing.Point(74, 150);
             this.editCustomerAddressLabel.Name = "editCustomerAddressLabel";
             this.editCustomerAddressLabel.Size = new System.Drawing.Size(45, 13);
             this.editCustomerAddressLabel.TabIndex = 28;
@@ -145,7 +146,7 @@
             // editCustomerCustomerNameLabel
             // 
             this.editCustomerCustomerNameLabel.AutoSize = true;
-            this.editCustomerCustomerNameLabel.Location = new System.Drawing.Point(115, 50);
+            this.editCustomerCustomerNameLabel.Location = new System.Drawing.Point(71, 109);
             this.editCustomerCustomerNameLabel.Name = "editCustomerCustomerNameLabel";
             this.editCustomerCustomerNameLabel.Size = new System.Drawing.Size(82, 13);
             this.editCustomerCustomerNameLabel.TabIndex = 27;
@@ -153,42 +154,42 @@
             // 
             // editCustomerCityText
             // 
-            this.editCustomerCityText.Location = new System.Drawing.Point(215, 201);
+            this.editCustomerCityText.Location = new System.Drawing.Point(171, 260);
             this.editCustomerCityText.Name = "editCustomerCityText";
-            this.editCustomerCityText.Size = new System.Drawing.Size(100, 20);
+            this.editCustomerCityText.Size = new System.Drawing.Size(171, 20);
             this.editCustomerCityText.TabIndex = 26;
             // 
             // editCustomerPhoneText
             // 
-            this.editCustomerPhoneText.Location = new System.Drawing.Point(215, 165);
+            this.editCustomerPhoneText.Location = new System.Drawing.Point(171, 224);
             this.editCustomerPhoneText.Name = "editCustomerPhoneText";
-            this.editCustomerPhoneText.Size = new System.Drawing.Size(100, 20);
+            this.editCustomerPhoneText.Size = new System.Drawing.Size(171, 20);
             this.editCustomerPhoneText.TabIndex = 25;
             // 
             // editCustomerAddress2Text
             // 
-            this.editCustomerAddress2Text.Location = new System.Drawing.Point(215, 124);
+            this.editCustomerAddress2Text.Location = new System.Drawing.Point(171, 183);
             this.editCustomerAddress2Text.Name = "editCustomerAddress2Text";
-            this.editCustomerAddress2Text.Size = new System.Drawing.Size(100, 20);
+            this.editCustomerAddress2Text.Size = new System.Drawing.Size(171, 20);
             this.editCustomerAddress2Text.TabIndex = 24;
             // 
             // editCustomerAddresText
             // 
-            this.editCustomerAddresText.Location = new System.Drawing.Point(215, 85);
+            this.editCustomerAddresText.Location = new System.Drawing.Point(171, 144);
             this.editCustomerAddresText.Name = "editCustomerAddresText";
-            this.editCustomerAddresText.Size = new System.Drawing.Size(100, 20);
+            this.editCustomerAddresText.Size = new System.Drawing.Size(171, 20);
             this.editCustomerAddresText.TabIndex = 23;
             // 
             // editCustomerNameText
             // 
-            this.editCustomerNameText.Location = new System.Drawing.Point(215, 47);
+            this.editCustomerNameText.Location = new System.Drawing.Point(171, 106);
             this.editCustomerNameText.Name = "editCustomerNameText";
-            this.editCustomerNameText.Size = new System.Drawing.Size(100, 20);
+            this.editCustomerNameText.Size = new System.Drawing.Size(171, 20);
             this.editCustomerNameText.TabIndex = 22;
             // 
             // editCustomerCancelBtn
             // 
-            this.editCustomerCancelBtn.Location = new System.Drawing.Point(180, 440);
+            this.editCustomerCancelBtn.Location = new System.Drawing.Point(171, 500);
             this.editCustomerCancelBtn.Name = "editCustomerCancelBtn";
             this.editCustomerCancelBtn.Size = new System.Drawing.Size(75, 23);
             this.editCustomerCancelBtn.TabIndex = 21;
@@ -198,7 +199,7 @@
             // 
             // editCustomerSaveBtn
             // 
-            this.editCustomerSaveBtn.Location = new System.Drawing.Point(180, 401);
+            this.editCustomerSaveBtn.Location = new System.Drawing.Point(171, 458);
             this.editCustomerSaveBtn.Name = "editCustomerSaveBtn";
             this.editCustomerSaveBtn.Size = new System.Drawing.Size(75, 23);
             this.editCustomerSaveBtn.TabIndex = 20;
@@ -206,11 +207,22 @@
             this.editCustomerSaveBtn.UseVisualStyleBackColor = true;
             this.editCustomerSaveBtn.Click += new System.EventHandler(this.editCustomerSaveBtn_Click);
             // 
+            // editCustomerFormLabel
+            // 
+            this.editCustomerFormLabel.AutoSize = true;
+            this.editCustomerFormLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.editCustomerFormLabel.Location = new System.Drawing.Point(132, 54);
+            this.editCustomerFormLabel.Name = "editCustomerFormLabel";
+            this.editCustomerFormLabel.Size = new System.Drawing.Size(165, 25);
+            this.editCustomerFormLabel.TabIndex = 38;
+            this.editCustomerFormLabel.Text = "Edit a Customer";
+            // 
             // EditCustomerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(450, 511);
+            this.ClientSize = new System.Drawing.Size(438, 621);
+            this.Controls.Add(this.editCustomerFormLabel);
             this.Controls.Add(this.editCustomerCountryCombo);
             this.Controls.Add(this.editCustomerActiveCheck);
             this.Controls.Add(this.editCustomerActiveLabel);
@@ -256,5 +268,6 @@
         private System.Windows.Forms.TextBox editCustomerNameText;
         private System.Windows.Forms.Button editCustomerCancelBtn;
         private System.Windows.Forms.Button editCustomerSaveBtn;
+        public System.Windows.Forms.Label editCustomerFormLabel;
     }
 }

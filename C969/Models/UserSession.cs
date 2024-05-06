@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Org.BouncyCastle.Bcpg;
 
 namespace C969.Models
 {
@@ -11,19 +12,22 @@ namespace C969.Models
     /// </summary>
     public static class UserSession
     {
+        public static int UserId { get; private set; }
         public static string CurrentUser { get; private set; }
 
-        public static void SetCurrentUser(string userName)
+        public static void Login(int userId, string userName)
         {
+            UserId = userId;
             CurrentUser = userName;
         }
 
         /// <summary>
         /// Clear the current user session
         /// </summary>
-        public static void ClearCurrentUser()
+        public static void Logout()
         {
-            CurrentUser = null;
+            UserId = 0;
+            CurrentUser = string.Empty;
         }
     }
 }

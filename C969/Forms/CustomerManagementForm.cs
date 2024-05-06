@@ -98,5 +98,12 @@ namespace C969.Forms
         {
             ExitApplication();
         }
+
+        private void cusMgmtAddAppointmentButton_Click(object sender, EventArgs e)
+        {
+            var addForm = new AddAppointmentForm();
+            addForm.ShowDialog();
+            LoadAppointments();
+        }
     }
 }

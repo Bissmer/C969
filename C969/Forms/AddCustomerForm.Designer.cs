@@ -48,6 +48,7 @@
             this.addCustomerActiveLabel = new System.Windows.Forms.Label();
             this.addCustomerActiveCheck = new System.Windows.Forms.CheckBox();
             this.addCustomerCountryCombo = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // contextMenuStrip1
@@ -57,7 +58,7 @@
             // 
             // addCustomerSaveBtn
             // 
-            this.addCustomerSaveBtn.Location = new System.Drawing.Point(252, 450);
+            this.addCustomerSaveBtn.Location = new System.Drawing.Point(163, 444);
             this.addCustomerSaveBtn.Name = "addCustomerSaveBtn";
             this.addCustomerSaveBtn.Size = new System.Drawing.Size(75, 23);
             this.addCustomerSaveBtn.TabIndex = 1;
@@ -67,7 +68,7 @@
             // 
             // addCustomerCancelBtn
             // 
-            this.addCustomerCancelBtn.Location = new System.Drawing.Point(252, 489);
+            this.addCustomerCancelBtn.Location = new System.Drawing.Point(163, 488);
             this.addCustomerCancelBtn.Name = "addCustomerCancelBtn";
             this.addCustomerCancelBtn.Size = new System.Drawing.Size(75, 23);
             this.addCustomerCancelBtn.TabIndex = 2;
@@ -77,43 +78,43 @@
             // 
             // addCustomerNameText
             // 
-            this.addCustomerNameText.Location = new System.Drawing.Point(287, 96);
+            this.addCustomerNameText.Location = new System.Drawing.Point(163, 100);
             this.addCustomerNameText.Name = "addCustomerNameText";
-            this.addCustomerNameText.Size = new System.Drawing.Size(100, 20);
+            this.addCustomerNameText.Size = new System.Drawing.Size(171, 20);
             this.addCustomerNameText.TabIndex = 3;
             // 
             // addCustomerAddresText
             // 
-            this.addCustomerAddresText.Location = new System.Drawing.Point(287, 134);
+            this.addCustomerAddresText.Location = new System.Drawing.Point(163, 138);
             this.addCustomerAddresText.Name = "addCustomerAddresText";
-            this.addCustomerAddresText.Size = new System.Drawing.Size(100, 20);
+            this.addCustomerAddresText.Size = new System.Drawing.Size(171, 20);
             this.addCustomerAddresText.TabIndex = 4;
             // 
             // addCustomerAddress2Text
             // 
-            this.addCustomerAddress2Text.Location = new System.Drawing.Point(287, 173);
+            this.addCustomerAddress2Text.Location = new System.Drawing.Point(163, 177);
             this.addCustomerAddress2Text.Name = "addCustomerAddress2Text";
-            this.addCustomerAddress2Text.Size = new System.Drawing.Size(100, 20);
+            this.addCustomerAddress2Text.Size = new System.Drawing.Size(171, 20);
             this.addCustomerAddress2Text.TabIndex = 5;
             // 
             // addCustomerPhoneText
             // 
-            this.addCustomerPhoneText.Location = new System.Drawing.Point(287, 214);
+            this.addCustomerPhoneText.Location = new System.Drawing.Point(163, 218);
             this.addCustomerPhoneText.Name = "addCustomerPhoneText";
-            this.addCustomerPhoneText.Size = new System.Drawing.Size(100, 20);
+            this.addCustomerPhoneText.Size = new System.Drawing.Size(171, 20);
             this.addCustomerPhoneText.TabIndex = 6;
             // 
             // addCustomerCityText
             // 
-            this.addCustomerCityText.Location = new System.Drawing.Point(287, 250);
+            this.addCustomerCityText.Location = new System.Drawing.Point(163, 254);
             this.addCustomerCityText.Name = "addCustomerCityText";
-            this.addCustomerCityText.Size = new System.Drawing.Size(100, 20);
+            this.addCustomerCityText.Size = new System.Drawing.Size(171, 20);
             this.addCustomerCityText.TabIndex = 7;
             // 
             // addCustomerCustomerNameLabel
             // 
             this.addCustomerCustomerNameLabel.AutoSize = true;
-            this.addCustomerCustomerNameLabel.Location = new System.Drawing.Point(187, 99);
+            this.addCustomerCustomerNameLabel.Location = new System.Drawing.Point(63, 103);
             this.addCustomerCustomerNameLabel.Name = "addCustomerCustomerNameLabel";
             this.addCustomerCustomerNameLabel.Size = new System.Drawing.Size(82, 13);
             this.addCustomerCustomerNameLabel.TabIndex = 8;
@@ -122,7 +123,7 @@
             // addCustomerAddressLabel
             // 
             this.addCustomerAddressLabel.AutoSize = true;
-            this.addCustomerAddressLabel.Location = new System.Drawing.Point(190, 140);
+            this.addCustomerAddressLabel.Location = new System.Drawing.Point(63, 141);
             this.addCustomerAddressLabel.Name = "addCustomerAddressLabel";
             this.addCustomerAddressLabel.Size = new System.Drawing.Size(45, 13);
             this.addCustomerAddressLabel.TabIndex = 9;
@@ -131,7 +132,7 @@
             // addCustomerAddress2Label
             // 
             this.addCustomerAddress2Label.AutoSize = true;
-            this.addCustomerAddress2Label.Location = new System.Drawing.Point(190, 179);
+            this.addCustomerAddress2Label.Location = new System.Drawing.Point(63, 184);
             this.addCustomerAddress2Label.Name = "addCustomerAddress2Label";
             this.addCustomerAddress2Label.Size = new System.Drawing.Size(54, 13);
             this.addCustomerAddress2Label.TabIndex = 10;
@@ -140,7 +141,7 @@
             // addCustomerPhoneLabel
             // 
             this.addCustomerPhoneLabel.AutoSize = true;
-            this.addCustomerPhoneLabel.Location = new System.Drawing.Point(190, 220);
+            this.addCustomerPhoneLabel.Location = new System.Drawing.Point(63, 225);
             this.addCustomerPhoneLabel.Name = "addCustomerPhoneLabel";
             this.addCustomerPhoneLabel.Size = new System.Drawing.Size(38, 13);
             this.addCustomerPhoneLabel.TabIndex = 11;
@@ -149,7 +150,7 @@
             // addCustomerCityLabel
             // 
             this.addCustomerCityLabel.AutoSize = true;
-            this.addCustomerCityLabel.Location = new System.Drawing.Point(190, 256);
+            this.addCustomerCityLabel.Location = new System.Drawing.Point(63, 261);
             this.addCustomerCityLabel.Name = "addCustomerCityLabel";
             this.addCustomerCityLabel.Size = new System.Drawing.Size(24, 13);
             this.addCustomerCityLabel.TabIndex = 12;
@@ -158,7 +159,7 @@
             // addCustomerPostalLabel
             // 
             this.addCustomerPostalLabel.AutoSize = true;
-            this.addCustomerPostalLabel.Location = new System.Drawing.Point(190, 287);
+            this.addCustomerPostalLabel.Location = new System.Drawing.Point(63, 291);
             this.addCustomerPostalLabel.Name = "addCustomerPostalLabel";
             this.addCustomerPostalLabel.Size = new System.Drawing.Size(64, 13);
             this.addCustomerPostalLabel.TabIndex = 13;
@@ -167,7 +168,7 @@
             // addCustomerCountryLabel
             // 
             this.addCustomerCountryLabel.AutoSize = true;
-            this.addCustomerCountryLabel.Location = new System.Drawing.Point(193, 323);
+            this.addCustomerCountryLabel.Location = new System.Drawing.Point(63, 327);
             this.addCustomerCountryLabel.Name = "addCustomerCountryLabel";
             this.addCustomerCountryLabel.Size = new System.Drawing.Size(43, 13);
             this.addCustomerCountryLabel.TabIndex = 14;
@@ -175,15 +176,15 @@
             // 
             // addCustomerZipText
             // 
-            this.addCustomerZipText.Location = new System.Drawing.Point(287, 287);
+            this.addCustomerZipText.Location = new System.Drawing.Point(163, 291);
             this.addCustomerZipText.Name = "addCustomerZipText";
-            this.addCustomerZipText.Size = new System.Drawing.Size(100, 20);
+            this.addCustomerZipText.Size = new System.Drawing.Size(171, 20);
             this.addCustomerZipText.TabIndex = 15;
             // 
             // addCustomerActiveLabel
             // 
             this.addCustomerActiveLabel.AutoSize = true;
-            this.addCustomerActiveLabel.Location = new System.Drawing.Point(196, 354);
+            this.addCustomerActiveLabel.Location = new System.Drawing.Point(63, 358);
             this.addCustomerActiveLabel.Name = "addCustomerActiveLabel";
             this.addCustomerActiveLabel.Size = new System.Drawing.Size(43, 13);
             this.addCustomerActiveLabel.TabIndex = 17;
@@ -192,7 +193,7 @@
             // addCustomerActiveCheck
             // 
             this.addCustomerActiveCheck.AutoSize = true;
-            this.addCustomerActiveCheck.Location = new System.Drawing.Point(287, 354);
+            this.addCustomerActiveCheck.Location = new System.Drawing.Point(163, 358);
             this.addCustomerActiveCheck.Name = "addCustomerActiveCheck";
             this.addCustomerActiveCheck.Size = new System.Drawing.Size(15, 14);
             this.addCustomerActiveCheck.TabIndex = 18;
@@ -201,16 +202,27 @@
             // addCustomerCountryCombo
             // 
             this.addCustomerCountryCombo.FormattingEnabled = true;
-            this.addCustomerCountryCombo.Location = new System.Drawing.Point(287, 320);
+            this.addCustomerCountryCombo.Location = new System.Drawing.Point(163, 324);
             this.addCustomerCountryCombo.Name = "addCustomerCountryCombo";
-            this.addCustomerCountryCombo.Size = new System.Drawing.Size(121, 21);
+            this.addCustomerCountryCombo.Size = new System.Drawing.Size(171, 21);
             this.addCustomerCountryCombo.TabIndex = 19;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(123, 42);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(162, 25);
+            this.label1.TabIndex = 20;
+            this.label1.Text = "Add a customer";
             // 
             // AddCustomerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(597, 678);
+            this.ClientSize = new System.Drawing.Size(438, 621);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.addCustomerCountryCombo);
             this.Controls.Add(this.addCustomerActiveCheck);
             this.Controls.Add(this.addCustomerActiveLabel);
@@ -256,5 +268,6 @@
         private System.Windows.Forms.Label addCustomerActiveLabel;
         private System.Windows.Forms.CheckBox addCustomerActiveCheck;
         private System.Windows.Forms.ComboBox addCustomerCountryCombo;
+        private System.Windows.Forms.Label label1;
     }
 }

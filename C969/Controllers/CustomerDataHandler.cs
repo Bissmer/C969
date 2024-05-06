@@ -141,6 +141,11 @@ namespace C969.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves the details of a customer from the database.
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
         public CustomerDetails GetCustomerDetails(int customerId)
         {
             CustomerDetails details = null;
@@ -182,6 +187,11 @@ namespace C969.Controllers
             return details;
         }
 
+        /// <summary>
+        /// Updates the details of a customer in the database.
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         public bool UpdateCustomerDetails(CustomerDetails customer)
         {
             using (var conn = new MySqlConnection(_connString))
@@ -240,6 +250,14 @@ namespace C969.Controllers
             }
         }
 
+        /// <summary>
+        /// Ensures that the given city exists in the database. If it does not exist, it is inserted and the new city ID is returned.
+        /// </summary>
+        /// <param name="cityName"></param>
+        /// <param name="countryId"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
         private int EnsureCity(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
         {
             int cityId = GetCityId(cityName, countryId, conn, trans);
@@ -263,6 +281,14 @@ namespace C969.Controllers
             return cityId;
         }
 
+        /// <summary>
+        /// Retrieves the city ID for the given city name and country ID.
+        /// </summary>
+        /// <param name="cityName"></param>
+        /// <param name="countryId"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
         private int GetCityId(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
         {
             string query = "SELECT cityId FROM City WHERE city = @cityName AND countryId = @countryId;";
@@ -275,6 +301,13 @@ namespace C969.Controllers
             }
         }
 
+        /// <summary>
+        /// Ensures that the given country exists in the database. If it does not exist, it is inserted and the new country ID is returned.
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
         private int EnsureCountry(string countryName, MySqlConnection conn, MySqlTransaction trans)
         {
             int countryId = GetCountryId(countryName, conn, trans);
@@ -290,6 +323,13 @@ namespace C969.Controllers
             return countryId;
         }
 
+        /// <summary>
+        /// Retrieves the country ID for the given country name.
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
         public int GetCountryId(string countryName, MySqlConnection conn, MySqlTransaction trans)
         {
             string query = "SELECT countryId FROM Country WHERE country = @countryName;";
@@ -301,6 +341,10 @@ namespace C969.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of all countries from the database.
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetCountries()
         {
             List<string> countries = new List<string>();
@@ -323,6 +367,10 @@ namespace C969.Controllers
             return countries;
         }
 
+        /// <summary>
+        /// Retrieves all customers from the database.
+        /// </summary>
+        /// <returns></returns>
         public List<CustomerDetails> GetAllCustomers()
         {
             List<CustomerDetails> customers = new List<CustomerDetails>();
@@ -361,6 +409,11 @@ namespace C969.Controllers
             return customers;
         }
 
+        /// <summary>
+        /// Deletes a customer from the database.
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
         public bool DeleteCustomer(int customerId)
         {
             using (var conn = new MySqlConnection(_connString))
@@ -376,6 +429,10 @@ namespace C969.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves all appointments from the database.
+        /// </summary>
+        /// <returns></returns>
         public List<AppointmentDetails> GetAllAppointments()
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
@@ -417,6 +474,66 @@ namespace C969.Controllers
             }
             return appointments;
         }
+
+        /// <summary>
+        /// Retrieves a list of all customer names with their IDs.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<int, string> GetCustomerNameAndId()
+        {
+            var customers = new Dictionary<int, string>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT customerId, customerName FROM Customer";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int customerId = reader.GetInt32("customerId");
+                            string customerName = reader.GetString("customerName");
+                            customers.Add(customerId, customerName);
+                        }
+                    }
+                }
+
+            }
+            return customers;
+        }
+
+        public bool AddAppointment(AppointmentDetails appointment)
+        {
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                var query = @"
+                  INSERT INTO appointment (CustomerId, UserId, Title, Description, Location, Contact, Type, Url, Start, End, CreatedBy,CreateDate, LastUpdateBy )
+                   VALUES (@CustomerId, @UserId, @Title, @Description, @Location, @Contact, @Type, @Url, @Start, @End, @CreatedBy,@CreateDate,@LastUpdateBy );";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@CustomerId", appointment.CustomerId);
+                    cmd.Parameters.AddWithValue("@UserId", appointment.UserId);
+                    cmd.Parameters.AddWithValue("@Title", appointment.Title);
+                    cmd.Parameters.AddWithValue("@Description", appointment.Description);
+                    cmd.Parameters.AddWithValue("@Location", appointment.Location);
+                    cmd.Parameters.AddWithValue("@Contact", appointment.Contact);
+                    cmd.Parameters.AddWithValue("@Type", appointment.Type);
+                    cmd.Parameters.AddWithValue("@Url", appointment.Url);
+                    cmd.Parameters.AddWithValue("@Start", appointment.Start);
+                    cmd.Parameters.AddWithValue("@End", appointment.End);
+                    cmd.Parameters.AddWithValue("@CreatedBy", appointment.CreatedBy);
+                    cmd.Parameters.AddWithValue("@CreateDate", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@LastUpdateBy", UserSession.CurrentUser);
+                    int result = cmd.ExecuteNonQuery();
+                    return result > 0;
+                }
+            }
+        }
+
+
 
     }
 }

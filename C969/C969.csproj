@@ -116,6 +116,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CustomerDataHandler.cs" />
+    <Compile Include="Forms\AddAppointmentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddAppointmentForm.Designer.cs">
+      <DependentUpon>AddAppointmentForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\AddCustomerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -157,6 +163,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>LoginFormPrompts_ru.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Forms\AddAppointmentForm.resx">
+      <DependentUpon>AddAppointmentForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddCustomerForm.resx">
       <DependentUpon>AddCustomerForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -127,6 +127,7 @@
             this.cusMgmtAddAppointmentButton.TabIndex = 8;
             this.cusMgmtAddAppointmentButton.Text = "Add Appointment";
             this.cusMgmtAddAppointmentButton.UseVisualStyleBackColor = true;
+            this.cusMgmtAddAppointmentButton.Click += new System.EventHandler(this.cusMgmtAddAppointmentButton_Click);
             // 
             // cusMgmtEditAppointmentButton
             // 

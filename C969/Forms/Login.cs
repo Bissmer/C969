@@ -13,11 +13,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using C969.Models;
+using C969.Controllers;
 
 namespace C969
 {
     public partial class Login : Form
     {
+        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         public Login()
         {
             
@@ -53,30 +55,20 @@ namespace C969
 
         }
 
-        private bool AuthenticateUser(string username, string password)
+        private int AuthenticateUser(string username, string password)
         {
-            bool isAuthenticated = false;
-
-            string connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
-            using (MySqlConnection connection = new MySqlConnection(connString))
+            using (var conn = new MySqlConnection(_connString))
             {
-                string query = "SELECT userId FROM user WHERE userName = @username AND password = @password";
-                MySqlCommand cmd = new MySqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@username", username);
-                cmd.Parameters.AddWithValue("@password", password);
-
-                try
+                conn.Open();
+                var query = "SELECT UserId FROM user WHERE Username = @username AND Password = @password";  
+                using (var cmd = new MySqlCommand(query, conn))
                 {
-                    connection.Open();
-                    object result = cmd.ExecuteScalar();
-                    isAuthenticated = result != null && Convert.ToInt32(result) == 1;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(_rm.GetString("DBConnectionFailure", currentCulture));
+                    cmd.Parameters.AddWithValue("@username", username);
+                    cmd.Parameters.AddWithValue("@password", password);  
+                    var result = cmd.ExecuteScalar();
+                    return result != null ? Convert.ToInt32(result) : -1;
                 }
             }
-            return isAuthenticated;
 
         }
 
@@ -90,9 +82,10 @@ namespace C969
                 MessageBox.Show(_rm.GetString("UsernamePwdEmptyMessage", currentCulture));
                 return;
             }
-            if (AuthenticateUser(username, password))
+            int userId = AuthenticateUser(username, password);
+            if (userId > 0)  // Check if a valid user ID was returned
             {
-                UserSession.SetCurrentUser(username);
+                UserSession.Login(userId, username);  // Update the session manager
                 CustomerManagementForm customerManagementForm = new CustomerManagementForm();
                 customerManagementForm.Show();
                 this.Hide();
@@ -101,6 +94,7 @@ namespace C969
             {
                 MessageBox.Show(_rm.GetString("LoginFailedMessage", currentCulture));
             }
+
         }
     }
 }
