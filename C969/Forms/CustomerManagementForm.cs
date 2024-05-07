@@ -21,6 +21,7 @@ namespace C969.Forms
         {
             InitializeComponent();
             _customerDataHandler = new CustomerDataHandler(_connString);
+            cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
             LoadCurrentUser();
             LoadCustomers();
             LoadAppointments();
@@ -105,5 +106,25 @@ namespace C969.Forms
             addForm.ShowDialog();
             LoadAppointments();
         }
+
+
+
+        private void cusMgmtSearchAppByCustomer_TextChanged(object sender, EventArgs e)
+        {
+            FilterAppointmentsByCustomerName(cusMgmtSearchAppByCustomer.Text);
+        }
+
+        private void FilterAppointmentsByCustomerName(string customerName)
+        {
+            if (string.IsNullOrWhiteSpace(customerName))
+            {
+                LoadAppointments(); // Reload all if the search box is cleared
+                return;
+            }
+
+            var filteredAppointments = _customerDataHandler.GetAppointmentsByCustomerName(customerName);
+            cusMgmtDgvAppontments.DataSource = filteredAppointments;
+        }
+
     }
 }

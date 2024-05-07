@@ -503,6 +503,11 @@ namespace C969.Controllers
             return customers;
         }
 
+        /// <summary>
+        /// Adds an appointment to the database.
+        /// </summary>
+        /// <param name="appointment"></param>
+        /// <returns></returns>
         public bool AddAppointment(AppointmentDetails appointment)
         {
             using (var conn = new MySqlConnection(_connString))
@@ -531,6 +536,59 @@ namespace C969.Controllers
                     return result > 0;
                 }
             }
+        }
+
+        public List<AppointmentDetails> GetAppointmentsByCustomerName(string customerName)
+        {
+            List<AppointmentDetails> filteredAppointments = new List<AppointmentDetails>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+                SELECT a.* FROM appointment a
+                JOIN customer c ON a.customerId = c.customerId
+                WHERE c.customerName LIKE @customerName";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@customerName", "%" + customerName + "%");
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            filteredAppointments.Add(MapReaderToAppointmentDetails(reader));
+                        }
+                    }
+                }
+            }
+            return filteredAppointments;
+        }
+
+        /// <summary>
+        /// Maps the data from a MySqlDataReader to an AppointmentDetails object.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        private AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader)
+        {
+            return new AppointmentDetails
+            {
+                AppointmentId = reader.GetInt32("appointmentId"),
+                CustomerId = reader.GetInt32("customerId"),
+                UserId = reader.GetInt32("userId"),
+                Title = reader["title"].ToString(),
+                Description = reader["description"].ToString(),
+                Location = reader["location"].ToString(),
+                Contact = reader["contact"].ToString(),
+                Type = reader["type"].ToString(),
+                Url = reader.IsDBNull(reader.GetOrdinal("url")) ? null : reader["url"].ToString(), // Handling nullable fields
+                Start = reader.GetDateTime("start"),
+                End = reader.GetDateTime("end"),
+                CreateDate = reader.GetDateTime("createDate"),
+                CreatedBy = reader["createdBy"].ToString(),
+                LastUpdate = reader.GetDateTime("lastUpdate"),
+                LastUpdateBy = reader["lastUpdateBy"].ToString()
+            };
         }
 
 

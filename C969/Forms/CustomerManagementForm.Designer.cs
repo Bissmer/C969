@@ -40,6 +40,7 @@
             this.cusMgmtEditAppointmentButton = new System.Windows.Forms.Button();
             this.cusMgmtDeleteAppointmentButton = new System.Windows.Forms.Button();
             this.cusMgmtEndSessionButton = new System.Windows.Forms.Button();
+            this.cusMgmtSearchAppByCustomer = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvCustomers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvAppontments)).BeginInit();
             this.SuspendLayout();
@@ -157,11 +158,19 @@
             this.cusMgmtEndSessionButton.UseVisualStyleBackColor = true;
             this.cusMgmtEndSessionButton.Click += new System.EventHandler(this.cusMgmtEndSessionButton_Click);
             // 
+            // cusMgmtSearchAppByCustomer
+            // 
+            this.cusMgmtSearchAppByCustomer.Location = new System.Drawing.Point(697, 430);
+            this.cusMgmtSearchAppByCustomer.Name = "cusMgmtSearchAppByCustomer";
+            this.cusMgmtSearchAppByCustomer.Size = new System.Drawing.Size(238, 20);
+            this.cusMgmtSearchAppByCustomer.TabIndex = 13;
+            // 
             // CustomerManagementForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1080, 807);
+            this.Controls.Add(this.cusMgmtSearchAppByCustomer);
             this.Controls.Add(this.cusMgmtEndSessionButton);
             this.Controls.Add(this.cusMgmtDeleteAppointmentButton);
             this.Controls.Add(this.cusMgmtEditAppointmentButton);
@@ -197,5 +206,6 @@
         private System.Windows.Forms.Button cusMgmtEditAppointmentButton;
         private System.Windows.Forms.Button cusMgmtDeleteAppointmentButton;
         private System.Windows.Forms.Button cusMgmtEndSessionButton;
+        private System.Windows.Forms.TextBox cusMgmtSearchAppByCustomer;
     }
 }
