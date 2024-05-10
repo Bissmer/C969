@@ -52,13 +52,13 @@ namespace C969.Forms
             this.addAppointmentEndTimeLabel = new System.Windows.Forms.Label();
             this.addAppointmentStartTimeCombo = new System.Windows.Forms.ComboBox();
             this.addAppointmentEndTimeCombo = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.addAppointmentCustomerNameLabel = new System.Windows.Forms.Label();
             this.addAppointmentCustomerNameCombo = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.addAppointmentCreatedByLabel = new System.Windows.Forms.Label();
             this.addAppointmentCurrentUserText = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.addAppointmentContactLabel = new System.Windows.Forms.Label();
             this.addAppointmentContactText = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
+            this.addAppointmentUrlLabel = new System.Windows.Forms.Label();
             this.addAppointmentUrlText = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
@@ -235,14 +235,14 @@ namespace C969.Forms
             this.addAppointmentEndTimeCombo.Size = new System.Drawing.Size(171, 21);
             this.addAppointmentEndTimeCombo.TabIndex = 46;
             // 
-            // label1
+            // addAppointmentCustomerNameLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(84, 423);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(82, 13);
-            this.label1.TabIndex = 47;
-            this.label1.Text = "Customer Name";
+            this.addAppointmentCustomerNameLabel.AutoSize = true;
+            this.addAppointmentCustomerNameLabel.Location = new System.Drawing.Point(84, 423);
+            this.addAppointmentCustomerNameLabel.Name = "addAppointmentCustomerNameLabel";
+            this.addAppointmentCustomerNameLabel.Size = new System.Drawing.Size(82, 13);
+            this.addAppointmentCustomerNameLabel.TabIndex = 47;
+            this.addAppointmentCustomerNameLabel.Text = "Customer Name";
             // 
             // addAppointmentCustomerNameCombo
             // 
@@ -252,14 +252,14 @@ namespace C969.Forms
             this.addAppointmentCustomerNameCombo.Size = new System.Drawing.Size(171, 21);
             this.addAppointmentCustomerNameCombo.TabIndex = 48;
             // 
-            // label2
+            // addAppointmentCreatedByLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(84, 456);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(58, 13);
-            this.label2.TabIndex = 49;
-            this.label2.Text = "Created by";
+            this.addAppointmentCreatedByLabel.AutoSize = true;
+            this.addAppointmentCreatedByLabel.Location = new System.Drawing.Point(84, 456);
+            this.addAppointmentCreatedByLabel.Name = "addAppointmentCreatedByLabel";
+            this.addAppointmentCreatedByLabel.Size = new System.Drawing.Size(58, 13);
+            this.addAppointmentCreatedByLabel.TabIndex = 49;
+            this.addAppointmentCreatedByLabel.Text = "Created by";
             // 
             // addAppointmentCurrentUserText
             // 
@@ -268,14 +268,14 @@ namespace C969.Forms
             this.addAppointmentCurrentUserText.Size = new System.Drawing.Size(171, 20);
             this.addAppointmentCurrentUserText.TabIndex = 50;
             // 
-            // label3
+            // addAppointmentContactLabel
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(84, 492);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(44, 13);
-            this.label3.TabIndex = 51;
-            this.label3.Text = "Contact";
+            this.addAppointmentContactLabel.AutoSize = true;
+            this.addAppointmentContactLabel.Location = new System.Drawing.Point(84, 492);
+            this.addAppointmentContactLabel.Name = "addAppointmentContactLabel";
+            this.addAppointmentContactLabel.Size = new System.Drawing.Size(44, 13);
+            this.addAppointmentContactLabel.TabIndex = 51;
+            this.addAppointmentContactLabel.Text = "Contact";
             // 
             // addAppointmentContactText
             // 
@@ -284,14 +284,14 @@ namespace C969.Forms
             this.addAppointmentContactText.Size = new System.Drawing.Size(171, 20);
             this.addAppointmentContactText.TabIndex = 52;
             // 
-            // label4
+            // addAppointmentUrlLabel
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(88, 523);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(20, 13);
-            this.label4.TabIndex = 53;
-            this.label4.Text = "Url";
+            this.addAppointmentUrlLabel.AutoSize = true;
+            this.addAppointmentUrlLabel.Location = new System.Drawing.Point(88, 523);
+            this.addAppointmentUrlLabel.Name = "addAppointmentUrlLabel";
+            this.addAppointmentUrlLabel.Size = new System.Drawing.Size(20, 13);
+            this.addAppointmentUrlLabel.TabIndex = 53;
+            this.addAppointmentUrlLabel.Text = "Url";
             // 
             // addAppointmentUrlText
             // 
@@ -307,13 +307,13 @@ namespace C969.Forms
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(431, 695);
             this.Controls.Add(this.addAppointmentUrlText);
-            this.Controls.Add(this.label4);
+            this.Controls.Add(this.addAppointmentUrlLabel);
             this.Controls.Add(this.addAppointmentContactText);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.addAppointmentContactLabel);
             this.Controls.Add(this.addAppointmentCurrentUserText);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.addAppointmentCreatedByLabel);
             this.Controls.Add(this.addAppointmentCustomerNameCombo);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.addAppointmentCustomerNameLabel);
             this.Controls.Add(this.addAppointmentEndTimeCombo);
             this.Controls.Add(this.addAppointmentStartTimeCombo);
             this.Controls.Add(this.addAppointmentEndTimeLabel);
@@ -362,13 +362,13 @@ namespace C969.Forms
         private Label addAppointmentEndTimeLabel;
         private ComboBox addAppointmentStartTimeCombo;
         private ComboBox addAppointmentEndTimeCombo;
-        private Label label1;
+        private Label addAppointmentCustomerNameLabel;
         private ComboBox addAppointmentCustomerNameCombo;
-        private Label label2;
+        private Label addAppointmentCreatedByLabel;
         private TextBox addAppointmentCurrentUserText;
-        private Label label3;
+        private Label addAppointmentContactLabel;
         private TextBox addAppointmentContactText;
-        private Label label4;
+        private Label addAppointmentUrlLabel;
         private TextBox addAppointmentUrlText;
     }
 }
