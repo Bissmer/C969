@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Common;
@@ -591,7 +592,112 @@ namespace C969.Controllers
             };
         }
 
+        /// <summary>
+        /// Retrieves an appointment by its ID.
+        /// </summary>
+        /// <param name="appointmentId"></param>
+        /// <returns></returns>
+        public AppointmentDetails GetAppointmentById(int appointmentId)
+        {
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open(); 
+                string query = "SELECT * FROM appointment WHERE appointmentId = @appointmentId";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@appointmentId", appointmentId);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return MapReaderToAppointmentDetails(reader);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
 
+        /// <summary>
+        /// Function to update an appointment in the database.
+        /// </summary>
+        /// <param name="appointment"></param>
+        /// <returns></returns>
+        public bool UpdateAppointment(AppointmentDetails appointment)
+        {
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+
+                using (var trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string query = @"
+                        UPDATE appointment
+                        SET
+                        customerId = @customerId, userId = @userId, title = @title, description = @description, location = @location,
+                        contact = @contact, type = @type, url = @url, start = @start, end = @end, lastUpdate = @lastUpdate,lastUpdateBy = @lastUpdateBy
+                        WHERE appointmentId = @appointmentId;";
+
+
+                        using (var cmd = new MySqlCommand(query, conn, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@customerId", appointment.CustomerId);
+                            cmd.Parameters.AddWithValue("@userId", appointment.UserId);
+                            cmd.Parameters.AddWithValue("@title", appointment.Title);
+                            cmd.Parameters.AddWithValue("@description", appointment.Description);
+                            cmd.Parameters.AddWithValue("@location", appointment.Location);
+                            cmd.Parameters.AddWithValue("@contact", appointment.Contact);
+                            cmd.Parameters.AddWithValue("@type", appointment.Type);
+                            cmd.Parameters.AddWithValue("@url", appointment.Url);
+                            cmd.Parameters.AddWithValue("@start", appointment.Start);
+                            cmd.Parameters.AddWithValue("@end", appointment.End);
+                            cmd.Parameters.AddWithValue("@lastUpdate", DateTime.Now);
+                            cmd.Parameters.AddWithValue("@lastUpdateBy", UserSession.CurrentUser);
+                            cmd.Parameters.AddWithValue("@appointmentId", appointment.AppointmentId);
+
+                            Console.WriteLine($"Updating appointment with ID: {appointment.AppointmentId}");
+                            int result = cmd.ExecuteNonQuery();
+                            trans.Commit();
+                            return result > 0;
+                        }
+                    }
+                    catch (MySqlException ex)
+                    {
+                        trans.Rollback();
+                        Console.WriteLine($"An error occurred: {ex.Message}");
+                        return false;
+                    }
+                    finally
+                    {
+                        if (conn.State == System.Data.ConnectionState.Open)
+                        {
+                            conn.Close();
+                        }
+                    }
+                    
+                }
+                    
+            }
+
+            
+        }
+
+        public bool DeleteApppointment(int appontmentId)
+        {
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "DELETE FROM appointment WHERE appointmentId = @appointmentId";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@appointmentId", appontmentId);
+                    int result = cmd.ExecuteNonQuery();
+                    return result > 0;
+                }
+            }
+        }
 
     }
 }

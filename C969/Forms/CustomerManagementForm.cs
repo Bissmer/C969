@@ -22,6 +22,7 @@ namespace C969.Forms
             InitializeComponent();
             _customerDataHandler = new CustomerDataHandler(_connString);
             cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
+            cusMgmtDeleteAppointmentButton.Click += cusMgmtDeleteAppointmentButton_Click;
             LoadCurrentUser();
             LoadCustomers();
             LoadAppointments();
@@ -126,5 +127,44 @@ namespace C969.Forms
             cusMgmtDgvAppontments.DataSource = filteredAppointments;
         }
 
-    }
+        private void cusMgmtEditAppointmentButton_Click(object sender, EventArgs e)
+        {
+            if (cusMgmtDgvAppontments.CurrentRow != null)
+            {
+                int appointmentId = Convert.ToInt32(cusMgmtDgvAppontments.CurrentRow.Cells["AppointmentID"].Value);
+                EditAppointmentForm editForm = new EditAppointmentForm(appointmentId);
+                editForm.ShowDialog();
+                LoadAppointments();
+            }
+        }
+
+        /// <summary>
+        /// Function to delete the selected appointment in the row
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtDeleteAppointmentButton_Click(object sender, EventArgs e)
+        {
+            if (cusMgmtDgvAppontments.SelectedRows.Count > 0)
+            {
+                var result = MessageBox.Show("Are you sure you want to delete the selected appointment?", "Delete Appointment",
+                                       MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    int appointmentId = Convert.ToInt32(cusMgmtDgvAppontments.SelectedRows[0].Cells["AppointmentId"].Value);
+                    if (_customerDataHandler.DeleteApppointment(appointmentId))
+                    {
+                        MessageBox.Show("Appointment deleted successfully.");
+                        LoadAppointments();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to delete the appointment. Please try again.");
+                    }
+                    
+                }
+            }
+        }
+        }
 }
+

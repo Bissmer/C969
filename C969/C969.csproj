@@ -135,11 +135,11 @@
     <Compile Include="Forms\CustomerManagementForm.Designer.cs">
       <DependentUpon>CustomerManagementForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EditAppointment.cs">
+    <Compile Include="Forms\EditAppointmentForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\EditAppointment.Designer.cs">
-      <DependentUpon>EditAppointment.cs</DependentUpon>
+    <Compile Include="Forms\EditAppointmentForm.Designer.cs">
+      <DependentUpon>EditAppointmentForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\EditCustomerForm.cs">
       <SubType>Form</SubType>
@@ -179,8 +179,8 @@
     <EmbeddedResource Include="Forms\CustomerManagementForm.resx">
       <DependentUpon>CustomerManagementForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\EditAppointment.resx">
-      <DependentUpon>EditAppointment.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\EditAppointmentForm.resx">
+      <DependentUpon>EditAppointmentForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EditCustomerForm.resx">
       <DependentUpon>EditCustomerForm.cs</DependentUpon>

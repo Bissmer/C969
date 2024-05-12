@@ -1,6 +1,8 @@
-﻿namespace C969.Forms
+﻿using System;
+
+namespace C969.Forms
 {
-    partial class EditAppointment
+    partial class EditAppointmentForm
     {
         /// <summary>
         /// Required designer variable.
@@ -175,22 +177,21 @@
             this.editAppointmentStartTimeLabel.Text = "Start Time";
             // 
             // editAppointmentStartDatePicker
-            // 
+            //
             this.editAppointmentStartDatePicker.CustomFormat = "MM/dd/yyyy";
             this.editAppointmentStartDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.editAppointmentStartDatePicker.Location = new System.Drawing.Point(180, 269);
-            this.editAppointmentStartDatePicker.MaxDate = new System.DateTime(2025, 5, 5, 11, 56, 2, 101);
-            this.editAppointmentStartDatePicker.MinDate = new System.DateTime(2024, 5, 5, 11, 56, 2, 101);
+            this.editAppointmentStartDatePicker.MinDate = new System.DateTime(2018, 1, 1, 0, 00, 00, 000);
+            this.editAppointmentStartDatePicker.MaxDate = DateTime.Now.AddYears(1);
             this.editAppointmentStartDatePicker.Name = "editAppointmentStartDatePicker";
             this.editAppointmentStartDatePicker.Size = new System.Drawing.Size(171, 20);
             this.editAppointmentStartDatePicker.TabIndex = 67;
-            this.editAppointmentStartDatePicker.Value = new System.DateTime(2024, 5, 5, 11, 56, 2, 101);
             // 
             // editAppointmentFormLabel
             // 
             this.editAppointmentFormLabel.AutoSize = true;
             this.editAppointmentFormLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.editAppointmentFormLabel.Location = new System.Drawing.Point(145, 53);
+            this.editAppointmentFormLabel.Location = new System.Drawing.Point(114, 53);
             this.editAppointmentFormLabel.Name = "editAppointmentFormLabel";
             this.editAppointmentFormLabel.Size = new System.Drawing.Size(205, 25);
             this.editAppointmentFormLabel.TabIndex = 66;
@@ -286,8 +287,9 @@
             this.editAppointmentSaveBtn.TabIndex = 55;
             this.editAppointmentSaveBtn.Text = "Save";
             this.editAppointmentSaveBtn.UseVisualStyleBackColor = true;
+            this.editAppointmentSaveBtn.Click += new System.EventHandler(this.editAppointmentSaveBtn_Click);
             // 
-            // EditAppointment
+            // EditAppointmentForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -319,7 +321,7 @@
             this.Controls.Add(this.editAppointmentTitleText);
             this.Controls.Add(this.editAppointmentCancelBtn);
             this.Controls.Add(this.editAppointmentSaveBtn);
-            this.Name = "EditAppointment";
+            this.Name = "EditAppointmentForm";
             this.Text = "EditAppointment";
             this.ResumeLayout(false);
             this.PerformLayout();

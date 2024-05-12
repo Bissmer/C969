@@ -138,6 +138,7 @@
             this.cusMgmtEditAppointmentButton.TabIndex = 9;
             this.cusMgmtEditAppointmentButton.Text = "Edit Appointment";
             this.cusMgmtEditAppointmentButton.UseVisualStyleBackColor = true;
+            this.cusMgmtEditAppointmentButton.Click += new System.EventHandler(this.cusMgmtEditAppointmentButton_Click);
             // 
             // cusMgmtDeleteAppointmentButton
             // 
@@ -147,6 +148,7 @@
             this.cusMgmtDeleteAppointmentButton.TabIndex = 10;
             this.cusMgmtDeleteAppointmentButton.Text = "Delete Appointment";
             this.cusMgmtDeleteAppointmentButton.UseVisualStyleBackColor = true;
+            this.cusMgmtDeleteAppointmentButton.Click += new System.EventHandler(this.cusMgmtDeleteAppointmentButton_Click);
             // 
             // cusMgmtEndSessionButton
             // 

@@ -176,12 +176,12 @@ namespace C969.Forms
             this.addAppointmentStartDatePicker.CustomFormat = "MM/dd/yyyy";
             this.addAppointmentStartDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.addAppointmentStartDatePicker.Location = new System.Drawing.Point(184, 289);
-            this.addAppointmentStartDatePicker.MaxDate = new System.DateTime(2025, 5, 5, 11, 56, 2, 101);
-            this.addAppointmentStartDatePicker.MinDate = new System.DateTime(2024, 5, 5, 11, 56, 2, 101);
+            this.addAppointmentStartDatePicker.MinDate = DateTime.Now;
+            this.addAppointmentStartDatePicker.MaxDate = DateTime.Now.AddYears(1);
             this.addAppointmentStartDatePicker.Name = "addAppointmentStartDatePicker";
             this.addAppointmentStartDatePicker.Size = new System.Drawing.Size(171, 20);
             this.addAppointmentStartDatePicker.TabIndex = 39;
-            this.addAppointmentStartDatePicker.Value = new System.DateTime(2024, 5, 5, 11, 56, 2, 101);
+            
             // 
             // addAppointmentStartTimeLabel
             // 
