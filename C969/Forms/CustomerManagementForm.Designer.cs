@@ -1,4 +1,6 @@
-﻿namespace C969.Forms
+﻿using System.Windows.Forms;
+
+namespace C969.Forms
 {
     partial class CustomerManagementForm
     {
@@ -41,6 +43,8 @@
             this.cusMgmtDeleteAppointmentButton = new System.Windows.Forms.Button();
             this.cusMgmtEndSessionButton = new System.Windows.Forms.Button();
             this.cusMgmtSearchAppByCustomer = new System.Windows.Forms.TextBox();
+            this.cusMgmtAppointmentsCalendar = new System.Windows.Forms.MonthCalendar();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvCustomers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvAppontments)).BeginInit();
             this.SuspendLayout();
@@ -86,7 +90,7 @@
             // cusMgmCurrentUserlbl
             // 
             this.cusMgmCurrentUserlbl.AutoSize = true;
-            this.cusMgmCurrentUserlbl.Location = new System.Drawing.Point(815, 25);
+            this.cusMgmCurrentUserlbl.Location = new System.Drawing.Point(815, 17);
             this.cusMgmCurrentUserlbl.Name = "cusMgmCurrentUserlbl";
             this.cusMgmCurrentUserlbl.Size = new System.Drawing.Size(35, 13);
             this.cusMgmCurrentUserlbl.TabIndex = 4;
@@ -152,9 +156,9 @@
             // 
             // cusMgmtEndSessionButton
             // 
-            this.cusMgmtEndSessionButton.Location = new System.Drawing.Point(983, 20);
+            this.cusMgmtEndSessionButton.Location = new System.Drawing.Point(1091, 755);
             this.cusMgmtEndSessionButton.Name = "cusMgmtEndSessionButton";
-            this.cusMgmtEndSessionButton.Size = new System.Drawing.Size(75, 23);
+            this.cusMgmtEndSessionButton.Size = new System.Drawing.Size(96, 40);
             this.cusMgmtEndSessionButton.TabIndex = 11;
             this.cusMgmtEndSessionButton.Text = "End Session";
             this.cusMgmtEndSessionButton.UseVisualStyleBackColor = true;
@@ -167,11 +171,32 @@
             this.cusMgmtSearchAppByCustomer.Size = new System.Drawing.Size(238, 20);
             this.cusMgmtSearchAppByCustomer.TabIndex = 13;
             // 
+            // cusMgmtAppointmentsCalendar
+            // 
+            this.cusMgmtAppointmentsCalendar.Location = new System.Drawing.Point(960, 492);
+            this.cusMgmtAppointmentsCalendar.MaxSelectionCount = 1;
+            this.cusMgmtAppointmentsCalendar.MinDate = new System.DateTime(2018, 12, 1, 0, 0, 0, 0);
+            this.cusMgmtAppointmentsCalendar.Name = "cusMgmtAppointmentsCalendar";
+            this.cusMgmtAppointmentsCalendar.TabIndex = 14;
+            // 
+            // label1
+            // 
+            this.label1.AutoEllipsis = true;
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(960, 456);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(224, 20);
+            this.label1.TabIndex = 15;
+            this.label1.Text = "Appointments calendar lookup";
+            // 
             // CustomerManagementForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1080, 807);
+            this.ClientSize = new System.Drawing.Size(1222, 807);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.cusMgmtAppointmentsCalendar);
             this.Controls.Add(this.cusMgmtSearchAppByCustomer);
             this.Controls.Add(this.cusMgmtEndSessionButton);
             this.Controls.Add(this.cusMgmtDeleteAppointmentButton);
@@ -209,5 +234,7 @@
         private System.Windows.Forms.Button cusMgmtDeleteAppointmentButton;
         private System.Windows.Forms.Button cusMgmtEndSessionButton;
         private System.Windows.Forms.TextBox cusMgmtSearchAppByCustomer;
+        private System.Windows.Forms.MonthCalendar cusMgmtAppointmentsCalendar;
+        private System.Windows.Forms.Label label1;
     }
 }

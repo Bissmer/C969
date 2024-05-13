@@ -90,6 +90,8 @@ namespace C969.Forms
                 editAppointmentLocationText.Text = appointment.Location;
                 editAppointmentContactText.Text = appointment.Contact;
                 SetupTimeComboBoxes(appointment.Start, appointment.End);
+                editAppointmentStartDatePicker.Value = appointment.Start;
+                editAppointmentEndDatePicker.Value = appointment.End;
                 editAppointmentCustomerNameCombo.SelectedValue = appointment.CustomerId;
                 editAppointmentUrlText.Text = appointment.Url;
                 editAppointmentCurrentUserText.Text = appointment.CreatedBy;

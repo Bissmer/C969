@@ -23,6 +23,8 @@ namespace C969.Forms
             _customerDataHandler = new CustomerDataHandler(_connString);
             cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
             cusMgmtDeleteAppointmentButton.Click += cusMgmtDeleteAppointmentButton_Click;
+            cusMgmtAppointmentsCalendar.DateChanged += cusMgmtAppointmentsCalendar_DateChanged;
+            LoadAppointmentsForSelectedDate(cusMgmtAppointmentsCalendar.SelectionStart); // Load appointments for the selected date
             LoadCurrentUser();
             LoadCustomers();
             LoadAppointments();
@@ -79,15 +81,14 @@ namespace C969.Forms
         {
             if (!string.IsNullOrEmpty(Models.UserSession.CurrentUser))
             {
-                cusMgmCurrentUserlbl.Text = $"Logged user: {Models.UserSession.CurrentUser}";
+                cusMgmCurrentUserlbl.Text = $"Welcome back, {Models.UserSession.CurrentUser}.";
             }
             else
             {
-                cusMgmCurrentUserlbl.Text = "Unknown";
+                cusMgmCurrentUserlbl.Text = "Unknown user";
             }
         }
 
-    
 
         /// <summary>
         /// Function to load all customers and refresh the Customers data grid view
@@ -177,6 +178,18 @@ namespace C969.Forms
                 }
             }
         }
+
+        private void LoadAppointmentsForSelectedDate(DateTime selectedDate)
+        {
+            // Assuming _dataHandler is your database access object
+            var appointments = _customerDataHandler.GetAppointmentsByDate(selectedDate);
+            cusMgmtDgvAppontments.DataSource = appointments;
         }
+
+        private void cusMgmtAppointmentsCalendar_DateChanged(object sender, DateRangeEventArgs e)
+        {
+            LoadAppointmentsForSelectedDate(e.Start);
+        }
+    }
 }
 

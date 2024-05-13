@@ -684,6 +684,11 @@ namespace C969.Controllers
             
         }
 
+        /// <summary>
+        /// Function to delete an appointment from the database.
+        /// </summary>
+        /// <param name="appontmentId"></param>
+        /// <returns></returns>
         public bool DeleteApppointment(int appontmentId)
         {
             using (var conn = new MySqlConnection(_connString))
@@ -697,6 +702,32 @@ namespace C969.Controllers
                     return result > 0;
                 }
             }
+        }
+
+        public List<AppointmentDetails> GetAppointmentsByDate(DateTime date)
+        {
+            List<AppointmentDetails> appointments = new List<AppointmentDetails>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+                SELECT appointmentId, customerId, userId, title, description, location, contact, type, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy
+                FROM appointment
+                WHERE DATE(start) = @Date"; 
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            appointments.Add(MapReaderToAppointmentDetails(reader));
+                        }
+                    }
+                }
+            }
+            return appointments;
         }
 
     }
