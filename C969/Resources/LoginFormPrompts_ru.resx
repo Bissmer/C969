@@ -141,6 +141,12 @@
   <data name="loginUsernameLabel" xml:space="preserve">
     <value>Юзернейм</value>
   </data>
+  <data name="QuitMessage" xml:space="preserve">
+    <value>Вы уверены что хотите выйти из приложения?</value>
+  </data>
+  <data name="QuitTitle" xml:space="preserve">
+    <value>Выход из приложения</value>
+  </data>
   <data name="UsernamePwdEmptyMessage" xml:space="preserve">
     <value>Юзернейм и пароль не могут быть пустыми.</value>
   </data>

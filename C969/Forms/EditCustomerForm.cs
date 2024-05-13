@@ -117,7 +117,12 @@ namespace C969.Forms
 
         private void editCustomerCancelBtn_Click(object sender, EventArgs e)
         {
-            this.Close();
+            DialogResult result = MessageBox.Show("Are you sure you want to cancel editing the customer and exit without save?", "Cancel Edit",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                this.Close();
+            }
         }
     }
 }

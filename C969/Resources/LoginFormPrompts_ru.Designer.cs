@@ -133,6 +133,24 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Вы уверены что хотите выйти из приложения?.
+        /// </summary>
+        internal static string QuitMessage {
+            get {
+                return ResourceManager.GetString("QuitMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Выход из приложения.
+        /// </summary>
+        internal static string QuitTitle {
+            get {
+                return ResourceManager.GetString("QuitTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Юзернейм и пароль не могут быть пустыми..
         /// </summary>
         internal static string UsernamePwdEmptyMessage {

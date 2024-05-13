@@ -144,6 +144,12 @@
   <data name="loginUsernameLabel" xml:space="preserve">
     <value>Username</value>
   </data>
+  <data name="QuitMessage" xml:space="preserve">
+    <value>Are you sure you want to quit the application?</value>
+  </data>
+  <data name="QuitTitle" xml:space="preserve">
+    <value>Quit the application</value>
+  </data>
   <data name="UsernamePwdEmptyMessage" xml:space="preserve">
     <value>Username and password cannot be empty.</value>
   </data>

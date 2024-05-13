@@ -78,6 +78,7 @@
             this.loginQuitButton.TabIndex = 4;
             this.loginQuitButton.Text = "Quit";
             this.loginQuitButton.UseVisualStyleBackColor = true;
+            this.loginQuitButton.Click += new System.EventHandler(this.loginQuitButton_Click);
             // 
             // loginUsernameLabel
             // 

@@ -199,5 +199,15 @@ namespace C969.Forms
         {
             SaveAppointment();
         }
+
+        private void addAppointmentCancelBtn_Click(object sender, EventArgs e)
+        {
+           DialogResult result = MessageBox.Show("Are you sure you want to cancel adding the appointment?", "Cancel Appointment",
+                              MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+           if (result == DialogResult.Yes)
+           {
+                this.Close();
+           }
+        }
     }
 }

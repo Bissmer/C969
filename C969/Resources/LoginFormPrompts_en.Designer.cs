@@ -142,6 +142,24 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to quit the application?.
+        /// </summary>
+        public static string QuitMessage {
+            get {
+                return ResourceManager.GetString("QuitMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quit the application.
+        /// </summary>
+        public static string QuitTitle {
+            get {
+                return ResourceManager.GetString("QuitTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Username and password cannot be empty..
         /// </summary>
         public static string UsernamePwdEmptyMessage {

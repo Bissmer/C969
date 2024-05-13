@@ -96,5 +96,14 @@ namespace C969
             }
 
         }
+
+        private void loginQuitButton_Click(object sender, EventArgs e)
+        {
+            DialogResult dialogResult = MessageBox.Show(_rm.GetString("QuitMessage", currentCulture), _rm.GetString("QuitTitle", currentCulture), MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+        }
     }
 }

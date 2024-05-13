@@ -93,7 +93,13 @@ namespace C969.Forms
 
         private void addCustomerCancelBtn_Click(object sender, EventArgs e)
         {
-            this.Close();
+            
+            DialogResult result = MessageBox.Show("Are you sure you want to cancel adding the customer?", "Cancel Add",
+                                              MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                this.Close();
+            }
         }
     }
 }
