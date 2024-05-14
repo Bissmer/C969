@@ -25,6 +25,8 @@ namespace C969.Forms
             cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
             cusMgmtDeleteAppointmentButton.Click += cusMgmtDeleteAppointmentButton_Click;
             cusMgmtAppointmentsCalendar.DateChanged += cusMgmtAppointmentsCalendar_DateChanged;
+            cusMgmtSearchAppByCustomer.Enter += cusMgmtSearchAppByCustomer_Enter;
+            cusMgmtSearchAppByCustomer.Leave += cusMgmtSearchAppByCustomer_Leave;
             LoadAppointmentsForSelectedDate(cusMgmtAppointmentsCalendar.SelectionStart); // Load appointments for the selected date
             LoadCurrentUser();
             LoadCustomers();
@@ -250,6 +252,26 @@ namespace C969.Forms
         {
             BoldAppointmentDates();
             cusMgmtAppointmentsCalendar.UpdateBoldedDates();  // Refreshes the calendar display
+        }
+
+        private void cusMgmtSearchAppByCustomer_Enter(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (textBox.Text == "Search by Customer Name")
+            {
+                textBox.Text = "";
+                textBox.ForeColor = Color.Black;
+            }
+        }
+
+        private void cusMgmtSearchAppByCustomer_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                textBox.Text = "Search by Customer Name";
+                textBox.ForeColor = Color.Gray;
+            }
         }
     }
 }

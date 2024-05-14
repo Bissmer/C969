@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Drawing;
+using System.Windows.Forms;
 
 namespace C969.Forms
 {
@@ -170,6 +171,8 @@ namespace C969.Forms
             this.cusMgmtSearchAppByCustomer.Name = "cusMgmtSearchAppByCustomer";
             this.cusMgmtSearchAppByCustomer.Size = new System.Drawing.Size(238, 20);
             this.cusMgmtSearchAppByCustomer.TabIndex = 13;
+            this.cusMgmtSearchAppByCustomer.Text = "Search by Customer Name";
+            this.cusMgmtSearchAppByCustomer.ForeColor = Color.Gray;
             // 
             // cusMgmtAppointmentsCalendar
             // 
