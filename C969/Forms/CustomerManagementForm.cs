@@ -14,6 +14,7 @@ namespace C969.Forms
 {
     public partial class CustomerManagementForm : Form
     {
+        private bool isProgrammaticallyAdjusting = false; // Flag to prevent infinite loop when adjusting the calendar date
         private CustomerDataHandler _customerDataHandler;
         private string _currentUser = Models.UserSession.CurrentUser;
         private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
@@ -28,9 +29,11 @@ namespace C969.Forms
             LoadCurrentUser();
             LoadCustomers();
             LoadAppointments();
+            UpdateCalendarHighlights();
 
 
         }
+
 
         private void cusMgmtAddCustomerButton_Click(object sender, EventArgs e)
         {
@@ -179,6 +182,10 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Function to load appointments for the selected date
+        /// </summary>
+        /// <param name="selectedDate"></param>
         private void LoadAppointmentsForSelectedDate(DateTime selectedDate)
         {
             // Assuming _dataHandler is your database access object
@@ -186,9 +193,63 @@ namespace C969.Forms
             cusMgmtDgvAppontments.DataSource = appointments;
         }
 
+        /// <summary>
+        /// Function to handle the date change event on the calendar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtAppointmentsCalendar_DateChanged(object sender, DateRangeEventArgs e)
         {
-            LoadAppointmentsForSelectedDate(e.Start);
+            {
+                // Prevent infinite loop when adjusting the calendar date
+                if (isProgrammaticallyAdjusting)
+                    return;
+                // If the selected date is a weekend, adjust it to the next weekday
+                if (e.Start.DayOfWeek == DayOfWeek.Saturday || e.Start.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    isProgrammaticallyAdjusting = true;
+                    DateTime nextWeekday = FindNextWeekday(e.Start);
+                    cusMgmtAppointmentsCalendar.SelectionStart = nextWeekday;
+                    cusMgmtAppointmentsCalendar.SelectionEnd = nextWeekday;
+                    isProgrammaticallyAdjusting = false;
+                }
+
+                // Load appointments for the selected date
+                LoadAppointmentsForSelectedDate(cusMgmtAppointmentsCalendar.SelectionStart);
+            }
+        }
+
+        /// <summary>
+        /// Function to find the next weekday
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <returns></returns>
+        private DateTime FindNextWeekday(DateTime startDate)
+        {
+            DateTime nextDate = startDate;
+            while (nextDate.DayOfWeek == DayOfWeek.Saturday || nextDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                nextDate = nextDate.AddDays(1);
+            }
+            return nextDate;
+        }
+
+        /// <summary>
+        /// Function to bold the dates on the calendar that have appointments
+        /// </summary>
+        private void BoldAppointmentDates()
+        {
+            List<DateTime> datesWithAppointments = _customerDataHandler.GetDatesWithAppointments(); // Fetch or calculate these dates
+            cusMgmtAppointmentsCalendar.BoldedDates = datesWithAppointments.ToArray();
+        }
+
+        /// <summary>
+        /// Function to update the calendar highlights
+        /// </summary>
+        private void UpdateCalendarHighlights()
+        {
+            BoldAppointmentDates();
+            cusMgmtAppointmentsCalendar.UpdateBoldedDates();  // Refreshes the calendar display
         }
     }
 }

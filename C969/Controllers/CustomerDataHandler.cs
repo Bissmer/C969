@@ -704,6 +704,11 @@ namespace C969.Controllers
             }
         }
 
+        /// <summary>
+        /// Function to retrieve appointments by date.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
         public List<AppointmentDetails> GetAppointmentsByDate(DateTime date)
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
@@ -728,6 +733,27 @@ namespace C969.Controllers
                 }
             }
             return appointments;
+        }
+
+        public List<DateTime> GetDatesWithAppointments()
+        {
+            List<DateTime> dates = new List<DateTime>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT DISTINCT DATE(start) AS AppointmentDate FROM appointment";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dates.Add(reader.GetDateTime("AppointmentDate"));
+                        }
+                    }
+                }
+            }
+            return dates;
         }
 
     }
