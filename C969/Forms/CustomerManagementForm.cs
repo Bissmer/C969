@@ -77,6 +77,8 @@ namespace C969.Forms
             var addForm = new AddAppointmentForm();
             addForm.ShowDialog();
             LoadAppointments();
+            UpdateCalendarHighlights();
+
         }
 
         /// <summary>
@@ -158,6 +160,7 @@ namespace C969.Forms
                 EditAppointmentForm editForm = new EditAppointmentForm(appointmentId);
                 editForm.ShowDialog();
                 LoadAppointments();
+                UpdateCalendarHighlights();
             }
         }
 
@@ -174,6 +177,7 @@ namespace C969.Forms
                     {
                         MessageBox.Show("Appointment deleted successfully.");
                         LoadAppointments();
+                        UpdateCalendarHighlights();
                     }
                     else
                     {

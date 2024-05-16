@@ -437,6 +437,8 @@ namespace C969.Controllers
         public List<AppointmentDetails> GetAllAppointments()
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
@@ -451,6 +453,14 @@ namespace C969.Controllers
                     {
                         while (reader.Read())
                         {
+                            //// Convert the UTC start and end times to local time
+                            DateTime utcStart = reader.GetDateTime("start");
+                            DateTime utcEnd = reader.GetDateTime("end");
+                            DateTime utcCreateDate = reader.GetDateTime("createDate");
+                            DateTime utcLastUpdate = reader.GetDateTime("lastUpdate");
+                            DateTime localStart = TimeZoneInfo.ConvertTimeFromUtc(utcStart, userTimeZone);
+                            DateTime localEnd = TimeZoneInfo.ConvertTimeFromUtc(utcEnd, userTimeZone);
+
                             appointments.Add(new AppointmentDetails
                             {
                                 AppointmentId = reader.GetInt32("appointmentId"),
@@ -462,11 +472,11 @@ namespace C969.Controllers
                                 Contact = reader.GetString("contact"),
                                 Type = reader.GetString("type"),
                                 Url = reader.GetString("url"),
-                                Start = reader.GetDateTime("start"),
-                                End = reader.GetDateTime("end"),
-                                CreateDate = reader.GetDateTime("createDate"),
+                                Start = localStart,
+                                End = localEnd,
+                                CreateDate = utcCreateDate,
                                 CreatedBy = reader.GetString("createdBy"),
-                                LastUpdate = reader.GetDateTime("lastUpdate"),
+                                LastUpdate = utcLastUpdate,
                                 LastUpdateBy = reader.GetString("lastUpdateBy")
                             });
                         }
@@ -511,6 +521,14 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool AddAppointment(AppointmentDetails appointment)
         {
+            // Convert the appointment start and end times to UTC
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+            DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(appointment.Start, userTimeZone);
+            DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(appointment.End, userTimeZone);
+            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now, userTimeZone);
+
+
+
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
@@ -528,10 +546,10 @@ namespace C969.Controllers
                     cmd.Parameters.AddWithValue("@Contact", appointment.Contact);
                     cmd.Parameters.AddWithValue("@Type", appointment.Type);
                     cmd.Parameters.AddWithValue("@Url", appointment.Url);
-                    cmd.Parameters.AddWithValue("@Start", appointment.Start);
-                    cmd.Parameters.AddWithValue("@End", appointment.End);
+                    cmd.Parameters.AddWithValue("@Start", utcStart);
+                    cmd.Parameters.AddWithValue("@End", utcEnd);
                     cmd.Parameters.AddWithValue("@CreatedBy", appointment.CreatedBy);
-                    cmd.Parameters.AddWithValue("@CreateDate", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@CreateDate", utcNow);
                     cmd.Parameters.AddWithValue("@LastUpdateBy", UserSession.CurrentUser);
                     int result = cmd.ExecuteNonQuery();
                     return result > 0;
@@ -542,6 +560,8 @@ namespace C969.Controllers
         public List<AppointmentDetails> GetAppointmentsByCustomerName(string customerName)
         {
             List<AppointmentDetails> filteredAppointments = new List<AppointmentDetails>();
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
@@ -557,7 +577,7 @@ namespace C969.Controllers
                     {
                         while (reader.Read())
                         {
-                            filteredAppointments.Add(MapReaderToAppointmentDetails(reader));
+                            filteredAppointments.Add(MapReaderToAppointmentDetails(reader, userTimeZone));
                         }
                     }
                 }
@@ -570,8 +590,16 @@ namespace C969.Controllers
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        private AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader)
+        private AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader, TimeZoneInfo userTimeZone )
         {
+
+            DateTime utcStart = reader.GetDateTime("start");
+            DateTime utcEnd = reader.GetDateTime("end");
+            DateTime localStart = TimeZoneInfo.ConvertTimeFromUtc(utcStart, userTimeZone);
+            DateTime localEnd = TimeZoneInfo.ConvertTimeFromUtc(utcEnd, userTimeZone);
+            DateTime utcCreateDate = TimeZoneInfo.ConvertTimeToUtc(reader.GetDateTime("createDate"), userTimeZone);
+            DateTime utcLastUpdate = TimeZoneInfo.ConvertTimeToUtc(reader.GetDateTime("lastUpdate"), userTimeZone);
+
             return new AppointmentDetails
             {
                 AppointmentId = reader.GetInt32("appointmentId"),
@@ -583,11 +611,11 @@ namespace C969.Controllers
                 Contact = reader["contact"].ToString(),
                 Type = reader["type"].ToString(),
                 Url = reader.IsDBNull(reader.GetOrdinal("url")) ? null : reader["url"].ToString(), // Handling nullable fields
-                Start = reader.GetDateTime("start"),
-                End = reader.GetDateTime("end"),
-                CreateDate = reader.GetDateTime("createDate"),
+                Start = localStart,
+                End = localEnd,
+                CreateDate = utcCreateDate,
                 CreatedBy = reader["createdBy"].ToString(),
-                LastUpdate = reader.GetDateTime("lastUpdate"),
+                LastUpdate = utcLastUpdate,
                 LastUpdateBy = reader["lastUpdateBy"].ToString()
             };
         }
@@ -599,6 +627,8 @@ namespace C969.Controllers
         /// <returns></returns>
         public AppointmentDetails GetAppointmentById(int appointmentId)
         {
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open(); 
@@ -610,7 +640,7 @@ namespace C969.Controllers
                     {
                         if (reader.Read())
                         {
-                            return MapReaderToAppointmentDetails(reader);
+                            return MapReaderToAppointmentDetails(reader, userTimeZone);
                         }
                     }
                 }
@@ -712,22 +742,33 @@ namespace C969.Controllers
         public List<AppointmentDetails> GetAppointmentsByDate(DateTime date)
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
+            // Convert the local date to the start and end of the day in UTC
+            DateTime startOfLocalDay = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Local);
+            DateTime endOfLocalDay = startOfLocalDay.AddDays(1).AddTicks(-1);
+
+            DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(startOfLocalDay, userTimeZone);
+            DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(endOfLocalDay, userTimeZone);
+
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
                 string query = @"
                 SELECT appointmentId, customerId, userId, title, description, location, contact, type, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy
                 FROM appointment
-                WHERE DATE(start) = @Date"; 
+                WHERE start >= @UtcStart AND start <= @UtcEnd"; 
 
                 using (var cmd = new MySqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd"));
+
+                    cmd.Parameters.AddWithValue("@UtcStart", utcStart);
+                    cmd.Parameters.AddWithValue("@UtcEnd", utcEnd);
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            appointments.Add(MapReaderToAppointmentDetails(reader));
+                            appointments.Add(MapReaderToAppointmentDetails(reader, userTimeZone));
                         }
                     }
                 }

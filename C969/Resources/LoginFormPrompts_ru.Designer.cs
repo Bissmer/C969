@@ -124,6 +124,15 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Местный Часовой Пояс:.
+        /// </summary>
+        internal static string loginTimeZoneLabel {
+            get {
+                return ResourceManager.GetString("loginTimeZoneLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Юзернейм.
         /// </summary>
         internal static string loginUsernameLabel {

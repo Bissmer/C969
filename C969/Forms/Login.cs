@@ -25,6 +25,7 @@ namespace C969
             
             InitializeComponent();
             SetLanguage(CultureInfo.CurrentCulture);
+            InitializeTimeZoneLabel();
 
         }
 
@@ -104,6 +105,17 @@ namespace C969
             {
                 Application.Exit();
             }
+        }
+
+        private void InitializeTimeZoneLabel()
+        {
+            loginTimeZoneLabel.Text = _rm.GetString("loginTimeZoneLabel", currentCulture);
+            // Get the current time zone of the user's system
+            TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
+
+            // Set the label to show the display name of the time zone
+            loginTimeZoneText.Text = $"{localTimeZone.DisplayName}";
+
         }
     }
 }

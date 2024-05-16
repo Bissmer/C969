@@ -35,6 +35,8 @@
             this.loginQuitButton = new System.Windows.Forms.Button();
             this.loginUsernameLabel = new System.Windows.Forms.Label();
             this.loginPasswordLabel = new System.Windows.Forms.Label();
+            this.loginTimeZoneLabel = new System.Windows.Forms.Label();
+            this.loginTimeZoneText = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // loginHeaderLabel
@@ -62,7 +64,7 @@
             // 
             // loginLoginButton
             // 
-            this.loginLoginButton.Location = new System.Drawing.Point(162, 233);
+            this.loginLoginButton.Location = new System.Drawing.Point(151, 236);
             this.loginLoginButton.Name = "loginLoginButton";
             this.loginLoginButton.Size = new System.Drawing.Size(75, 23);
             this.loginLoginButton.TabIndex = 3;
@@ -72,7 +74,7 @@
             // 
             // loginQuitButton
             // 
-            this.loginQuitButton.Location = new System.Drawing.Point(162, 272);
+            this.loginQuitButton.Location = new System.Drawing.Point(151, 275);
             this.loginQuitButton.Name = "loginQuitButton";
             this.loginQuitButton.Size = new System.Drawing.Size(75, 23);
             this.loginQuitButton.TabIndex = 4;
@@ -98,11 +100,31 @@
             this.loginPasswordLabel.TabIndex = 6;
             this.loginPasswordLabel.Text = "Password";
             // 
+            // loginTimeZoneLabel
+            // 
+            this.loginTimeZoneLabel.AutoSize = true;
+            this.loginTimeZoneLabel.Location = new System.Drawing.Point(12, 9);
+            this.loginTimeZoneLabel.Name = "loginTimeZoneLabel";
+            this.loginTimeZoneLabel.Size = new System.Drawing.Size(87, 13);
+            this.loginTimeZoneLabel.TabIndex = 7;
+            this.loginTimeZoneLabel.Text = "Local Time Zone";
+            // 
+            // loginTimeZoneText
+            // 
+            this.loginTimeZoneText.AutoSize = true;
+            this.loginTimeZoneText.Location = new System.Drawing.Point(12, 31);
+            this.loginTimeZoneText.Name = "loginTimeZoneText";
+            this.loginTimeZoneText.Size = new System.Drawing.Size(35, 13);
+            this.loginTimeZoneText.TabIndex = 8;
+            this.loginTimeZoneText.Text = "label1";
+            // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(405, 433);
+            this.Controls.Add(this.loginTimeZoneText);
+            this.Controls.Add(this.loginTimeZoneLabel);
             this.Controls.Add(this.loginPasswordLabel);
             this.Controls.Add(this.loginUsernameLabel);
             this.Controls.Add(this.loginQuitButton);
@@ -126,6 +148,8 @@
         private System.Windows.Forms.Button loginQuitButton;
         private System.Windows.Forms.Label loginUsernameLabel;
         private System.Windows.Forms.Label loginPasswordLabel;
+        private System.Windows.Forms.Label loginTimeZoneLabel;
+        private System.Windows.Forms.Label loginTimeZoneText;
     }
 }
 

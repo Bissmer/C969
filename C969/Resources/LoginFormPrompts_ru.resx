@@ -138,6 +138,9 @@
   <data name="LoginSuccessMessage" xml:space="preserve">
     <value>Вход выполнен успешно.</value>
   </data>
+  <data name="loginTimeZoneLabel" xml:space="preserve">
+    <value>Местный Часовой Пояс:</value>
+  </data>
   <data name="loginUsernameLabel" xml:space="preserve">
     <value>Юзернейм</value>
   </data>

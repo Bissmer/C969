@@ -14,11 +14,13 @@ namespace C969.Models
     {
         public static int UserId { get; private set; }
         public static string CurrentUser { get; private set; }
+        public static TimeZoneInfo CurrentTimeZone { get; private set; }
 
         public static void Login(int userId, string userName)
         {
             UserId = userId;
             CurrentUser = userName;
+            CurrentTimeZone = TimeZoneInfo.Local; // Initialize time zone during login
         }
 
         /// <summary>
@@ -28,6 +30,8 @@ namespace C969.Models
         {
             UserId = 0;
             CurrentUser = string.Empty;
+            CurrentTimeZone = null; // Clear time zone during logout
         }
+
     }
 }

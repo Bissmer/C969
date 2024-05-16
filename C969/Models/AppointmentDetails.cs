@@ -24,5 +24,9 @@ namespace C969.Models
         public DateTime LastUpdate { get; set; }
         public string LastUpdateBy { get; set; }
 
+        // Localized properties for Start and End Dates
+        public DateTime LocalStartDate { get; set;}
+        public DateTime LocalEndDate { get; set;}
+
     }
 }

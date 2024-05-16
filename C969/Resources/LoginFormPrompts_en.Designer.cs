@@ -133,6 +133,15 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Local Time Zone:.
+        /// </summary>
+        public static string loginTimeZoneLabel {
+            get {
+                return ResourceManager.GetString("loginTimeZoneLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Username.
         /// </summary>
         public static string loginUsernameLabel {
