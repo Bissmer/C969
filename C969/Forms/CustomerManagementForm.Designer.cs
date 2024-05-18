@@ -46,6 +46,7 @@ namespace C969.Forms
             this.cusMgmtSearchAppByCustomer = new System.Windows.Forms.TextBox();
             this.cusMgmtAppointmentsCalendar = new System.Windows.Forms.MonthCalendar();
             this.label1 = new System.Windows.Forms.Label();
+            this.cusMgmtShowAllAppts = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvCustomers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvAppontments)).BeginInit();
             this.SuspendLayout();
@@ -85,6 +86,7 @@ namespace C969.Forms
             this.cusMgmtDgvCustomers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.cusMgmtDgvCustomers.Location = new System.Drawing.Point(12, 94);
             this.cusMgmtDgvCustomers.Name = "cusMgmtDgvCustomers";
+            this.cusMgmtDgvCustomers.ReadOnly = true;
             this.cusMgmtDgvCustomers.Size = new System.Drawing.Size(923, 226);
             this.cusMgmtDgvCustomers.TabIndex = 3;
             // 
@@ -122,6 +124,7 @@ namespace C969.Forms
             this.cusMgmtDgvAppontments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.cusMgmtDgvAppontments.Location = new System.Drawing.Point(12, 456);
             this.cusMgmtDgvAppontments.Name = "cusMgmtDgvAppontments";
+            this.cusMgmtDgvAppontments.ReadOnly = true;
             this.cusMgmtDgvAppontments.Size = new System.Drawing.Size(923, 226);
             this.cusMgmtDgvAppontments.TabIndex = 7;
             // 
@@ -157,7 +160,7 @@ namespace C969.Forms
             // 
             // cusMgmtEndSessionButton
             // 
-            this.cusMgmtEndSessionButton.Location = new System.Drawing.Point(1091, 755);
+            this.cusMgmtEndSessionButton.Location = new System.Drawing.Point(964, 10);
             this.cusMgmtEndSessionButton.Name = "cusMgmtEndSessionButton";
             this.cusMgmtEndSessionButton.Size = new System.Drawing.Size(96, 40);
             this.cusMgmtEndSessionButton.TabIndex = 11;
@@ -167,16 +170,16 @@ namespace C969.Forms
             // 
             // cusMgmtSearchAppByCustomer
             // 
+            this.cusMgmtSearchAppByCustomer.ForeColor = System.Drawing.Color.Gray;
             this.cusMgmtSearchAppByCustomer.Location = new System.Drawing.Point(697, 430);
             this.cusMgmtSearchAppByCustomer.Name = "cusMgmtSearchAppByCustomer";
             this.cusMgmtSearchAppByCustomer.Size = new System.Drawing.Size(238, 20);
             this.cusMgmtSearchAppByCustomer.TabIndex = 13;
             this.cusMgmtSearchAppByCustomer.Text = "Search by Customer Name";
-            this.cusMgmtSearchAppByCustomer.ForeColor = Color.Gray;
             // 
             // cusMgmtAppointmentsCalendar
             // 
-            this.cusMgmtAppointmentsCalendar.Location = new System.Drawing.Point(960, 492);
+            this.cusMgmtAppointmentsCalendar.Location = new System.Drawing.Point(960, 467);
             this.cusMgmtAppointmentsCalendar.MaxSelectionCount = 1;
             this.cusMgmtAppointmentsCalendar.MinDate = new System.DateTime(2018, 12, 1, 0, 0, 0, 0);
             this.cusMgmtAppointmentsCalendar.Name = "cusMgmtAppointmentsCalendar";
@@ -187,17 +190,28 @@ namespace C969.Forms
             this.label1.AutoEllipsis = true;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(960, 456);
+            this.label1.Location = new System.Drawing.Point(960, 431);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(224, 20);
             this.label1.TabIndex = 15;
             this.label1.Text = "Appointments calendar lookup";
+            // 
+            // cusMgmtShowAllAppts
+            // 
+            this.cusMgmtShowAllAppts.Location = new System.Drawing.Point(1004, 641);
+            this.cusMgmtShowAllAppts.Name = "cusMgmtShowAllAppts";
+            this.cusMgmtShowAllAppts.Size = new System.Drawing.Size(146, 23);
+            this.cusMgmtShowAllAppts.TabIndex = 16;
+            this.cusMgmtShowAllAppts.Text = "Show All Appointments";
+            this.cusMgmtShowAllAppts.UseVisualStyleBackColor = true;
+            this.cusMgmtShowAllAppts.Click += new System.EventHandler(this.cusMgmtShowAllAppts_Click);
             // 
             // CustomerManagementForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1222, 807);
+            this.Controls.Add(this.cusMgmtShowAllAppts);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cusMgmtAppointmentsCalendar);
             this.Controls.Add(this.cusMgmtSearchAppByCustomer);
@@ -239,5 +253,6 @@ namespace C969.Forms
         private System.Windows.Forms.TextBox cusMgmtSearchAppByCustomer;
         private System.Windows.Forms.MonthCalendar cusMgmtAppointmentsCalendar;
         private System.Windows.Forms.Label label1;
+        private Button cusMgmtShowAllAppts;
     }
 }

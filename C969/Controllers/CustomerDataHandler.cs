@@ -417,6 +417,12 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool DeleteCustomer(int customerId)
         {
+
+            if (CustomerHasAppointments(customerId))
+            {
+                throw new InvalidOperationException("Customer has related appointments. Please delete the appointments first.");
+            }
+
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
@@ -775,7 +781,10 @@ namespace C969.Controllers
             }
             return appointments;
         }
-
+        /// <summary>
+        /// Method to retrieve a list of dates with appointments.
+        /// </summary>
+        /// <returns></returns>
         public List<DateTime> GetDatesWithAppointments()
         {
             List<DateTime> dates = new List<DateTime>();
@@ -795,6 +804,26 @@ namespace C969.Controllers
                 }
             }
             return dates;
+        }
+
+        /// <summary>
+        /// Method to check if a customer has appointments.
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
+        public bool CustomerHasAppointments(int customerId)
+        {
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT COUNT(*) FROM appointment WHERE customerId = @customerId";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@customerId", customerId);
+                    int result = Convert.ToInt32(cmd.ExecuteScalar());
+                    return result > 0;
+                }
+            }
         }
 
     }

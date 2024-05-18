@@ -22,11 +22,7 @@ namespace C969.Forms
         {
             InitializeComponent();
             _customerDataHandler = new CustomerDataHandler(_connString);
-            cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
-            cusMgmtDeleteAppointmentButton.Click += cusMgmtDeleteAppointmentButton_Click;
-            cusMgmtAppointmentsCalendar.DateChanged += cusMgmtAppointmentsCalendar_DateChanged;
-            cusMgmtSearchAppByCustomer.Enter += cusMgmtSearchAppByCustomer_Enter;
-            cusMgmtSearchAppByCustomer.Leave += cusMgmtSearchAppByCustomer_Leave;
+            this.Load += CustomerManagementForm_Load;
             LoadAppointmentsForSelectedDate(cusMgmtAppointmentsCalendar.SelectionStart); // Load appointments for the selected date
             LoadCurrentUser();
             LoadCustomers();
@@ -59,11 +55,30 @@ namespace C969.Forms
 
         private void cusMgmtDeleteCustomerButton_Click(object sender, EventArgs e)
         {
-            if (cusMgmtDgvCustomers.CurrentRow != null)
+            if (cusMgmtDgvCustomers.SelectedRows.Count > 0)
             {
-                int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["customerID"].Value);
-                _customerDataHandler.DeleteCustomer(customerId);
-                LoadCustomers();
+                int customerId = Convert.ToInt32(cusMgmtDgvCustomers.SelectedRows[0].Cells["customerId"].Value);
+                try
+                {
+                    var result = _customerDataHandler.DeleteCustomer(customerId);
+                    if (result)
+                    {
+                        MessageBox.Show("Customer deleted successfully.");
+                        LoadCustomers();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to delete customer.");
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a customer to delete.");
             }
         }
 
@@ -86,9 +101,9 @@ namespace C969.Forms
         /// </summary>
         private void LoadCurrentUser()
         {
-            if (!string.IsNullOrEmpty(Models.UserSession.CurrentUser))
+            if (!string.IsNullOrEmpty(_currentUser))
             {
-                cusMgmCurrentUserlbl.Text = $"Welcome back, {Models.UserSession.CurrentUser}.";
+                cusMgmCurrentUserlbl.Text = $"Welcome back, {_currentUser}.";
             }
             else
             {
@@ -275,6 +290,53 @@ namespace C969.Forms
             {
                 textBox.Text = "Search by Customer Name";
                 textBox.ForeColor = Color.Gray;
+            }
+        }
+
+        private void CustomerManagementForm_Load(object sender, EventArgs e)
+        {
+            cusMgmtEditCustomerButton.Enabled = false;
+            cusMgmtDeleteCustomerButton.Enabled = false;
+            cusMgmtEditAppointmentButton.Enabled = false;
+            cusMgmtDeleteAppointmentButton.Enabled = false;
+            cusMgmtDgvCustomers.SelectionChanged += cusMgmtDgvCustomers_SelectionChanged;
+            cusMgmtDgvAppontments.SelectionChanged += cusMgmtDgvAppontments_SelectionChanged;
+            cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
+            cusMgmtDeleteAppointmentButton.Click += cusMgmtDeleteAppointmentButton_Click;
+            cusMgmtAppointmentsCalendar.DateChanged += cusMgmtAppointmentsCalendar_DateChanged;
+            cusMgmtSearchAppByCustomer.Enter += cusMgmtSearchAppByCustomer_Enter;
+            cusMgmtSearchAppByCustomer.Leave += cusMgmtSearchAppByCustomer_Leave;
+
+        }
+        private void cusMgmtDgvCustomers_SelectionChanged(object sender, EventArgs e)
+        {
+            bool isRowSelected = cusMgmtDgvCustomers.SelectedRows.Count > 0;
+            cusMgmtEditCustomerButton.Enabled = isRowSelected;
+            cusMgmtDeleteCustomerButton.Enabled = isRowSelected;
+        }
+
+        private void cusMgmtDgvAppontments_SelectionChanged(object sender, EventArgs e)
+        {
+            bool isRowSelected = cusMgmtDgvAppontments.SelectedRows.Count > 0;
+            cusMgmtEditAppointmentButton.Enabled = isRowSelected;
+            cusMgmtDeleteAppointmentButton.Enabled = isRowSelected;
+        }
+
+        /// <summary>
+        /// Click event handler for the Show All Appointments button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtShowAllAppts_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Fetch all appointments
+                LoadAppointments();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occured during the retrieval of appointments: {ex.Message}");
             }
         }
     }
