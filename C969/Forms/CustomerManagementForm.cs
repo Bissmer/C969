@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using C969.Models;
 
 namespace C969.Forms
 {
@@ -21,13 +22,14 @@ namespace C969.Forms
         public CustomerManagementForm()
         {
             InitializeComponent();
-            _customerDataHandler = new CustomerDataHandler(_connString);
             this.Load += CustomerManagementForm_Load;
+            _customerDataHandler = new CustomerDataHandler(_connString);
             LoadAppointmentsForSelectedDate(cusMgmtAppointmentsCalendar.SelectionStart); // Load appointments for the selected date
             LoadCurrentUser();
             LoadCustomers();
             LoadAppointments();
             UpdateCalendarHighlights();
+            this.Shown += CustomerManagementForm_Shown;
 
 
         }
@@ -295,6 +297,7 @@ namespace C969.Forms
 
         private void CustomerManagementForm_Load(object sender, EventArgs e)
         {
+            
             cusMgmtEditCustomerButton.Enabled = false;
             cusMgmtDeleteCustomerButton.Enabled = false;
             cusMgmtEditAppointmentButton.Enabled = false;
@@ -302,11 +305,15 @@ namespace C969.Forms
             cusMgmtDgvCustomers.SelectionChanged += cusMgmtDgvCustomers_SelectionChanged;
             cusMgmtDgvAppontments.SelectionChanged += cusMgmtDgvAppontments_SelectionChanged;
             cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
-            cusMgmtDeleteAppointmentButton.Click += cusMgmtDeleteAppointmentButton_Click;
             cusMgmtAppointmentsCalendar.DateChanged += cusMgmtAppointmentsCalendar_DateChanged;
             cusMgmtSearchAppByCustomer.Enter += cusMgmtSearchAppByCustomer_Enter;
             cusMgmtSearchAppByCustomer.Leave += cusMgmtSearchAppByCustomer_Leave;
 
+        }
+
+        private void CustomerManagementForm_Shown(object sender, EventArgs e)
+        {
+            ShowUpcomingAppointmentsAlert();
         }
         private void cusMgmtDgvCustomers_SelectionChanged(object sender, EventArgs e)
         {
@@ -337,6 +344,29 @@ namespace C969.Forms
             catch (Exception ex)
             {
                 MessageBox.Show($"An error occured during the retrieval of appointments: {ex.Message}");
+            }
+        }
+        /// <summary>
+        ///Method to show an alert for upcoming appointments
+        /// </summary>
+        private void ShowUpcomingAppointmentsAlert()
+        {
+            int userId = UserSession.UserId;
+            List<AppointmentDetails> upcomingAppointments = _customerDataHandler.GetUpcomingAppointments(userId);
+
+            if (upcomingAppointments.Count > 0)
+            {
+                StringBuilder appointmentAlert = new StringBuilder("You have the following appointments within the next 15 minutes:\n\n");
+                foreach (var appointment in upcomingAppointments)
+                {
+                    appointmentAlert.AppendLine(
+                        $"{appointment.Title} is about to start at {appointment.Start.ToShortTimeString()}");
+                }
+                MessageBox.Show(appointmentAlert.ToString(), "Upcoming Appointments", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("There are no upcoming appointments within the next 15 minutes.", "No Upcoming Appointments", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

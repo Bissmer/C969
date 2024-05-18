@@ -826,5 +826,43 @@ namespace C969.Controllers
             }
         }
 
+        /// <summary>
+        /// Method to retrieve upcoming appointments for a user.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public List<AppointmentDetails> GetUpcomingAppointments( int userId)
+        {
+            List<AppointmentDetails> upcomingAppointments = new List<AppointmentDetails>();
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now, userTimeZone);
+            DateTime utcFuture = utcNow.AddMinutes(15); // 15 minutes from now
+
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+                SELECT appointmentId, customerId, userId, title, description, location, contact, type, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy
+                FROM appointment
+                WHERE userId = @userId AND start BETWEEN @utcNow AND @utcFuture";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@utcNow", utcNow);
+                    cmd.Parameters.AddWithValue("@utcFuture", utcFuture);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            upcomingAppointments.Add(MapReaderToAppointmentDetails(reader, userTimeZone));
+                        }
+                    }
+                }
+            }
+            return upcomingAppointments;
+        }
+
     }
 }
