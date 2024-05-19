@@ -596,7 +596,7 @@ namespace C969.Controllers
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        private AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader, TimeZoneInfo userTimeZone )
+        public AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader, TimeZoneInfo userTimeZone )
         {
 
             DateTime utcStart = reader.GetDateTime("start");

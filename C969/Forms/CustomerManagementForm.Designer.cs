@@ -47,6 +47,7 @@ namespace C969.Forms
             this.cusMgmtAppointmentsCalendar = new System.Windows.Forms.MonthCalendar();
             this.label1 = new System.Windows.Forms.Label();
             this.cusMgmtShowAllAppts = new System.Windows.Forms.Button();
+            this.cusMgmtReportsButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvCustomers)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvAppontments)).BeginInit();
             this.SuspendLayout();
@@ -206,11 +207,22 @@ namespace C969.Forms
             this.cusMgmtShowAllAppts.UseVisualStyleBackColor = true;
             this.cusMgmtShowAllAppts.Click += new System.EventHandler(this.cusMgmtShowAllAppts_Click);
             // 
+            // cusMgmtReportsButton
+            // 
+            this.cusMgmtReportsButton.Location = new System.Drawing.Point(960, 94);
+            this.cusMgmtReportsButton.Name = "cusMgmtReportsButton";
+            this.cusMgmtReportsButton.Size = new System.Drawing.Size(100, 46);
+            this.cusMgmtReportsButton.TabIndex = 17;
+            this.cusMgmtReportsButton.Text = "Reports";
+            this.cusMgmtReportsButton.UseVisualStyleBackColor = true;
+            this.cusMgmtReportsButton.Click += new System.EventHandler(this.cusMgmtReportsButton_Click);
+            // 
             // CustomerManagementForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1222, 807);
+            this.Controls.Add(this.cusMgmtReportsButton);
             this.Controls.Add(this.cusMgmtShowAllAppts);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cusMgmtAppointmentsCalendar);
@@ -254,5 +266,6 @@ namespace C969.Forms
         private System.Windows.Forms.MonthCalendar cusMgmtAppointmentsCalendar;
         private System.Windows.Forms.Label label1;
         private Button cusMgmtShowAllAppts;
+        private Button cusMgmtReportsButton;
     }
 }

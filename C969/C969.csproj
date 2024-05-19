@@ -117,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CustomerDataHandler.cs" />
+    <Compile Include="Controllers\ReportsDataHandler.cs" />
     <Compile Include="Forms\AddAppointmentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -147,11 +148,17 @@
     <Compile Include="Forms\EditCustomerForm.Designer.cs">
       <DependentUpon>EditCustomerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Login.cs">
+    <Compile Include="Forms\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Login.Designer.cs">
-      <DependentUpon>Login.cs</DependentUpon>
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ReportsForm.Designer.cs">
+      <DependentUpon>ReportsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\AppointmentDetails.cs" />
     <Compile Include="Models\Customer.cs" />
@@ -186,7 +193,10 @@
       <DependentUpon>EditCustomerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Login.resx">
-      <DependentUpon>Login.cs</DependentUpon>
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ReportsForm.resx">
+      <DependentUpon>ReportsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

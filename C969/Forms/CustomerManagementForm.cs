@@ -15,10 +15,10 @@ namespace C969.Forms
 {
     public partial class CustomerManagementForm : Form
     {
-        private bool isProgrammaticallyAdjusting = false; // Flag to prevent infinite loop when adjusting the calendar date
-        private CustomerDataHandler _customerDataHandler;
-        private string _currentUser = Models.UserSession.CurrentUser;
-        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private bool _isProgrammaticallyAdjusting = false; // Flag to prevent infinite loop when adjusting the calendar date
+        private readonly CustomerDataHandler _customerDataHandler;
+        private  readonly string _currentUser = UserSession.CurrentUser;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         public CustomerManagementForm()
         {
             InitializeComponent();
@@ -225,16 +225,16 @@ namespace C969.Forms
         {
             {
                 // Prevent infinite loop when adjusting the calendar date
-                if (isProgrammaticallyAdjusting)
+                if (_isProgrammaticallyAdjusting)
                     return;
                 // If the selected date is a weekend, adjust it to the next weekday
                 if (e.Start.DayOfWeek == DayOfWeek.Saturday || e.Start.DayOfWeek == DayOfWeek.Sunday)
                 {
-                    isProgrammaticallyAdjusting = true;
+                    _isProgrammaticallyAdjusting = true;
                     DateTime nextWeekday = FindNextWeekday(e.Start);
                     cusMgmtAppointmentsCalendar.SelectionStart = nextWeekday;
                     cusMgmtAppointmentsCalendar.SelectionEnd = nextWeekday;
-                    isProgrammaticallyAdjusting = false;
+                    _isProgrammaticallyAdjusting = false;
                 }
 
                 // Load appointments for the selected date
@@ -368,6 +368,12 @@ namespace C969.Forms
             {
                 MessageBox.Show("There are no upcoming appointments within the next 15 minutes.", "No Upcoming Appointments", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void cusMgmtReportsButton_Click(object sender, EventArgs e)
+        {
+            var reportsForm = new ReportsForm();
+            reportsForm.ShowDialog();
         }
     }
 }
