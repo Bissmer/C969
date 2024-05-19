@@ -14,8 +14,7 @@ namespace C969.Controllers
     {
         private readonly MySqlConnection _connection;
 
-        private readonly string _connString =
-            ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
         private string _currentUser;
         private readonly CustomerDataHandler _customerDataHandler;
@@ -30,7 +29,7 @@ namespace C969.Controllers
         public List<User> GetAllUsers()
         {
             List<User> users = new List<User>();
-            using (var conn = _connection)
+            using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
                 string query = "SELECT userId, userName FROM user";
@@ -59,7 +58,7 @@ namespace C969.Controllers
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
             TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
 
-            using (var conn = _connection)
+            using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
                 string query = @"
@@ -81,5 +80,7 @@ namespace C969.Controllers
             }
             return appointments;
         }
+
+
     }
 }

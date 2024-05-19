@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,13 +26,17 @@ namespace C969.Forms
             InitializeComponent();
             _reportsDataHandler = new ReportsDataHandler(_connString);
             _customerDataHandler = new CustomerDataHandler(_connString);
-            reportsFormUsersCombo.SelectedIndexChanged += reportsFormUsersCombo_SelectedIndexChanged;
             this.Load += ReportsForm_Load;
+            this.reportsFormDownloadSchedulesByUser.Click += reportsFormDownloadSchedulesByUser_Click;
+            reportsFormUsersCombo.SelectedIndexChanged += reportsFormUsersCombo_SelectedIndexChanged;
+            
         }
 
         private void ReportsForm_Load(object sender, EventArgs e)
         {
             LoadUsers();
+            ConfigureAppointmentsDataGridView();
+            LoadDefaultAppointments();
         }
 
         private void LoadUsers()
@@ -44,10 +49,16 @@ namespace C969.Forms
 
         private void reportsFormUsersCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (reportsFormUsersCombo.SelectedValue != null)
+            try
             {
-                int selectedUserId = (int)reportsFormUsersCombo.SelectedValue;
-                LoadAppointmentsByUser(selectedUserId);
+                if (reportsFormUsersCombo.SelectedValue != null && int.TryParse(reportsFormUsersCombo.SelectedValue.ToString(), out int selectedUserId))
+                {
+                    LoadAppointmentsByUser(selectedUserId);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -104,6 +115,57 @@ namespace C969.Forms
                 HeaderText = "End Time"
             });
 
+        }
+
+        /// <summary>
+        /// Load the default appointments for the first user in the combo box
+        /// </summary>
+        private void LoadDefaultAppointments()
+        {
+            if (reportsFormUsersCombo.Items.Count > 0)
+            {
+                reportsFormUsersCombo.SelectedIndex = 0; // Select the first item by default
+                int selectedUserId = (int)reportsFormUsersCombo.SelectedValue;
+                LoadAppointmentsByUser(selectedUserId);
+            }
+        }
+
+        private void reportsFormDownloadSchedulesByUser_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "CSV files (*.csv)|*.csv";
+            saveFileDialog.Title = "Save schedules by user";
+            saveFileDialog.ShowDialog();
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                ExportAppontmentsByUserToCSV(reportsFormDgvAppointmentsByUser, saveFileDialog.FileName);
+            }
+        }
+
+        private void ExportAppontmentsByUserToCSV(DataGridView dgv, string fileName)
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                var headers = dgv.Columns.Cast<DataGridViewColumn>();
+
+                sb.AppendLine(string.Join(",", headers.Select(column => "\"" + column.HeaderText + "\"").ToArray())); // Write the headers to the file
+
+                /// Write the data to the file
+                foreach (DataGridViewRow row in dgv.Rows)
+                {
+                    var cells = row.Cells.Cast<DataGridViewCell>();
+                    sb.AppendLine(string.Join(",", cells.Select(cell => "\"" + cell.Value?.ToString() + "\"").ToArray()));
+                }
+
+                File.WriteAllText(fileName, sb.ToString());
+                MessageBox.Show("File saved successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while exporting data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

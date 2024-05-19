@@ -148,11 +148,11 @@
     <Compile Include="Forms\EditCustomerForm.Designer.cs">
       <DependentUpon>EditCustomerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\LoginForm.cs">
+    <Compile Include="Forms\Login.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Login.Designer.cs">
-      <DependentUpon>LoginForm.cs</DependentUpon>
+      <DependentUpon>Login.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ReportsForm.cs">
       <SubType>Form</SubType>
@@ -193,7 +193,7 @@
       <DependentUpon>EditCustomerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Login.resx">
-      <DependentUpon>LoginForm.cs</DependentUpon>
+      <DependentUpon>Login.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ReportsForm.resx">
       <DependentUpon>ReportsForm.cs</DependentUpon>
