@@ -18,8 +18,8 @@ namespace C969.Forms
     {
 
         private CustomerDataHandler _customerDataHandler;
-        private ReportsDataHandler _reportsDataHandler;
-        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private readonly ReportsDataHandler _reportsDataHandler;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         
         public ReportsForm()
         {
@@ -36,7 +36,9 @@ namespace C969.Forms
         {
             LoadUsers();
             ConfigureAppointmentsDataGridView();
+            ConfigureMonthlyReportDataGridView();
             LoadDefaultAppointments();
+            LoadMonthlyReport();
         }
 
         private void LoadUsers()
@@ -66,6 +68,7 @@ namespace C969.Forms
         {
             var appointments = _reportsDataHandler.GetAppointmentsByUserId(userId);
             reportsFormDgvAppointmentsByUser.DataSource = appointments;
+            reportsFormDgvAppointmentsByUser.Refresh();
         }
 
         private void ConfigureAppointmentsDataGridView()
@@ -132,18 +135,25 @@ namespace C969.Forms
 
         private void reportsFormDownloadSchedulesByUser_Click(object sender, EventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "CSV files (*.csv)|*.csv";
-            saveFileDialog.Title = "Save schedules by user";
-            saveFileDialog.ShowDialog();
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "CSV files (*.csv)|*.csv",
+                Title = "Save schedules by user"
+            };
+            
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                ExportAppontmentsByUserToCSV(reportsFormDgvAppointmentsByUser, saveFileDialog.FileName);
+                ExportReportsToCsv(reportsFormDgvAppointmentsByUser, saveFileDialog.FileName);
             }
         }
 
-        private void ExportAppontmentsByUserToCSV(DataGridView dgv, string fileName)
+        /// <summary>
+        /// Load the appointments for the selected user and export them to a CSV file
+        /// </summary>
+        /// <param name="dgv"></param>
+        /// <param name="fileName"></param>
+        private void ExportReportsToCsv(DataGridView dgv, string fileName)
         {
             try
             {
@@ -152,7 +162,7 @@ namespace C969.Forms
 
                 sb.AppendLine(string.Join(",", headers.Select(column => "\"" + column.HeaderText + "\"").ToArray())); // Write the headers to the file
 
-                /// Write the data to the file
+                // Write the data to the file
                 foreach (DataGridViewRow row in dgv.Rows)
                 {
                     var cells = row.Cells.Cast<DataGridViewCell>();
@@ -167,5 +177,51 @@ namespace C969.Forms
                 MessageBox.Show($"An error occurred while exporting data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void ConfigureMonthlyReportDataGridView()
+        {
+            reportsFormDgvAppointmentsByMonth.AutoGenerateColumns = false;
+            reportsFormDgvAppointmentsByMonth.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "MonthName",
+                HeaderText = "Month"
+            });
+
+            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Type",
+                HeaderText = "Type"
+            });
+
+            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Count",
+                HeaderText = "Count"
+            });
+        }
+
+        private void LoadMonthlyReport()
+        {
+            var monthlyReport = _reportsDataHandler.GetAppointmentTypesByMonth();
+            reportsFormDgvAppointmentsByMonth.DataSource = monthlyReport;
+            reportsFormDgvAppointmentsByMonth.Refresh();
+        }
+
+        private void reportsFormDownloadAppointmentsByMonth_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "CSV files (*.csv)|*.csv",
+                Title = "Save appointments by month"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                ExportReportsToCsv(reportsFormDgvAppointmentsByMonth, saveFileDialog.FileName);
+            }
+        }
+
     }
 }

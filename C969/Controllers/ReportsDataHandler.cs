@@ -81,6 +81,38 @@ namespace C969.Controllers
             return appointments;
         }
 
+        public List<AppointmentTypesByMonths> GetAppointmentTypesByMonth()
+        {
+            List<AppointmentDetails> appointments = new List<AppointmentDetails>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+                SELECT appointmentId, customerId, userId, title, description, location, contact, type, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy
+                FROM appointment";
 
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            appointments.Add(_customerDataHandler.MapReaderToAppointmentDetails(reader, UserSession.CurrentTimeZone));
+                        }
+                    }
+                }
+            }
+
+            var groupedAppointments = appointments.GroupBy(app => new{app.Start.Month, AppointmentType = app.Type})
+                    .Select(group => new AppointmentTypesByMonths
+                        {
+                            Month = group.Key.Month,
+                            Type = group.Key.AppointmentType,
+                            Count = group.Count()
+                        }).ToList();
+
+            return groupedAppointments;
+
+        }
     }
 }

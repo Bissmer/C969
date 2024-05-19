@@ -161,6 +161,7 @@
       <DependentUpon>ReportsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\AppointmentDetails.cs" />
+    <Compile Include="Models\AppointmentTypesByMonths.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\CustomerDetails.cs" />
     <Compile Include="Models\User.cs" />
