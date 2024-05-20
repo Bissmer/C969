@@ -29,14 +29,19 @@ namespace C969.Forms
             this.Load += ReportsForm_Load;
             this.reportsFormDownloadSchedulesByUser.Click += reportsFormDownloadSchedulesByUser_Click;
             reportsFormUsersCombo.SelectedIndexChanged += reportsFormUsersCombo_SelectedIndexChanged;
+            reportsFormDownloadAppointmentsByMonth.Click += reportsFormDownloadAppointmentsByMonth_Click;
+            reportsFormCountriesCombo.SelectedIndexChanged += reportsFormCountriesCombo_SelectedIndexChanged;
             
         }
 
         private void ReportsForm_Load(object sender, EventArgs e)
         {
             LoadUsers();
+            LoadCountries();
+            LoadCustomerCountByCountry();
             ConfigureAppointmentsDataGridView();
             ConfigureMonthlyReportDataGridView();
+            ConfigureCustomerCountByCountryCityDataGridView();
             LoadDefaultAppointments();
             LoadMonthlyReport();
         }
@@ -222,6 +227,58 @@ namespace C969.Forms
                 ExportReportsToCsv(reportsFormDgvAppointmentsByMonth, saveFileDialog.FileName);
             }
         }
+
+
+        private void ConfigureCustomerCountByCountryCityDataGridView()
+        {
+            reportsFormDgvCustomerCountByCountry.AutoGenerateColumns = false;
+            reportsFormDgvCustomerCountByCountry.Columns.Clear();
+            reportsFormDgvCustomerCountByCountry.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            reportsFormDgvCustomerCountByCountry.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Name",
+                HeaderText = "Name",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+
+            reportsFormDgvCustomerCountByCountry.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "CusCount",
+                HeaderText = "Customer Count",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+        }
+
+        private void LoadCountries()
+        {
+            var countries = _reportsDataHandler.GetAllCountries();
+            reportsFormCountriesCombo.DataSource = countries;
+            reportsFormCountriesCombo.DisplayMember = "CountryName";
+            reportsFormCountriesCombo.ValueMember = "CountryId";
+        }
+
+        private void LoadCustomerCountByCountry()
+        {
+            var customerCounts = _reportsDataHandler.GetCustomerCountByCountry();
+            reportsFormDgvCustomerCountByCountry.DataSource = customerCounts;
+
+        }
+
+        private void reportsFormCountriesCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (reportsFormCountriesCombo.SelectedValue != null && int.TryParse(reportsFormCountriesCombo.SelectedValue.ToString(), out int selectedCountryId)) 
+            {
+                LoadCustomerCountByCity(selectedCountryId);
+            }
+        }
+
+        private void LoadCustomerCountByCity(int countryId)
+        {
+            var customerCounts = _reportsDataHandler.GetCustomerCountByCity(countryId);
+            reportsFormDgvCustomerCountByCountry.DataSource = customerCounts;
+        }
+
 
     }
 }

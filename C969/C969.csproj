@@ -162,7 +162,10 @@
     </Compile>
     <Compile Include="Models\AppointmentDetails.cs" />
     <Compile Include="Models\AppointmentTypesByMonths.cs" />
+    <Compile Include="Models\City.cs" />
+    <Compile Include="Models\Country.cs" />
     <Compile Include="Models\Customer.cs" />
+    <Compile Include="Models\CustomerCount.cs" />
     <Compile Include="Models\CustomerDetails.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserSession.cs" />

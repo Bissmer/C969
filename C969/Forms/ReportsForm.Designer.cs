@@ -39,8 +39,13 @@
             this.reportsFormDgvAppointmentsByMonth = new System.Windows.Forms.DataGridView();
             this.reportsFormDownloadAppointmentsByMonth = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.reportsFormCustomerAppointmentsBreakdownLabel = new System.Windows.Forms.Label();
+            this.reportsFormDgvCustomerCountByCountry = new System.Windows.Forms.DataGridView();
+            this.reportsFormCountriesCombo = new System.Windows.Forms.ComboBox();
+            this.reportsFormCountriesComboLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.reportsFormDgvAppointmentsByUser)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.reportsFormDgvAppointmentsByMonth)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.reportsFormDgvCustomerCountByCountry)).BeginInit();
             this.SuspendLayout();
             // 
             // reportsFormTitleLabel
@@ -146,11 +151,50 @@
             this.label1.Size = new System.Drawing.Size(985, 10);
             this.label1.TabIndex = 10;
             // 
+            // reportsFormCustomerAppointmentsBreakdownLabel
+            // 
+            this.reportsFormCustomerAppointmentsBreakdownLabel.AutoSize = true;
+            this.reportsFormCustomerAppointmentsBreakdownLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.reportsFormCustomerAppointmentsBreakdownLabel.Location = new System.Drawing.Point(16, 601);
+            this.reportsFormCustomerAppointmentsBreakdownLabel.Name = "reportsFormCustomerAppointmentsBreakdownLabel";
+            this.reportsFormCustomerAppointmentsBreakdownLabel.Size = new System.Drawing.Size(265, 20);
+            this.reportsFormCustomerAppointmentsBreakdownLabel.TabIndex = 11;
+            this.reportsFormCustomerAppointmentsBreakdownLabel.Text = "Customer Appointments Breakdown";
+            // 
+            // reportsFormDgvCustomerCountByCountry
+            // 
+            this.reportsFormDgvCustomerCountByCountry.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.reportsFormDgvCustomerCountByCountry.Location = new System.Drawing.Point(14, 653);
+            this.reportsFormDgvCustomerCountByCountry.Name = "reportsFormDgvCustomerCountByCountry";
+            this.reportsFormDgvCustomerCountByCountry.Size = new System.Drawing.Size(701, 150);
+            this.reportsFormDgvCustomerCountByCountry.TabIndex = 12;
+            // 
+            // reportsFormCountriesCombo
+            // 
+            this.reportsFormCountriesCombo.FormattingEnabled = true;
+            this.reportsFormCountriesCombo.Location = new System.Drawing.Point(863, 652);
+            this.reportsFormCountriesCombo.Name = "reportsFormCountriesCombo";
+            this.reportsFormCountriesCombo.Size = new System.Drawing.Size(121, 21);
+            this.reportsFormCountriesCombo.TabIndex = 13;
+            // 
+            // reportsFormCountriesComboLabel
+            // 
+            this.reportsFormCountriesComboLabel.AutoSize = true;
+            this.reportsFormCountriesComboLabel.Location = new System.Drawing.Point(739, 655);
+            this.reportsFormCountriesComboLabel.Name = "reportsFormCountriesComboLabel";
+            this.reportsFormCountriesComboLabel.Size = new System.Drawing.Size(117, 13);
+            this.reportsFormCountriesComboLabel.TabIndex = 14;
+            this.reportsFormCountriesComboLabel.Text = "Please select a country";
+            // 
             // ReportsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1024, 893);
+            this.ClientSize = new System.Drawing.Size(1024, 934);
+            this.Controls.Add(this.reportsFormCountriesComboLabel);
+            this.Controls.Add(this.reportsFormCountriesCombo);
+            this.Controls.Add(this.reportsFormDgvCustomerCountByCountry);
+            this.Controls.Add(this.reportsFormCustomerAppointmentsBreakdownLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.reportsFormDownloadAppointmentsByMonth);
             this.Controls.Add(this.reportsFormDgvAppointmentsByMonth);
@@ -166,6 +210,7 @@
             this.Text = "ReportsForm";
             ((System.ComponentModel.ISupportInitialize)(this.reportsFormDgvAppointmentsByUser)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.reportsFormDgvAppointmentsByMonth)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.reportsFormDgvCustomerCountByCountry)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -184,5 +229,9 @@
         private System.Windows.Forms.DataGridView reportsFormDgvAppointmentsByMonth;
         private System.Windows.Forms.Button reportsFormDownloadAppointmentsByMonth;
         public System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label reportsFormCustomerAppointmentsBreakdownLabel;
+        private System.Windows.Forms.DataGridView reportsFormDgvCustomerCountByCountry;
+        private System.Windows.Forms.ComboBox reportsFormCountriesCombo;
+        private System.Windows.Forms.Label reportsFormCountriesComboLabel;
     }
 }

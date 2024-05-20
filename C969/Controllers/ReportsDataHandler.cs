@@ -53,6 +53,11 @@ namespace C969.Controllers
             return users;
         }
 
+        /// <summary>
+        /// Method to get appointments by user id. Returns all appointments for the user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public List<AppointmentDetails> GetAppointmentsByUserId(int userId)
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
@@ -81,6 +86,10 @@ namespace C969.Controllers
             return appointments;
         }
 
+        /// <summary>
+        /// Method to get the count of appointments by month and type.
+        /// </summary>
+        /// <returns></returns>
         public List<AppointmentTypesByMonths> GetAppointmentTypesByMonth()
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
@@ -114,5 +123,173 @@ namespace C969.Controllers
             return groupedAppointments;
 
         }
+
+        /// <summary>
+        /// Method to get the count of appointments by user.
+        /// </summary>
+        /// <returns></returns>
+        private List<Customer> GetAllCustomers()
+        {
+            List<Customer> customers = new List<Customer>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT customerId, customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM customer";
+
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            customers.Add(new Customer
+                            (
+                                reader.GetInt32("customerId"),
+                                reader.GetString("customerName"),
+                                reader.GetInt32("addressId"),
+                                reader.GetInt32("active"),
+                                reader.GetDateTime("createDate"),
+                                reader.GetString("createdBy"),
+                                reader.GetDateTime("lastUpdate"),
+                                reader.GetString("lastUpdateBy")
+                            ));
+                        }
+                    }
+                }
+            }
+            return customers;
+        }
+
+        /// <summary>
+        /// Method to get all cities. Returns a list of cities.
+        /// </summary>
+        /// <returns></returns>
+        private List<City> GetAllCities()
+        {
+            List<City> cities = new List<City>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT cityId, city, countryId FROM city";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            cities.Add(new City
+                                {
+                                    CityId = reader.GetInt32("cityId"),
+                                    CountryId = reader.GetInt32("countryId"),
+                                    CityName = reader.GetString("city")
+                            });
+                        }
+                    }
+                }
+            }
+            return cities;
+        }
+
+        /// <summary>
+        /// Method to get all countries. Returns a list of countries.
+        /// </summary>
+        /// <returns></returns>
+        public List<Country> GetAllCountries()
+        {
+            List<Country> countries = new List<Country>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT countryId, country FROM country ORDER BY country";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            countries.Add(new Country
+                            {
+                                CountryId = reader.GetInt32("countryId"),
+                                CountryName = reader.GetString("country")
+                            });
+                        }
+                    }
+                }
+            }
+            return countries;
+        }
+
+        /// <summary>
+        /// Method to get the count of customers by city. Returns a list of CustomerCount.
+        /// </summary>
+        /// <param name="countryId"></param>
+        /// <returns></returns>
+        public List<CustomerCount> GetCustomerCountByCity(int countryId)
+        {
+
+            List<Customer> customers = GetAllCustomers();
+            List<City> cities = GetAllCities();
+
+            var result = cities
+                .Where(city=> city.CountryId == countryId)
+                .GroupJoin(
+                    customers,
+                    city => city.CityId,
+                    customer => customer.AddressID,
+                    (city, customerGroup) => new CustomerCount
+                    {
+                        Name = city.CityName,
+                        CusCount = customerGroup.Count()
+                    }
+                    ).ToList();
+                return result;
+        }
+
+        /// <summary>
+        /// Method to get the count of customers by country. Returns a list of CustomerCount.
+        /// <returns></returns>
+        public List<CustomerCount> GetCustomerCountByCountry()
+        {
+            List<Customer> customers = GetAllCustomers();
+            List<City> cities = GetAllCities();
+            List<Country> countries = GetAllCountries();
+
+            var result = countries
+                .GroupJoin( // Join countries with cities
+                    cities,
+                    country => country.CountryId,
+                    city => city.CountryId,
+                    (country, cityGroup) => new { country, cityGroup }
+                )
+                .SelectMany( // Flatten the result
+                    x => x.cityGroup.DefaultIfEmpty(),
+                    (x, city) => new { x.country, city }
+                    )
+                .GroupJoin( // Join the result with customers
+
+                    customers,
+                    x => x.city?.CityId,
+                    customer => customer.AddressID, // Assuming AddressID maps to CityId
+                    (x, customerGroup) => new
+                    {
+                        CountryName = x.country.CountryName,
+                        CusCount = customerGroup.Count()
+                    }
+                    )
+                .GroupBy(x => x.CountryName) // Group by country name
+                .Select(g => new CustomerCount // Select the result
+                {
+                    Name = g.Key,
+                    CusCount = g.Sum(x => x.CusCount)
+                })
+                .ToList(); // Convert to list
+
+            return result;
+        }
+
+
     }
 }

@@ -48,5 +48,6 @@ namespace C969.Models
             LastUpdate = lastUpdate;
             LastUpdateBy = lastUpdateBy.Trim();
         }
+
     }
 }
