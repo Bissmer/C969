@@ -89,6 +89,7 @@ namespace C969
                 UserSession.Login(userId, username);  // Update the session manager
                 CustomerManagementForm customerManagementForm = new CustomerManagementForm();
                 customerManagementForm.Show();
+                LoginLogger.LogLogger(username);
                 this.Hide();
             }
             else
@@ -117,5 +118,6 @@ namespace C969
             loginTimeZoneText.Text = $"{localTimeZone.DisplayName}";
 
         }
+
     }
 }
