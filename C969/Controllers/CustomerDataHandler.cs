@@ -834,8 +834,7 @@ namespace C969.Controllers
         public List<AppointmentDetails> GetUpcomingAppointments( int userId)
         {
             List<AppointmentDetails> upcomingAppointments = new List<AppointmentDetails>();
-            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
-            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.UtcNow, userTimeZone);
+            DateTime utcNow = DateTime.UtcNow;
             DateTime utcFuture = utcNow.AddMinutes(15); // 15 minutes from now
 
             using (var conn = new MySqlConnection(_connString))
@@ -856,7 +855,7 @@ namespace C969.Controllers
                     {
                         while (reader.Read())
                         {
-                            upcomingAppointments.Add(MapReaderToAppointmentDetails(reader, userTimeZone));
+                            upcomingAppointments.Add(MapReaderToAppointmentDetails(reader, UserSession.CurrentTimeZone));
                         }
                     }
                 }
