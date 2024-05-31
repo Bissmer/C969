@@ -527,11 +527,16 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool AddAppointment(AppointmentDetails appointment)
         {
+            // Ensure the appointment start and end times are treated as local times relative to the user's time zone without any predefined kind
+            DateTime startLocal = DateTime.SpecifyKind(appointment.Start, DateTimeKind.Unspecified);
+            DateTime endLocal = DateTime.SpecifyKind(appointment.End, DateTimeKind.Unspecified);
+            DateTime nowLocal = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
+
             // Convert the appointment start and end times to UTC
             TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
-            DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(appointment.Start, userTimeZone);
-            DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(appointment.End, userTimeZone);
-            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.UtcNow, userTimeZone);
+            DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(startLocal, userTimeZone);
+            DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(endLocal, userTimeZone);
+            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(nowLocal, userTimeZone);
 
 
 
