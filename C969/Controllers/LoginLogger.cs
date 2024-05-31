@@ -9,12 +9,12 @@ namespace C969.Controllers
 {
     public static class LoginLogger
     {
-        private static readonly string _logFilePath = "Login_History.txt";
+        private const string logFilePath = "Login_History.txt";
 
         public static void LogLogger(string username)
         {
-            string logMessage = $"{DateTime.Now}: {username} logged in.";
-            File.AppendAllText(_logFilePath, logMessage + Environment.NewLine);
+            string logMessage = $"{DateTime.UtcNow}: {username} logged in.";
+            File.AppendAllText(logFilePath, logMessage + Environment.NewLine);
         }
     }
 }

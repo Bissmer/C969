@@ -28,9 +28,9 @@ namespace C969.Models
             CustomerName = customerName.Trim();
             AddressID = addressID;
             Active = active;
-            CreateDate = DateTime.Now; //assuming that the CreateDate is the current date and time
+            CreateDate = DateTime.UtcNow; //assuming that the CreateDate is the current date and time
             CreatedBy = createdBy;
-            LastUpdate = DateTime.Now; // Assuming last update is set to the current date/time for new records
+            LastUpdate = DateTime.UtcNow; // Assuming last update is set to the current date/time for new records
             LastUpdateBy = lastUpdateBy;
         }
 

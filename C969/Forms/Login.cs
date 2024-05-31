@@ -19,7 +19,7 @@ namespace C969
 {
     public partial class Login : Form
     {
-        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         public Login()
         {
             
@@ -37,14 +37,8 @@ namespace C969
         {
 
             //check culture and set the appropriate resource file
-            if (culture.TwoLetterISOLanguageName == "en")
-            {
-                _rm = new ResourceManager("C969.Resources.LoginFormPrompts_en", typeof(Login).Assembly);
-            }
-            else
-            {
-                _rm = new ResourceManager("C969.Resources.LoginFormPrompts_ru", typeof(Login).Assembly);
-            }
+            _rm = culture.TwoLetterISOLanguageName == "ru" ? new ResourceManager("C969.Resources.LoginFormPrompts_ru", typeof(Login).Assembly) : 
+                new ResourceManager("C969.Resources.LoginFormPrompts_en", typeof(Login).Assembly);
          
             loginHeaderLabel.Text = _rm.GetString("loginHeaderLabel", culture);
             loginHeaderLabel.Text = _rm.GetString("loginHeaderLabel", culture);
@@ -108,13 +102,16 @@ namespace C969
             }
         }
 
+        /// <summary>
+        /// Method to initialize the time zone label
+        /// </summary>
         private void InitializeTimeZoneLabel()
         {
             loginTimeZoneLabel.Text = _rm.GetString("loginTimeZoneLabel", currentCulture);
-            // Get the current time zone of the user's system
+            // Getting the current time zone of the system
             TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
 
-            // Set the label to show the display name of the time zone
+            // Setting the label to show the display name of the time zone
             loginTimeZoneText.Text = $"{localTimeZone.DisplayName}";
 
         }

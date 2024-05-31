@@ -16,9 +16,9 @@ namespace C969.Forms
 {
     public partial class EditAppointmentForm : Form
     {
-        private int _appointmentId;
-        private CustomerDataHandler _customerDataHandler;
-        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private readonly int _appointmentId;
+        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         private bool ignoreEvent = false; //Flag to prevent infinite loop in DateTimePicker event handler
         
         public EditAppointmentForm(int appointmentId)
@@ -119,7 +119,7 @@ namespace C969.Forms
                     CustomerId = (int)editAppointmentCustomerNameCombo.SelectedValue,
                     UserId = UserSession.UserId,
                     CreatedBy = editAppointmentCurrentUserText.Text,
-                    LastUpdate = DateTime.Now,
+                    LastUpdate = DateTime.UtcNow,
                     LastUpdateBy = editAppointmentCurrentUserText.Text,
                     Url = editAppointmentUrlText.Text
 

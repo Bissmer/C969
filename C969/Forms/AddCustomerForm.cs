@@ -16,9 +16,8 @@ namespace C969.Forms
 {
     public partial class AddCustomerForm : Form
     {
-        private CustomerDataHandler _customerDataHandler;
-        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
-        private string _currentUser = UserSession.CurrentUser;
+        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
         public AddCustomerForm()
         {

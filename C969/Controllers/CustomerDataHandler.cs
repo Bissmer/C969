@@ -15,9 +15,9 @@ namespace C969.Controllers
 {
     public class CustomerDataHandler
     {
-        private MySqlConnection _connection;
-        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
-        private string _currentUser;
+        private readonly MySqlConnection _connection;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private readonly string _currentUser;
 
 
         public CustomerDataHandler(string _connString)
@@ -111,7 +111,7 @@ namespace C969.Controllers
 
                 cmd.CommandText = insertQuery;
                 cmd.Parameters.AddRange(parameters);  // Re-add parameters for the insert operation
-                cmd.Parameters.AddWithValue("@now", DateTime.Now);
+                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow);
                 cmd.Parameters.AddWithValue("@user", _currentUser);
                 return Convert.ToInt32(cmd.ExecuteScalar());
             }
@@ -136,7 +136,7 @@ namespace C969.Controllers
                 cmd.Parameters.AddWithValue("@customerName", customerName);
                 cmd.Parameters.AddWithValue("@addressId", addressId);
                 cmd.Parameters.AddWithValue("@active", isActive ? 1 : 0);
-                cmd.Parameters.AddWithValue("@now", DateTime.Now);
+                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow);
                 cmd.Parameters.AddWithValue("@user", _currentUser);
                 cmd.ExecuteNonQuery();
             }
@@ -531,7 +531,7 @@ namespace C969.Controllers
             TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
             DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(appointment.Start, userTimeZone);
             DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(appointment.End, userTimeZone);
-            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now, userTimeZone);
+            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.UtcNow, userTimeZone);
 
 
 
@@ -689,7 +689,7 @@ namespace C969.Controllers
                             cmd.Parameters.AddWithValue("@url", appointment.Url);
                             cmd.Parameters.AddWithValue("@start", appointment.Start);
                             cmd.Parameters.AddWithValue("@end", appointment.End);
-                            cmd.Parameters.AddWithValue("@lastUpdate", DateTime.Now);
+                            cmd.Parameters.AddWithValue("@lastUpdate", DateTime.UtcNow);
                             cmd.Parameters.AddWithValue("@lastUpdateBy", UserSession.CurrentUser);
                             cmd.Parameters.AddWithValue("@appointmentId", appointment.AppointmentId);
 
@@ -835,7 +835,7 @@ namespace C969.Controllers
         {
             List<AppointmentDetails> upcomingAppointments = new List<AppointmentDetails>();
             TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
-            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now, userTimeZone);
+            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(DateTime.UtcNow, userTimeZone);
             DateTime utcFuture = utcNow.AddMinutes(15); // 15 minutes from now
 
             using (var conn = new MySqlConnection(_connString))

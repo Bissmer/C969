@@ -16,10 +16,9 @@ namespace C969.Forms
 {
     public partial class EditCustomerForm : Form
     {
-        private int _customerId;
-        private CustomerDataHandler _customerDataHandler;
-        private string _currentUser = UserSession.CurrentUser;
-        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private readonly int _customerId;
+        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
         public EditCustomerForm(int customerId, CustomerDataHandler customerDataHandler)
         {

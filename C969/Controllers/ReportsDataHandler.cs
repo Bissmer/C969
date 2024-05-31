@@ -16,12 +16,10 @@ namespace C969.Controllers
 
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
-        private string _currentUser;
         private readonly CustomerDataHandler _customerDataHandler;
 
         public ReportsDataHandler(string currentUser)
         {
-            _currentUser = currentUser;
             _connection = new MySqlConnection(_connString);
             _customerDataHandler = new CustomerDataHandler(currentUser);
         }

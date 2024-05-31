@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +16,9 @@ namespace C969.Forms
 {
     public partial class AddAppointmentForm : Form
     {
-        private CustomerDataHandler _customerDataHandler;
-        private string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
-        private bool ignoreEvent = false; //Flag to prevent infinite loop in DateTimePicker event handler
+        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private bool _ignoreEvent = false; //Flag to prevent infinite loop in DateTimePicker event handler
 
         public AddAppointmentForm()
         {
@@ -38,22 +39,22 @@ namespace C969.Forms
         /// <param name="e"></param>
         private void AddAppointmentStartDatePicker_ValueChanged(object sender, EventArgs e)
         {
-            if (ignoreEvent) return;
+            if (_ignoreEvent) return;
 
             DateTimePicker picker = (DateTimePicker)sender;
             if (picker.Value.DayOfWeek == DayOfWeek.Saturday)
             {
-                ignoreEvent = true;
+                _ignoreEvent = true;
                 MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
                 picker.Value = picker.Value.AddDays(2); // Adjust to next Monday
-                ignoreEvent = false;
+                _ignoreEvent = false;
             }
             else if (picker.Value.DayOfWeek == DayOfWeek.Sunday)
             {
-                ignoreEvent = true;
+                _ignoreEvent = true;
                 MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
                 picker.Value = picker.Value.AddDays(1); // Adjust to next Monday
-                ignoreEvent = false;
+                _ignoreEvent = false;
             }
         }
 
@@ -64,22 +65,22 @@ namespace C969.Forms
         /// <param name="e"></param>
         private void AddAppointmentEndDatePicker_ValueChanged(object sender, EventArgs e)
         {
-            if (ignoreEvent) return;
+            if (_ignoreEvent) return;
 
             DateTimePicker picker = (DateTimePicker)sender;
             if (picker.Value.DayOfWeek == DayOfWeek.Saturday)
             {
-                ignoreEvent = true;
+                _ignoreEvent = true;
                 MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
                 picker.Value = picker.Value.AddDays(2); // Adjust to next Monday
-                ignoreEvent = false;
+                _ignoreEvent = false;
             }
             else if (picker.Value.DayOfWeek == DayOfWeek.Sunday)
             {
-                ignoreEvent = true;
+                _ignoreEvent = true;
                 MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
                 picker.Value = picker.Value.AddDays(1); // Adjust to next Monday
-                ignoreEvent = false;
+                _ignoreEvent = false;
             }
         }
 
@@ -128,7 +129,7 @@ namespace C969.Forms
             if (addAppointmentStartTimeCombo.SelectedIndex == -1) return;
 
             string selectedStartTime = addAppointmentStartTimeCombo.SelectedItem.ToString();
-            DateTime startTime = DateTime.Parse(selectedStartTime);
+            DateTime startTime = DateTime.Parse(selectedStartTime, new CultureInfo("en-US"));
 
             // Clear current items and add only times that are later than the selected start time
             addAppointmentEndTimeCombo.Items.Clear();
@@ -136,7 +137,7 @@ namespace C969.Forms
 
             foreach (string slot in slots)
             {
-                DateTime slotTime = DateTime.Parse(slot);
+                DateTime slotTime = DateTime.Parse(slot, new CultureInfo("en-US"));
                 if (slotTime > startTime)
                 {
                     addAppointmentEndTimeCombo.Items.Add(slot);

@@ -17,7 +17,6 @@ namespace C969.Forms
     public partial class ReportsForm : Form
     {
 
-        private CustomerDataHandler _customerDataHandler;
         private readonly ReportsDataHandler _reportsDataHandler;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         
@@ -25,7 +24,6 @@ namespace C969.Forms
         {
             InitializeComponent();
             _reportsDataHandler = new ReportsDataHandler(_connString);
-            _customerDataHandler = new CustomerDataHandler(_connString);
             this.Load += ReportsForm_Load;
             this.reportsFormDownloadSchedulesByUser.Click += reportsFormDownloadSchedulesByUser_Click;
             reportsFormUsersCombo.SelectedIndexChanged += reportsFormUsersCombo_SelectedIndexChanged;

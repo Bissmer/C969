@@ -103,14 +103,7 @@ namespace C969.Forms
         /// </summary>
         private void LoadCurrentUser()
         {
-            if (!string.IsNullOrEmpty(_currentUser))
-            {
-                cusMgmCurrentUserlbl.Text = $"Welcome back, {_currentUser}.";
-            }
-            else
-            {
-                cusMgmCurrentUserlbl.Text = "Unknown user";
-            }
+            cusMgmCurrentUserlbl.Text = !string.IsNullOrEmpty(_currentUser) ? $"Welcome back, {_currentUser}." : "Unknown user";
         }
 
 
