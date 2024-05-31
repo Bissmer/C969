@@ -24,8 +24,12 @@ namespace C969.Forms
             InitializeComponent();
             _customerDataHandler = new CustomerDataHandler(_connString);
             LoadCountries();
+            addCustomerPhoneText.KeyPress += new KeyPressEventHandler(PhoneTextBox_KeyPress);
         }
 
+        /// <summary>
+        /// Method that loads the countries into the country combo box
+        /// </summary>
         private void LoadCountries()
         {
             using (var connection = new MySqlConnection(_connString))
@@ -43,33 +47,49 @@ namespace C969.Forms
                     }
                 }
             }
+            if (addCustomerCountryCombo.Items.Count > 0)
+            {
+                addCustomerCountryCombo.SelectedIndex = 0; // Set the first item as the default
+            }
         }
 
         private void addCustomerSaveBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                string customerName = addCustomerNameText.Text;
-                string address = addCustomerAddresText.Text;
-                string address2 = addCustomerAddress2Text.Text;
-                string phone = addCustomerPhoneText.Text;
-                string city = addCustomerCityText.Text;
-                string postalCode = addCustomerZipText.Text;
+                string customerName = addCustomerNameText.Text.Trim();
+                string address = addCustomerAddresText.Text.Trim();
+                string address2 = addCustomerAddress2Text.Text.Trim();
+                string phone = addCustomerPhoneText.Text.Trim();
+                string city = addCustomerCityText.Text.Trim();
+                string postalCode = addCustomerZipText.Text.Trim();
                 string country = addCustomerCountryCombo.SelectedItem.ToString() ?? "";
                 bool isActive = addCustomerActiveCheck.Checked;
 
 
-                if (string.IsNullOrEmpty(country))
+                //fields validation block
+
+                var fields = new Dictionary<string, string>
                 {
-                    MessageBox.Show("Please select a country from the list.");
+                    { "Customer Name", customerName },
+                    { "Address", address },
+                    { "Phone", phone },
+                    { "City", city },
+                    { "Postal Code", postalCode },
+                };
+
+                if (!ValidateFields(fields))
+                {
                     return;
                 }
+
 
                 bool result = _customerDataHandler.AddCustomerWithDetails(customerName, address, address2, phone, city,
                     postalCode, country, isActive);
                 if (result)
                 {
                     MessageBox.Show("Customer added successfully.");
+                    this.Close();
                 }
                 else
                 {
@@ -82,11 +102,6 @@ namespace C969.Forms
                 
                 MessageBox.Show($"An error occurred while saving the customer: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            finally
-            {
-                this.Close();
-            }
-
 
         }
 
@@ -98,6 +113,39 @@ namespace C969.Forms
             if (result == DialogResult.Yes)
             {
                 this.Close();
+            }
+        }
+
+        /// <summary>
+        /// Method that validates the form fields before saving the customer
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <returns></returns>
+        private bool ValidateFields(Dictionary<string, string> fields)
+        {
+
+            foreach (var field in fields)
+            {
+                if (string.IsNullOrWhiteSpace(field.Value))
+                {
+                    MessageBox.Show($"{field.Key} cannot be empty.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Method that enables the phone number field to only allow numbers and hyphens,
+        /// other characters are ignored
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PhoneTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '-')
+            {
+                e.Handled = true;
             }
         }
     }

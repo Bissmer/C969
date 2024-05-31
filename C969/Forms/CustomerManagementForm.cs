@@ -183,7 +183,7 @@ namespace C969.Forms
                 if (result == DialogResult.Yes)
                 {
                     int appointmentId = Convert.ToInt32(cusMgmtDgvAppontments.SelectedRows[0].Cells["AppointmentId"].Value);
-                    if (_customerDataHandler.DeleteApppointment(appointmentId))
+                    if (_customerDataHandler.DeleteAppointment(appointmentId))
                     {
                         MessageBox.Show("Appointment deleted successfully.");
                         LoadAppointments();

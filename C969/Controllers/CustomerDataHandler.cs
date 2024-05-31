@@ -728,9 +728,9 @@ namespace C969.Controllers
         /// <summary>
         /// Function to delete an appointment from the database.
         /// </summary>
-        /// <param name="appontmentId"></param>
+        /// <param name="appointmentId"></param>
         /// <returns></returns>
-        public bool DeleteApppointment(int appontmentId)
+        public bool DeleteAppointment(int appointmentId)
         {
             using (var conn = new MySqlConnection(_connString))
             {
@@ -738,7 +738,7 @@ namespace C969.Controllers
                 string query = "DELETE FROM appointment WHERE appointmentId = @appointmentId";
                 using (var cmd = new MySqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@appointmentId", appontmentId);
+                    cmd.Parameters.AddWithValue("@appointmentId", appointmentId);
                     int result = cmd.ExecuteNonQuery();
                     return result > 0;
                 }
