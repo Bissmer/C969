@@ -18,14 +18,18 @@ namespace C969.Forms
     {
         private readonly int _customerId;
         private readonly CustomerDataHandler _customerDataHandler;
-        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+
+        private readonly string _connString =
+            ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
         public EditCustomerForm(int customerId, CustomerDataHandler customerDataHandler)
         {
             InitializeComponent();
             _customerId = customerId;
             _customerDataHandler = customerDataHandler;
+            LoadCountries();
             LoadCustomerData();
+            editCustomerPhoneText.KeyPress += new KeyPressEventHandler(PhoneTextBox_KeyPress);
 
 
         }
@@ -71,31 +75,42 @@ namespace C969.Forms
                 this.Close();
             }
 
-           
+
         }
 
         private void editCustomerSaveBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                if (editCustomerCountryCombo.SelectedItem == null)
+
+                var fields = new Dictionary<string, Control>
                 {
-                    MessageBox.Show("Please select a country.");
-                    return; // Stop further execution
+                    { "Customer Name", editCustomerNameText },
+                    { "Address", editCustomerAddresText },
+                    { "Phone", editCustomerPhoneText },
+                    { "City", editCustomerCityText },
+                    { "Postal Code", editCustomerZipText },
+                    { "Country", editCustomerCountryCombo }
+                };
+
+                if (!ValidateFields(fields))
+                {
+                    return;
                 }
 
                 CustomerDetails customer = new CustomerDetails()
                 {
                     CustomerID = _customerId,
-                    CustomerName = editCustomerNameText.Text,
-                    Address = editCustomerAddresText.Text,
-                    Address2 = editCustomerAddress2Text.Text,
-                    Phone = editCustomerPhoneText.Text,
-                    City = editCustomerCityText.Text,
-                    PostalCode = editCustomerZipText.Text,
+                    CustomerName = editCustomerNameText.Text.Trim(),
+                    Address = editCustomerAddresText.Text.Trim(),
+                    Address2 = editCustomerAddress2Text.Text.Trim(),
+                    Phone = editCustomerPhoneText.Text.Trim(),
+                    City = editCustomerCityText.Text.Trim(),
+                    PostalCode = editCustomerZipText.Text.Trim(),
                     Country = editCustomerCountryCombo.SelectedItem.ToString(),
                     IsActive = editCustomerActiveCheck.Checked
                 };
+
                 if (_customerDataHandler.UpdateCustomerDetails(customer))
                 {
                     MessageBox.Show("Customer updated successfully.");
@@ -116,12 +131,45 @@ namespace C969.Forms
 
         private void editCustomerCancelBtn_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show("Are you sure you want to cancel editing the customer and exit without save?", "Cancel Edit",
+            DialogResult result = MessageBox.Show(
+                "Are you sure you want to cancel editing the customer and exit without save?", "Cancel Edit",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 this.Close();
             }
+        }
+
+        private void PhoneTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '-')
+            {
+                e.Handled = true;
+            }
+        }
+
+        private bool ValidateFields(Dictionary<string, Control> fields)
+        {
+            foreach (var field in fields)
+            {
+                if (field.Value is TextBox textBox)
+                {
+                    if (string.IsNullOrWhiteSpace(textBox.Text))
+                    {
+                        MessageBox.Show($"{field.Key} cannot be empty.");
+                        return false;
+                    }
+                    if (field.Value is ComboBox comboBox)
+                    {
+                        if (comboBox.SelectedItem == null || string.IsNullOrWhiteSpace(comboBox.SelectedItem.ToString()))
+                        {
+                            MessageBox.Show($"{field.Key} cannot be empty.");
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
         }
     }
 }

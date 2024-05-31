@@ -75,7 +75,7 @@ namespace C969.Forms
                     { "Address", address },
                     { "Phone", phone },
                     { "City", city },
-                    { "Postal Code", postalCode },
+                    { "Postal Code", postalCode }
                 };
 
                 if (!ValidateFields(fields))
