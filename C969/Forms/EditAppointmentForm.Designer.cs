@@ -177,12 +177,12 @@ namespace C969.Forms
             this.editAppointmentStartTimeLabel.Text = "Start Time";
             // 
             // editAppointmentStartDatePicker
-            //
+            // 
             this.editAppointmentStartDatePicker.CustomFormat = "MM/dd/yyyy";
             this.editAppointmentStartDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.editAppointmentStartDatePicker.Location = new System.Drawing.Point(180, 269);
-            this.editAppointmentStartDatePicker.MinDate = new System.DateTime(2018, 1, 1, 0, 00, 00, 000);
-            this.editAppointmentStartDatePicker.MaxDate = DateTime.Now.AddYears(1);
+            this.editAppointmentStartDatePicker.MaxDate = new System.DateTime(2025, 6, 2, 10, 38, 57, 618);
+            this.editAppointmentStartDatePicker.MinDate = new System.DateTime(2018, 1, 1, 0, 0, 0, 0);
             this.editAppointmentStartDatePicker.Name = "editAppointmentStartDatePicker";
             this.editAppointmentStartDatePicker.Size = new System.Drawing.Size(171, 20);
             this.editAppointmentStartDatePicker.TabIndex = 67;
@@ -278,6 +278,7 @@ namespace C969.Forms
             this.editAppointmentCancelBtn.TabIndex = 56;
             this.editAppointmentCancelBtn.Text = "Cancel";
             this.editAppointmentCancelBtn.UseVisualStyleBackColor = true;
+            this.editAppointmentCancelBtn.Click += new System.EventHandler(this.editAppointmentCancelBtn_Click);
             // 
             // editAppointmentSaveBtn
             // 

@@ -444,6 +444,7 @@ namespace C969.Controllers
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
             TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+            TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
             using (var conn = new MySqlConnection(_connString))
             {
@@ -459,13 +460,20 @@ namespace C969.Controllers
                     {
                         while (reader.Read())
                         {
-                            //// Convert the UTC start and end times to local time
-                            DateTime utcStart = reader.GetDateTime("start");
-                            DateTime utcEnd = reader.GetDateTime("end");
-                            DateTime utcCreateDate = reader.GetDateTime("createDate");
-                            DateTime utcLastUpdate = reader.GetDateTime("lastUpdate");
-                            DateTime localStart = TimeZoneInfo.ConvertTimeFromUtc(utcStart, userTimeZone);
-                            DateTime localEnd = TimeZoneInfo.ConvertTimeFromUtc(utcEnd, userTimeZone);
+                            // Read the start and end times from the database and specify the DateTimeKind
+                            DateTime estStart = DateTime.SpecifyKind(reader.GetDateTime("start"), DateTimeKind.Unspecified);
+                            DateTime estEnd = DateTime.SpecifyKind(reader.GetDateTime("end"), DateTimeKind.Unspecified);
+                            DateTime estCreate = DateTime.SpecifyKind(reader.GetDateTime("createDate"), DateTimeKind.Unspecified);
+                            DateTime estLastUpdate = DateTime.SpecifyKind(reader.GetDateTime("lastUpdate"), DateTimeKind.Unspecified);
+
+
+                            // Convert the start and end times from EST to the user's local time zone
+                            DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
+                            DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
+                            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, userTimeZone);
+                            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estLastUpdate,userTimeZone);
+
+
 
                             appointments.Add(new AppointmentDetails
                             {
@@ -480,9 +488,9 @@ namespace C969.Controllers
                                 Url = reader.GetString("url"),
                                 Start = localStart,
                                 End = localEnd,
-                                CreateDate = utcCreateDate,
+                                CreateDate = localCreateDate,
                                 CreatedBy = reader.GetString("createdBy"),
-                                LastUpdate = utcLastUpdate,
+                                LastUpdate = localLastUpdate,
                                 LastUpdateBy = reader.GetString("lastUpdateBy")
                             });
                         }
@@ -530,15 +538,15 @@ namespace C969.Controllers
             // Ensure the appointment start and end times are treated as local times relative to the user's time zone without any predefined kind
             DateTime startLocal = DateTime.SpecifyKind(appointment.Start, DateTimeKind.Unspecified);
             DateTime endLocal = DateTime.SpecifyKind(appointment.End, DateTimeKind.Unspecified);
-            DateTime nowLocal = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
-
-            // Convert the appointment start and end times to UTC
-            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
-            DateTime utcStart = TimeZoneInfo.ConvertTimeToUtc(startLocal, userTimeZone);
-            DateTime utcEnd = TimeZoneInfo.ConvertTimeToUtc(endLocal, userTimeZone);
-            DateTime utcNow = TimeZoneInfo.ConvertTimeToUtc(nowLocal, userTimeZone);
 
 
+            // Convert the appointment start and end times to EST
+            TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+            DateTime estStart = TimeZoneInfo.ConvertTime(startLocal, UserSession.CurrentTimeZone, estTimeZone);
+            DateTime estEnd = TimeZoneInfo.ConvertTime(endLocal, UserSession.CurrentTimeZone, estTimeZone);
+
+            // Convert the current time to UTC for CreateDate
+            DateTime localNow = TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserSession.CurrentTimeZone);
 
             using (var conn = new MySqlConnection(_connString))
             {
@@ -557,10 +565,10 @@ namespace C969.Controllers
                     cmd.Parameters.AddWithValue("@Contact", appointment.Contact);
                     cmd.Parameters.AddWithValue("@Type", appointment.Type);
                     cmd.Parameters.AddWithValue("@Url", appointment.Url);
-                    cmd.Parameters.AddWithValue("@Start", utcStart);
-                    cmd.Parameters.AddWithValue("@End", utcEnd);
+                    cmd.Parameters.AddWithValue("@Start", estStart);
+                    cmd.Parameters.AddWithValue("@End", estEnd);
                     cmd.Parameters.AddWithValue("@CreatedBy", appointment.CreatedBy);
-                    cmd.Parameters.AddWithValue("@CreateDate", utcNow);
+                    cmd.Parameters.AddWithValue("@CreateDate", localNow);
                     cmd.Parameters.AddWithValue("@LastUpdateBy", UserSession.CurrentUser);
                     int result = cmd.ExecuteNonQuery();
                     return result > 0;
@@ -604,12 +612,19 @@ namespace C969.Controllers
         public AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader, TimeZoneInfo userTimeZone )
         {
 
-            DateTime utcStart = reader.GetDateTime("start");
-            DateTime utcEnd = reader.GetDateTime("end");
-            DateTime localStart = TimeZoneInfo.ConvertTimeFromUtc(utcStart, userTimeZone);
-            DateTime localEnd = TimeZoneInfo.ConvertTimeFromUtc(utcEnd, userTimeZone);
-            DateTime utcCreateDate = TimeZoneInfo.ConvertTimeToUtc(reader.GetDateTime("createDate"), userTimeZone);
-            DateTime utcLastUpdate = TimeZoneInfo.ConvertTimeToUtc(reader.GetDateTime("lastUpdate"), userTimeZone);
+            // Get the time zone for Eastern Standard Time
+            TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+
+            // Read the start and end times from the database as EST
+            DateTime estStart = reader.GetDateTime("start");
+            DateTime estEnd = reader.GetDateTime("end");
+
+            // Convert the start and end times from EST to the user's local time zone
+            DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
+            DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
+
+            DateTime localCreateDate = reader.GetDateTime("createDate");
+            DateTime localLastUpdate = reader.GetDateTime("lastUpdate");
 
             return new AppointmentDetails
             {
@@ -624,9 +639,9 @@ namespace C969.Controllers
                 Url = reader.IsDBNull(reader.GetOrdinal("url")) ? null : reader["url"].ToString(), // Handling nullable fields
                 Start = localStart,
                 End = localEnd,
-                CreateDate = utcCreateDate,
+                CreateDate = localCreateDate,
                 CreatedBy = reader["createdBy"].ToString(),
-                LastUpdate = utcLastUpdate,
+                LastUpdate = localLastUpdate,
                 LastUpdateBy = reader["lastUpdateBy"].ToString()
             };
         }

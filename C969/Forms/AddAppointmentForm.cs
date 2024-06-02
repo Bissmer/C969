@@ -20,6 +20,7 @@ namespace C969.Forms
         private readonly ReportsDataHandler _reportDataHandler;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         private bool _ignoreEvent = false; //Flag to prevent infinite loop in DateTimePicker event handler
+        private readonly TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
         public AddAppointmentForm()
         {
@@ -189,12 +190,19 @@ namespace C969.Forms
 
         public void SaveAppointment()
         {
+            // Parse the selected date and time in the local time zone
+            DateTime startDateTimeLocal = DateTime.Parse(
+                $"{addAppointmentStartDatePicker.Value.ToShortDateString()} {addAppointmentStartTimeCombo.SelectedItem}");
+            DateTime endDateTimeLocal = DateTime.Parse(
+                $"{addAppointmentEndDatePicker.Value.ToShortDateString()} {addAppointmentEndTimeCombo.SelectedItem}");
+
 
             if (addAppointmentEndDatePicker.Value.Date != addAppointmentStartDatePicker.Value.Date)
             {
                 MessageBox.Show("End date cannot be different from start date. Please adjust the dates.");
                 return;
             }
+
 
             AppointmentDetails appointment = new AppointmentDetails
             {
@@ -203,10 +211,8 @@ namespace C969.Forms
                 Description = addAppointmentDescriptionText.Text,
                 Location = addAppointmentLocationText.Text,
                 Contact = addAppointmentContactText.Text,
-                Start = DateTime.Parse(
-                    $"{addAppointmentStartDatePicker.Value.ToShortDateString()} {addAppointmentStartTimeCombo.SelectedItem}"),
-                End = DateTime.Parse(
-                    $"{addAppointmentEndDatePicker.Value.ToShortDateString()} {addAppointmentEndTimeCombo.SelectedItem}"),
+                Start = startDateTimeLocal,
+                End = endDateTimeLocal,
                 CustomerId = (int)addAppointmentCustomerNameCombo.SelectedValue,
                 UserId = UserSession.UserId,
                 CreatedBy = addAppointmentCurrentUserText.Text,
@@ -215,7 +221,7 @@ namespace C969.Forms
 
             };
 
-            if (IsOverLappingAppointment(appointment))
+            if (IsOverlappingAppointment(appointment))
             {
                 MessageBox.Show($"Appointment overlaps with an existing appointment: {appointment.Title}.\n Please adjust the time.");
                 return;
@@ -263,18 +269,13 @@ namespace C969.Forms
             addAppointmentEndDatePicker.Value = initialDate;
         }
 
-        private bool IsOverLappingAppointment(AppointmentDetails appointment)
+        private bool IsOverlappingAppointment(AppointmentDetails newAppointment)
         {
-            var existingAppointments = _reportDataHandler.GetAppointmentsByUserId(appointment.UserId);
-            foreach (var existingApp in existingAppointments)
-            {
-                //overlap check
-                if (appointment.Start < existingApp.End && appointment.End > existingApp.Start)
-                {
-                    return true;
-                }
-            }
-            return false;
+            var existingAppointments = _reportDataHandler.GetAppointmentsByUserId(UserSession.UserId);
+            return existingAppointments.Any(existingAppointment =>
+                newAppointment.AppointmentId != existingAppointment.AppointmentId && // Exclude the current appointment being edited
+                newAppointment.Start < existingAppointment.End &&
+                newAppointment.End > existingAppointment.Start);
         }
     }
 }
