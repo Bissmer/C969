@@ -32,24 +32,30 @@ namespace C969.Forms
         /// </summary>
         private void LoadCountries()
         {
-            using (var connection = new MySqlConnection(_connString))
+            try
             {
-                connection.Open();
-                var query = "SELECT country FROM country";
-                using (var cmd = new MySqlCommand(query, connection))
+                using (var connection = new MySqlConnection(_connString))
                 {
-                    using (var reader = cmd.ExecuteReader())
+                    connection.Open();
+                    var query = "SELECT country FROM country";
+                    using (var cmd = new MySqlCommand(query, connection))
                     {
-                        while (reader.Read())
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            addCustomerCountryCombo.Items.Add(reader["country"].ToString());
+                            while (reader.Read())
+                            {
+                                addCustomerCountryCombo.Items.Add(reader["country"].ToString());
+                            }
                         }
                     }
                 }
-            }
-            if (addCustomerCountryCombo.Items.Count > 0)
+                if (addCustomerCountryCombo.Items.Count > 0)
+                {
+                    addCustomerCountryCombo.SelectedIndex = 0; // Set the first item as the default
+                }
+            } catch (Exception ex)
             {
-                addCustomerCountryCombo.SelectedIndex = 0; // Set the first item as the default
+                MessageBox.Show($"An error occurred while loading countries: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -69,13 +75,14 @@ namespace C969.Forms
 
                 //fields validation block
 
-                var fields = new Dictionary<string, string>
+                var fields = new Dictionary<string, Control>
                 {
-                    { "Customer Name", customerName },
-                    { "Address", address },
-                    { "Phone", phone },
-                    { "City", city },
-                    { "Postal Code", postalCode }
+                    { "Customer Name", addCustomerNameText },
+                    { "Address", addCustomerAddresText },
+                    { "Phone", addCustomerPhoneText },
+                    { "City", addCustomerCityText },
+                    { "Postal Code", addCustomerZipText },
+                    { "Country", addCustomerCountryCombo }
                 };
 
                 if (!ValidateFields(fields))
@@ -86,6 +93,7 @@ namespace C969.Forms
 
                 bool result = _customerDataHandler.AddCustomerWithDetails(customerName, address, address2, phone, city,
                     postalCode, country, isActive);
+
                 if (result)
                 {
                     MessageBox.Show("Customer added successfully.");
@@ -93,7 +101,7 @@ namespace C969.Forms
                 }
                 else
                 {
-                    MessageBox.Show("Failed to add customer. Check the data and try again.");
+                    MessageBox.Show("Failed to add customer. Check the entered data and try again.");
                 }
 
             }
@@ -121,15 +129,26 @@ namespace C969.Forms
         /// </summary>
         /// <param name="fields"></param>
         /// <returns></returns>
-        private bool ValidateFields(Dictionary<string, string> fields)
+        private bool ValidateFields(Dictionary<string, Control> fields)
         {
 
             foreach (var field in fields)
             {
-                if (string.IsNullOrWhiteSpace(field.Value))
+                if (field.Value is TextBox textBox)
                 {
-                    MessageBox.Show($"{field.Key} cannot be empty.");
-                    return false;
+                    if (string.IsNullOrWhiteSpace(textBox.Text))
+                    {
+                        MessageBox.Show($"{field.Key} cannot be empty.");
+                        return false;
+                    }
+                    if (field.Value is ComboBox comboBox)
+                    {
+                        if (comboBox.SelectedItem == null || string.IsNullOrWhiteSpace(comboBox.SelectedItem.ToString()))
+                        {
+                            MessageBox.Show($"{field.Key} cannot be empty.");
+                            return false;
+                        }
+                    }
                 }
             }
             return true;

@@ -17,6 +17,7 @@ namespace C969.Forms
     public partial class AddAppointmentForm : Form
     {
         private readonly CustomerDataHandler _customerDataHandler;
+        private readonly ReportsDataHandler _reportDataHandler;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         private bool _ignoreEvent = false; //Flag to prevent infinite loop in DateTimePicker event handler
 
@@ -24,12 +25,14 @@ namespace C969.Forms
         {
             InitializeComponent();
             _customerDataHandler = new CustomerDataHandler(_connString);
+            _reportDataHandler = new ReportsDataHandler(_connString);
             this.addAppointmentStartDatePicker.ValueChanged += AddAppointmentStartDatePicker_ValueChanged;
             this.addAppointmentEndDatePicker.ValueChanged += AddAppointmentEndDatePicker_ValueChanged;
             this.addAppointmentStartTimeCombo.SelectedIndexChanged += AddAppointmentStartTimeCombo_SelectedIndexChanged;
             SetupTimeComboBoxes();
             LoadCustomerNames();
             DisplayCurrentUser();
+            AdjustDefaultDates();
         }
 
         /// <summary>
@@ -56,6 +59,12 @@ namespace C969.Forms
                 picker.Value = picker.Value.AddDays(1); // Adjust to next Monday
                 _ignoreEvent = false;
             }
+
+            //Make sure the end date is the same as the start date (not before the start date)
+            if (addAppointmentEndDatePicker.Value.Date != picker.Value.Date)
+            {
+                addAppointmentEndDatePicker.Value = picker.Value;
+            }
         }
 
         /// <summary>
@@ -80,6 +89,20 @@ namespace C969.Forms
                 _ignoreEvent = true;
                 MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
                 picker.Value = picker.Value.AddDays(1); // Adjust to next Monday
+                _ignoreEvent = false;
+            }
+
+            if (picker.Value.Date > addAppointmentStartDatePicker.Value.Date)
+            {
+                _ignoreEvent = true;
+                MessageBox.Show("Appointment can't last more than the whole day. Consider splitting into several days.");
+                picker.Value = addAppointmentStartDatePicker.Value;
+                _ignoreEvent = false;
+            } else if (picker.Value.Date < addAppointmentStartDatePicker.Value.Date)
+            {
+                _ignoreEvent = true;
+                MessageBox.Show("Appointment can't end before it starts.");
+                picker.Value = addAppointmentStartDatePicker.Value;
                 _ignoreEvent = false;
             }
         }
@@ -166,6 +189,13 @@ namespace C969.Forms
 
         public void SaveAppointment()
         {
+
+            if (addAppointmentEndDatePicker.Value.Date != addAppointmentStartDatePicker.Value.Date)
+            {
+                MessageBox.Show("End date cannot be different from start date. Please adjust the dates.");
+                return;
+            }
+
             AppointmentDetails appointment = new AppointmentDetails
             {
                 Title = addAppointmentTitleText.Text,
@@ -184,6 +214,12 @@ namespace C969.Forms
                 Url = addAppointmentUrlText.Text
 
             };
+
+            if (IsOverLappingAppointment(appointment))
+            {
+                MessageBox.Show($"Appointment overlaps with an existing appointment: {appointment.Title}.\n Please adjust the time.");
+                return;
+            }
 
             if (_customerDataHandler.AddAppointment(appointment))
             {
@@ -209,6 +245,36 @@ namespace C969.Forms
            {
                 this.Close();
            }
+        }
+
+        private void AdjustDefaultDates()
+        {
+            DateTime initialDate = DateTime.UtcNow;
+            if(initialDate.DayOfWeek == DayOfWeek.Saturday)
+            {
+                initialDate = initialDate.AddDays(2);
+            }
+            else if(initialDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                initialDate = initialDate.AddDays(1);
+            }
+
+            addAppointmentStartDatePicker.Value = initialDate;
+            addAppointmentEndDatePicker.Value = initialDate;
+        }
+
+        private bool IsOverLappingAppointment(AppointmentDetails appointment)
+        {
+            var existingAppointments = _reportDataHandler.GetAppointmentsByUserId(appointment.UserId);
+            foreach (var existingApp in existingAppointments)
+            {
+                //overlap check
+                if (appointment.Start < existingApp.End && appointment.End > existingApp.Start)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

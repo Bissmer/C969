@@ -182,7 +182,6 @@ namespace C969.Forms
             this.addAppointmentStartDatePicker.Name = "addAppointmentStartDatePicker";
             this.addAppointmentStartDatePicker.Size = new System.Drawing.Size(171, 20);
             this.addAppointmentStartDatePicker.TabIndex = 39;
-            this.addAppointmentStartDatePicker.Value = new System.DateTime(2024, 5, 12, 13, 41, 0, 824);
             // 
             // addAppointmentStartTimeLabel
             // 

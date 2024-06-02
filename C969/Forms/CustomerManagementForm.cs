@@ -34,7 +34,32 @@ namespace C969.Forms
 
         }
 
+        /// <summary>
+        /// Load event handler for the Customer Management form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CustomerManagementForm_Load(object sender, EventArgs e)
+        {
 
+            cusMgmtEditCustomerButton.Enabled = false;
+            cusMgmtDeleteCustomerButton.Enabled = false;
+            cusMgmtEditAppointmentButton.Enabled = false;
+            cusMgmtDeleteAppointmentButton.Enabled = false;
+            cusMgmtDgvCustomers.SelectionChanged += cusMgmtDgvCustomers_SelectionChanged;
+            cusMgmtDgvAppontments.SelectionChanged += cusMgmtDgvAppontments_SelectionChanged;
+            cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
+            cusMgmtAppointmentsCalendar.DateChanged += cusMgmtAppointmentsCalendar_DateChanged;
+            cusMgmtSearchAppByCustomer.Enter += cusMgmtSearchAppByCustomer_Enter;
+            cusMgmtSearchAppByCustomer.Leave += cusMgmtSearchAppByCustomer_Leave;
+
+        }
+
+        /// <summary>
+        /// Triggers the add customer form open
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtAddCustomerButton_Click(object sender, EventArgs e)
         {
             var addForm = new AddCustomerForm();
@@ -42,6 +67,11 @@ namespace C969.Forms
             LoadCustomers();
         }
 
+        /// <summary>
+        /// Triggers the edit customer form open for the selected customer on the Customer data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtEditCustomerButton_Click(object sender, EventArgs e)
         {
             if (cusMgmtDgvCustomers.CurrentRow != null)
@@ -55,11 +85,17 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Triggers a delete operation on the selected customer on the Customer data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtDeleteCustomerButton_Click(object sender, EventArgs e)
         {
             if (cusMgmtDgvCustomers.SelectedRows.Count > 0)
             {
                 int customerId = Convert.ToInt32(cusMgmtDgvCustomers.SelectedRows[0].Cells["customerId"].Value);
+
                 try
                 {
                     var result = _customerDataHandler.DeleteCustomer(customerId);
@@ -84,11 +120,11 @@ namespace C969.Forms
             }
         }
 
-        private void cusMgmtEndSessionButton_Click(object sender, EventArgs e)
-        {
-            ExitApplication();
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtAddAppointmentButton_Click(object sender, EventArgs e)
         {
             var addForm = new AddAppointmentForm();
@@ -97,6 +133,18 @@ namespace C969.Forms
             UpdateCalendarHighlights();
 
         }
+
+        /// <summary>
+        /// Triggers the end session and closes the application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtEndSessionButton_Click(object sender, EventArgs e)
+        {
+            ExitApplication();
+        }
+
+
 
         /// <summary>
         /// Debug label to show current user
@@ -141,6 +189,11 @@ namespace C969.Forms
         }
 
 
+        /// <summary>
+        /// Triggers filtering appointments by customer name
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtSearchAppByCustomer_TextChanged(object sender, EventArgs e)
         {
             FilterAppointmentsByCustomerName(cusMgmtSearchAppByCustomer.Text);
@@ -162,6 +215,11 @@ namespace C969.Forms
             cusMgmtDgvAppontments.DataSource = filteredAppointments;
         }
 
+        /// <summary>
+        /// Triggers the edit appointment form for the selected appointment on the Appointments data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtEditAppointmentButton_Click(object sender, EventArgs e)
         {
             if (cusMgmtDgvAppontments.CurrentRow != null)
@@ -174,6 +232,11 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Triggers the delete operation on the selected appointment on the Appointments data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtDeleteAppointmentButton_Click(object sender, EventArgs e)
         {
             if (cusMgmtDgvAppontments.SelectedRows.Count > 0)
@@ -268,6 +331,11 @@ namespace C969.Forms
             cusMgmtAppointmentsCalendar.UpdateBoldedDates();  // Refreshes the calendar display
         }
 
+        /// <summary>
+        /// Removes the default text in the search box when it is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtSearchAppByCustomer_Enter(object sender, EventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -278,6 +346,11 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Adds the default text in the search box when it loses focus and is empty
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtSearchAppByCustomer_Leave(object sender, EventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -288,26 +361,22 @@ namespace C969.Forms
             }
         }
 
-        private void CustomerManagementForm_Load(object sender, EventArgs e)
-        {
-            
-            cusMgmtEditCustomerButton.Enabled = false;
-            cusMgmtDeleteCustomerButton.Enabled = false;
-            cusMgmtEditAppointmentButton.Enabled = false;
-            cusMgmtDeleteAppointmentButton.Enabled = false;
-            cusMgmtDgvCustomers.SelectionChanged += cusMgmtDgvCustomers_SelectionChanged;
-            cusMgmtDgvAppontments.SelectionChanged += cusMgmtDgvAppontments_SelectionChanged;
-            cusMgmtSearchAppByCustomer.TextChanged += cusMgmtSearchAppByCustomer_TextChanged;
-            cusMgmtAppointmentsCalendar.DateChanged += cusMgmtAppointmentsCalendar_DateChanged;
-            cusMgmtSearchAppByCustomer.Enter += cusMgmtSearchAppByCustomer_Enter;
-            cusMgmtSearchAppByCustomer.Leave += cusMgmtSearchAppByCustomer_Leave;
 
-        }
-
+        /// <summary>
+        /// Handle the event of the form to show an alert for upcoming appointments
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CustomerManagementForm_Shown(object sender, EventArgs e)
         {
             ShowUpcomingAppointmentsAlert();
         }
+
+        /// <summary>
+        /// Enables or disables the edit and delete buttons based on the selection of a row in the Customers data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtDgvCustomers_SelectionChanged(object sender, EventArgs e)
         {
             bool isRowSelected = cusMgmtDgvCustomers.SelectedRows.Count > 0;
@@ -315,6 +384,11 @@ namespace C969.Forms
             cusMgmtDeleteCustomerButton.Enabled = isRowSelected;
         }
 
+        /// <summary>
+        /// Enables or disables the edit and delete buttons based on the selection of a row in the Appointments data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtDgvAppontments_SelectionChanged(object sender, EventArgs e)
         {
             bool isRowSelected = cusMgmtDgvAppontments.SelectedRows.Count > 0;
@@ -363,6 +437,11 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Triggers the reports form open
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cusMgmtReportsButton_Click(object sender, EventArgs e)
         {
             var reportsForm = new ReportsForm();

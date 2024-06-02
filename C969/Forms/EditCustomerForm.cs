@@ -30,10 +30,11 @@ namespace C969.Forms
             LoadCountries();
             LoadCustomerData();
             editCustomerPhoneText.KeyPress += new KeyPressEventHandler(PhoneTextBox_KeyPress);
-
-
         }
 
+        /// <summary>
+        /// Method to load countries into the country combobox
+        /// </summary>
         private void LoadCountries()
         {
             using (var connection = new MySqlConnection(_connString))
@@ -52,7 +53,9 @@ namespace C969.Forms
                 }
             }
         }
-
+        /// <summary>
+        /// Method to load customer data when an EditCustomer is opened 
+        /// </summary>
         private void LoadCustomerData()
         {
             var customerDetails = _customerDataHandler.GetCustomerDetails(_customerId);
@@ -74,7 +77,6 @@ namespace C969.Forms
                 MessageBox.Show("Customer not found.");
                 this.Close();
             }
-
 
         }
 
@@ -140,6 +142,11 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Method to validate phone number input
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PhoneTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '-')
@@ -148,6 +155,11 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Method to validate form fields
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <returns></returns>
         private bool ValidateFields(Dictionary<string, Control> fields)
         {
             foreach (var field in fields)
