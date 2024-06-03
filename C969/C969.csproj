@@ -120,6 +120,7 @@
     <Compile Include="Controllers\CustomerDataHandler.cs" />
     <Compile Include="Controllers\LoginLogger.cs" />
     <Compile Include="Controllers\ReportsDataHandler.cs" />
+    <Compile Include="Controllers\TimeZoneHandler.cs" />
     <Compile Include="Forms\AddAppointmentForm.cs">
       <SubType>Form</SubType>
     </Compile>

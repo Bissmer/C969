@@ -535,15 +535,8 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool AddAppointment(AppointmentDetails appointment)
         {
-            // Ensure the appointment start and end times are treated as local times relative to the user's time zone without any predefined kind
-            DateTime startLocal = DateTime.SpecifyKind(appointment.Start, DateTimeKind.Unspecified);
-            DateTime endLocal = DateTime.SpecifyKind(appointment.End, DateTimeKind.Unspecified);
-
-
-            // Convert the appointment start and end times to EST
-            TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            DateTime estStart = TimeZoneInfo.ConvertTime(startLocal, UserSession.CurrentTimeZone, estTimeZone);
-            DateTime estEnd = TimeZoneInfo.ConvertTime(endLocal, UserSession.CurrentTimeZone, estTimeZone);
+            var (estStart, estEnd) =
+                TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, UserSession.CurrentTimeZone);
 
             // Convert the current time to UTC for CreateDate
             DateTime localNow = TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserSession.CurrentTimeZone);
@@ -681,6 +674,13 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool UpdateAppointment(AppointmentDetails appointment)
         {
+            // Convert the appointment start and end times to EST
+            var (estStart, estEnd) =
+                TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, UserSession.CurrentTimeZone);
+            
+            // Convert the current time to UTC for CreateDate
+            DateTime localNow = TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserSession.CurrentTimeZone);
+
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
@@ -707,9 +707,9 @@ namespace C969.Controllers
                             cmd.Parameters.AddWithValue("@contact", appointment.Contact);
                             cmd.Parameters.AddWithValue("@type", appointment.Type);
                             cmd.Parameters.AddWithValue("@url", appointment.Url);
-                            cmd.Parameters.AddWithValue("@start", appointment.Start);
-                            cmd.Parameters.AddWithValue("@end", appointment.End);
-                            cmd.Parameters.AddWithValue("@lastUpdate", DateTime.UtcNow);
+                            cmd.Parameters.AddWithValue("@start", estStart);
+                            cmd.Parameters.AddWithValue("@end", estEnd);
+                            cmd.Parameters.AddWithValue("@lastUpdate", localNow);
                             cmd.Parameters.AddWithValue("@lastUpdateBy", UserSession.CurrentUser);
                             cmd.Parameters.AddWithValue("@appointmentId", appointment.AppointmentId);
 

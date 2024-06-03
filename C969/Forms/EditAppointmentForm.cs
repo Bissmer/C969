@@ -117,10 +117,6 @@ namespace C969.Forms
                     DateTime endDateTimeLocal = DateTime.Parse(
                         $"{editAppointmentEndDatePicker.Value.ToShortDateString()} {editAppointmentEndTimeCombo.SelectedItem}");
 
-                    // Convert local time to EST
-                    TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                    DateTime estStart = TimeZoneInfo.ConvertTime(startDateTimeLocal, estTimeZone);
-                    DateTime estEnd = TimeZoneInfo.ConvertTime(endDateTimeLocal, estTimeZone);
 
                     AppointmentDetails appointment = new AppointmentDetails
                     {
@@ -130,8 +126,8 @@ namespace C969.Forms
                         Description = editAppointmentDescriptionText.Text,
                         Location = editAppointmentLocationText.Text,
                         Contact = editAppointmentContactText.Text,
-                        Start = estStart,
-                        End = estEnd,
+                        Start = startDateTimeLocal,
+                        End = endDateTimeLocal,
                         CustomerId = (int)editAppointmentCustomerNameCombo.SelectedValue,
                         UserId = UserSession.UserId,
                         CreatedBy = editAppointmentCurrentUserText.Text,
