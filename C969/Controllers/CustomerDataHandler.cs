@@ -18,6 +18,7 @@ namespace C969.Controllers
         private readonly MySqlConnection _connection;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         private readonly string _currentUser;
+        public TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
 
         public CustomerDataHandler(string _connString)
@@ -444,7 +445,6 @@ namespace C969.Controllers
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
             TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
-            TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
             using (var conn = new MySqlConnection(_connString))
             {
@@ -470,8 +470,8 @@ namespace C969.Controllers
                             // Convert the start and end times from EST to the user's local time zone
                             DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
                             DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
-                            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, userTimeZone);
-                            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estLastUpdate,userTimeZone);
+                            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, estTimeZone, userTimeZone);
+                            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estLastUpdate, estTimeZone, userTimeZone);
 
 
 
@@ -535,18 +535,15 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool AddAppointment(AppointmentDetails appointment)
         {
-            var (estStart, estEnd) =
-                TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, UserSession.CurrentTimeZone);
+            var (estStart, estEnd, estNow) = TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, DateTime.Now, UserSession.CurrentTimeZone);
 
-            // Convert the current time to UTC for CreateDate
-            DateTime localNow = TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserSession.CurrentTimeZone);
 
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
                 var query = @"
-                  INSERT INTO appointment (CustomerId, UserId, Title, Description, Location, Contact, Type, Url, Start, End, CreatedBy,CreateDate, LastUpdateBy )
-                   VALUES (@CustomerId, @UserId, @Title, @Description, @Location, @Contact, @Type, @Url, @Start, @End, @CreatedBy,@CreateDate,@LastUpdateBy );";
+                  INSERT INTO appointment (CustomerId, UserId, Title, Description, Location, Contact, Type, Url, Start, End, CreatedBy,CreateDate,LastUpdate, LastUpdateBy )
+                   VALUES (@CustomerId, @UserId, @Title, @Description, @Location, @Contact, @Type, @Url, @Start, @End, @CreatedBy,@CreateDate,@LastUpdate, @LastUpdateBy );";
 
                 using (var cmd = new MySqlCommand(query, conn))
                 {
@@ -561,7 +558,8 @@ namespace C969.Controllers
                     cmd.Parameters.AddWithValue("@Start", estStart);
                     cmd.Parameters.AddWithValue("@End", estEnd);
                     cmd.Parameters.AddWithValue("@CreatedBy", appointment.CreatedBy);
-                    cmd.Parameters.AddWithValue("@CreateDate", localNow);
+                    cmd.Parameters.AddWithValue("@CreateDate", estNow);
+                    cmd.Parameters.AddWithValue("@LastUpdate", estNow);
                     cmd.Parameters.AddWithValue("@LastUpdateBy", UserSession.CurrentUser);
                     int result = cmd.ExecuteNonQuery();
                     return result > 0;
@@ -674,12 +672,7 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool UpdateAppointment(AppointmentDetails appointment)
         {
-            // Convert the appointment start and end times to EST
-            var (estStart, estEnd) =
-                TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, UserSession.CurrentTimeZone);
-            
-            // Convert the current time to UTC for CreateDate
-            DateTime localNow = TimeZoneInfo.ConvertTime(DateTime.UtcNow, UserSession.CurrentTimeZone);
+            var (estStart, estEnd, estNow) = TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, DateTime.UtcNow, UserSession.CurrentTimeZone);
 
             using (var conn = new MySqlConnection(_connString))
             {
@@ -709,7 +702,7 @@ namespace C969.Controllers
                             cmd.Parameters.AddWithValue("@url", appointment.Url);
                             cmd.Parameters.AddWithValue("@start", estStart);
                             cmd.Parameters.AddWithValue("@end", estEnd);
-                            cmd.Parameters.AddWithValue("@lastUpdate", localNow);
+                            cmd.Parameters.AddWithValue("@lastUpdate", estNow);
                             cmd.Parameters.AddWithValue("@lastUpdateBy", UserSession.CurrentUser);
                             cmd.Parameters.AddWithValue("@appointmentId", appointment.AppointmentId);
 
@@ -881,6 +874,49 @@ namespace C969.Controllers
                 }
             }
             return upcomingAppointments;
+        }
+
+        public List<(DateTime start, DateTime end)> GetAvailableHours(DateTime selectedDate, TimeZoneInfo userTimeZone)
+        {
+            var availableHours = new List<(DateTime start, DateTime end)>();
+
+            // Define working hours in EST
+            var estStartWork = new DateTime(selectedDate.Year, selectedDate.Month, selectedDate.Day, 9, 0, 0);
+            var estEndWork = new DateTime(selectedDate.Year, selectedDate.Month, selectedDate.Day, 17, 0, 0);
+
+            // Convert to user's time zone
+            var userStartWork = TimeZoneHandler.ConvertToUserTimeZone(estStartWork, userTimeZone);
+            var userEndWork = TimeZoneHandler.ConvertToUserTimeZone(estEndWork, userTimeZone);
+
+            // Fetch appointments for the selected date
+            var appointments = GetAppointmentsByDate(selectedDate);
+
+            // Get overlapping appointments in user's time zone
+            var overlappingAppointments = appointments
+                .Where(app => app.Start.Date == selectedDate.Date)
+                .Select(app => (
+                    start: TimeZoneHandler.ConvertToUserTimeZone(app.Start, userTimeZone),
+                    end: TimeZoneHandler.ConvertToUserTimeZone(app.End, userTimeZone)
+                ))
+                .ToList();
+
+            // Calculate available hours
+            DateTime currentTime = userStartWork;
+            foreach (var appt in overlappingAppointments.OrderBy(a => a.start))
+            {
+                if (appt.start > currentTime)
+                {
+                    availableHours.Add((currentTime, appt.start));
+                }
+                currentTime = appt.end > currentTime ? appt.end : currentTime;
+            }
+
+            if (currentTime < userEndWork)
+            {
+                availableHours.Add((currentTime, userEndWork));
+            }
+
+            return availableHours;
         }
 
     }

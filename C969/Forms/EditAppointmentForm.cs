@@ -117,7 +117,6 @@ namespace C969.Forms
                     DateTime endDateTimeLocal = DateTime.Parse(
                         $"{editAppointmentEndDatePicker.Value.ToShortDateString()} {editAppointmentEndTimeCombo.SelectedItem}");
 
-
                     AppointmentDetails appointment = new AppointmentDetails
                     {
                         AppointmentId = _appointmentId,
@@ -172,6 +171,7 @@ namespace C969.Forms
 
                 DateTime startDateTime = DateTime.Parse($"{editAppointmentStartDatePicker.Value.ToShortDateString()} {editAppointmentStartTimeCombo.SelectedItem}");
                 DateTime endDateTime = DateTime.Parse($"{editAppointmentEndDatePicker.Value.ToShortDateString()} {editAppointmentEndTimeCombo.SelectedItem}");
+                
 
                 if (endDateTime <= startDateTime)
                 {

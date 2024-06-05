@@ -36,6 +36,7 @@ namespace C969.Forms
             AdjustDefaultDates();
         }
 
+
         /// <summary>
         /// Prevent user from selecting weekends for appointment start date
         /// </summary>
@@ -113,9 +114,24 @@ namespace C969.Forms
         /// </summary>
         private void SetupTimeComboBoxes()
         {
-            var timeSlots = GenerateTimeSlots();
+            var userTimeZone = UserSession.CurrentTimeZone;
+
+            // Define working hours in EST
+            var estStartWork = new DateTime(1, 1, 1, 9, 0, 0); // 9 AM
+            var estEndWork = new DateTime(1, 1, 1, 17, 0, 0); // 5 PM
+
+            // Convert to user's time zone
+            var userStartWork = TimeZoneHandler.ConvertToUserTimeZone(estStartWork, userTimeZone);
+            var userEndWork = TimeZoneHandler.ConvertToUserTimeZone(estEndWork, userTimeZone);
+
+            // Generate time slots based on the converted hours
+            var timeSlots = GenerateTimeSlots(userStartWork, userEndWork);
+
+            addAppointmentStartTimeCombo.Items.Clear();
+            addAppointmentEndTimeCombo.Items.Clear();
             addAppointmentStartTimeCombo.Items.AddRange(timeSlots.ToArray());
-            addAppointmentEndTimeCombo.SelectedItem = timeSlots.First();
+            addAppointmentEndTimeCombo.Items.AddRange(timeSlots.ToArray());
+            addAppointmentStartTimeCombo.SelectedIndex = 0;
             UpdateEndTimeComboBox();
 
 
@@ -125,16 +141,14 @@ namespace C969.Forms
         /// Generate time slots for the appointment time combo boxes
         /// </summary>
         /// <returns></returns>
-        private List<string> GenerateTimeSlots()
+        private List<string> GenerateTimeSlots(DateTime startTime, DateTime endTime)
         {
             List<string> timeSlots = new List<string>();
-            DateTime startTime = DateTime.Today.AddHours(9); //start at 9am
-            DateTime endTime = DateTime.Today.AddHours(17); //end at 5pm
 
             while (startTime < endTime)
             {
                 timeSlots.Add(startTime.ToString("hh:mm tt"));
-                startTime = startTime.AddMinutes(15); //gaps are 15 minutes
+                startTime = startTime.AddMinutes(15); // gaps are 15 minutes
             }
 
             return timeSlots;
@@ -157,7 +171,7 @@ namespace C969.Forms
 
             // Clear current items and add only times that are later than the selected start time
             addAppointmentEndTimeCombo.Items.Clear();
-            List<string> slots = GenerateTimeSlots();
+            List<string> slots = GenerateTimeSlots(startTime, startTime.AddHours(8)); // 8 hours working period
 
             foreach (string slot in slots)
             {
@@ -217,7 +231,8 @@ namespace C969.Forms
                 UserId = UserSession.UserId,
                 CreatedBy = addAppointmentCurrentUserText.Text,
                 LastUpdateBy = addAppointmentCurrentUserText.Text,
-                Url = addAppointmentUrlText.Text
+                Url = addAppointmentUrlText.Text,
+                CreateDate = DateTime.Now,
 
             };
 
