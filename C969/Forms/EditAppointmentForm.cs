@@ -29,37 +29,48 @@ namespace C969.Forms
             _appointmentId = appointmentId;
             _customerDataHandler = new CustomerDataHandler(_connString);
             _reportDataHandler = new ReportsDataHandler(_connString);
-            LoadAppointmentDetails(appointmentId);
+            LoadAppointmentData();
             LoadCustomerNames();
             DisplayCurrentUser();
+            SetupTimeComboBoxes();
             editAppointmentStartDatePicker.ValueChanged += editAppointmentStartDatePicker_ValueChanged;
             editAppointmentEndDatePicker.ValueChanged += editAppointmentEndDatePicker_ValueChanged;
             editAppointmentStartTimeCombo.SelectedIndexChanged += EditAppointmentStartTimeCombo_SelectedIndexChanged;
         }
 
 
-        private void SetupTimeComboBoxes(DateTime selectedStartTime, DateTime selectedEndTime)
+        private void SetupTimeComboBoxes()
         {
-            var timeSlots = GenerateTimeSlots();
+            var userTimeZone = UserSession.CurrentTimeZone;
+
+            // Define working hours in EST
+            var estStartWork = new DateTime(1, 1, 1, 9, 0, 0); // 9 AM
+            var estEndWork = new DateTime(1, 1, 1, 17, 0, 0); // 5 PM
+
+            // Convert to user's time zone
+            var userStartWork = TimeZoneHandler.ConvertToUserTimeZone(estStartWork, userTimeZone);
+            var userEndWork = TimeZoneHandler.ConvertToUserTimeZone(estEndWork, userTimeZone);
+
+            // Generate time slots based on the converted hours
+            var timeSlots = GenerateTimeSlots(userStartWork, userEndWork);
+
             editAppointmentStartTimeCombo.Items.Clear();
-            editAppointmentStartTimeCombo.Items.AddRange(timeSlots.ToArray());
             editAppointmentEndTimeCombo.Items.Clear();
+            editAppointmentStartTimeCombo.Items.AddRange(timeSlots.ToArray());
             editAppointmentEndTimeCombo.Items.AddRange(timeSlots.ToArray());
-            editAppointmentStartTimeCombo.SelectedItem = selectedStartTime.ToString("hh:mm tt");
-            editAppointmentEndTimeCombo.SelectedItem = selectedEndTime.ToString("hh:mm tt");
+            editAppointmentStartTimeCombo.SelectedIndex = 0;
+            UpdateEndTimeComboBox();
 
         }
 
-        private List<string> GenerateTimeSlots()
+        private List<string> GenerateTimeSlots(DateTime startTime, DateTime endTime)
         {
             List<string> timeSlots = new List<string>();
-            DateTime startTime = DateTime.Today.AddHours(9); //start at 9am
-            DateTime endTime = DateTime.Today.AddHours(17); //end at 5pm
 
             while (startTime < endTime)
             {
                 timeSlots.Add(startTime.ToString("hh:mm tt"));
-                startTime = startTime.AddMinutes(15); //gaps are 15 minutes
+                startTime = startTime.AddMinutes(15); // gaps are 15 minutes
             }
 
             return timeSlots;
@@ -80,28 +91,31 @@ namespace C969.Forms
             editAppointmentCurrentUserText.ReadOnly = true;
         }
 
-        /// <summary>
-        /// Function to load the appointment details into the form
-        /// </summary>
-        /// <param name="appointmentId"></param>
-        private void LoadAppointmentDetails(int appointmentId)
+        private void LoadAppointmentData()
         {
-            var appointment = _customerDataHandler.GetAppointmentById(appointmentId);
-            if (appointment != null)
+            var appointmentDetails = _customerDataHandler.GetAppointmentById(_appointmentId);
+            if (appointmentDetails != null)
             {
-                editAppointmentTitleText.Text = appointment.Title;
-                editAppointmentTypeText.Text = appointment.Type;
-                editAppointmentDescriptionText.Text = appointment.Description;
-                editAppointmentLocationText.Text = appointment.Location;
-                editAppointmentContactText.Text = appointment.Contact;
-                SetupTimeComboBoxes(appointment.Start, appointment.End);
-                editAppointmentStartDatePicker.Value = appointment.Start;
-                editAppointmentEndDatePicker.Value = appointment.End;
-                editAppointmentCustomerNameCombo.SelectedValue = appointment.CustomerId;
-                editAppointmentUrlText.Text = appointment.Url;
-                editAppointmentCurrentUserText.Text = appointment.CreatedBy;
-                editAppointmentCurrentUserText.ReadOnly = true;
-                editAppointmentContactText.Text = appointment.Contact;
+                editAppointmentTitleText.Text = appointmentDetails.Title;
+                editAppointmentTypeText.Text = appointmentDetails.Type;
+                editAppointmentDescriptionText.Text = appointmentDetails.Description;
+                editAppointmentLocationText.Text = appointmentDetails.Location;
+                editAppointmentContactText.Text = appointmentDetails.Contact;
+                editAppointmentStartDatePicker.Value = appointmentDetails.Start.Date;
+                editAppointmentEndDatePicker.Value = appointmentDetails.End.Date;
+
+                editAppointmentStartTimeCombo.SelectedItem = appointmentDetails.Start.ToString("hh:mm tt");
+                editAppointmentEndTimeCombo.SelectedItem = appointmentDetails.End.ToString("hh:mm tt");
+
+                editAppointmentCustomerNameCombo.DataSource = new BindingSource(_customerDataHandler.GetCustomerNameAndId(), null);
+                editAppointmentCustomerNameCombo.DisplayMember = "Value";
+                editAppointmentCustomerNameCombo.ValueMember = "Key";
+                editAppointmentCustomerNameCombo.SelectedValue = appointmentDetails.CustomerId;
+            }
+            else
+            {
+                MessageBox.Show("Appointment not found.");
+                this.Close();
             }
         }
 
@@ -253,13 +267,14 @@ namespace C969.Forms
 
         private void UpdateEndTimeComboBox()
         {
-            if(editAppointmentStartTimeCombo.SelectedIndex == -1) return;
+            if (editAppointmentStartTimeCombo.SelectedIndex == -1) return;
+
             string selectedStartTime = editAppointmentStartTimeCombo.SelectedItem.ToString();
             DateTime startTime = DateTime.Parse(selectedStartTime, new CultureInfo("en-US"));
 
             // Clear current items and add only times that are later than the selected start time
             editAppointmentEndTimeCombo.Items.Clear();
-            List<string> slots = GenerateTimeSlots();
+            List<string> slots = GenerateTimeSlots(startTime, startTime.AddHours(8)); // 8 hours working period
 
             foreach (string slot in slots)
             {
