@@ -100,19 +100,26 @@ namespace C969.Forms
                 editAppointmentDescriptionText.Text = appointmentDetails.Description;
                 editAppointmentLocationText.Text = appointmentDetails.Location;
                 editAppointmentContactText.Text = appointmentDetails.Contact;
+                editAppointmentUrlText.Text = appointmentDetails.Url;
+
+
+                // Set date and time values
                 editAppointmentStartDatePicker.Value = appointmentDetails.Start.Date;
                 editAppointmentEndDatePicker.Value = appointmentDetails.End.Date;
-
                 SetupTimeComboBoxes();
                 editAppointmentStartTimeCombo.SelectedItem = appointmentDetails.Start.ToString("hh:mm tt");
                 editAppointmentEndTimeCombo.SelectedItem = appointmentDetails.End.ToString("hh:mm tt");
 
-                
 
+                // Set customer
                 editAppointmentCustomerNameCombo.DataSource = new BindingSource(_customerDataHandler.GetCustomerNameAndId(), null);
                 editAppointmentCustomerNameCombo.DisplayMember = "Value";
                 editAppointmentCustomerNameCombo.ValueMember = "Key";
                 editAppointmentCustomerNameCombo.SelectedValue = appointmentDetails.CustomerId;
+
+                // Set current user (readonly)
+                editAppointmentCurrentUserText.Text = UserSession.CurrentUser;
+                editAppointmentCurrentUserText.ReadOnly = true;
             }
             else
             {
@@ -152,10 +159,19 @@ namespace C969.Forms
 
                     };
 
-                    if (IsOverlappingAppointment(appointment))
+                    var overlappingAppointment = GetOverlappingAppointment(appointment, _appointmentId);
+
+
+                    if (overlappingAppointment != null)
                     {
-                        MessageBox.Show(
-                            $"Appointment overlaps with an existing appointment: {appointment.Title}.\\n Please adjust the time.");
+                        MessageBox.Show($"The appointment '{appointment.Title}' overlaps with an existing appointment: \n" +
+                                        $"Title: {overlappingAppointment.Title}\n" +
+                                        $"Start: {overlappingAppointment.Start}\n" +
+                                        $"End: {overlappingAppointment.End}\n" +
+                                        "Please adjust the time.",
+                            "Overlapping Appointment",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
                         return;
                     }
 
@@ -175,6 +191,23 @@ namespace C969.Forms
                 }
 
             }
+        }
+
+        private AppointmentDetails GetOverlappingAppointment(AppointmentDetails newAppointment, int excludeAppointmentId = 0)
+        {
+            var existingAppointments = _customerDataHandler.GetAppointmentsByCustomerName(editAppointmentCustomerNameCombo.Text);
+
+            foreach (var appointment in existingAppointments)
+            {
+                if (newAppointment.CustomerId == appointment.CustomerId &&
+                    newAppointment.Start < appointment.End && newAppointment.End > appointment.Start &&
+                    appointment.AppointmentId != excludeAppointmentId)
+                {
+                    return appointment;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

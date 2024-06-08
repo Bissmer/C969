@@ -236,9 +236,18 @@ namespace C969.Forms
 
             };
 
-            if (IsOverlappingAppointment(appointment))
+            var overlappingAppointment = GetOverlappingAppointment(appointment);
+
+            if (overlappingAppointment != null)
             {
-                MessageBox.Show($"Appointment overlaps with an existing appointment: {appointment.Title}.\n Please adjust the time.");
+                MessageBox.Show($"The appointment '{appointment.Title}' overlaps with an existing appointment: \n" +
+                                $"Title: {overlappingAppointment.Title}\n" +
+                                $"Start: {overlappingAppointment.Start}\n" +
+                                $"End: {overlappingAppointment.End}\n" +
+                                "Please adjust the time.",
+                    "Overlapping Appointment",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
@@ -251,6 +260,27 @@ namespace C969.Forms
             {
                 MessageBox.Show("Failed to add appointment. Check the data and try again.");
             }
+        }
+
+        /// <summary>
+        /// Retrieve an overlapping appointment for the Customer if it exists
+        /// </summary>
+        /// <param name="newAppointment"></param>
+        /// <returns></returns>
+        private AppointmentDetails GetOverlappingAppointment(AppointmentDetails newAppointment)
+        {
+            var existingAppointments = _customerDataHandler.GetAppointmentsByCustomerName(addAppointmentCustomerNameCombo.Text);
+
+            foreach (var appointment in existingAppointments)
+            {
+                if (newAppointment.CustomerId == appointment.CustomerId &&
+                    newAppointment.Start <= appointment.End && newAppointment.End >= appointment.Start)
+                {
+                    return appointment;
+                }
+            }
+
+            return null;
         }
 
         private void addAppointmentSaveBtn_Click(object sender, EventArgs e)
