@@ -32,7 +32,6 @@ namespace C969.Forms
             LoadAppointmentData();
             LoadCustomerNames();
             DisplayCurrentUser();
-            SetupTimeComboBoxes();
             editAppointmentStartDatePicker.ValueChanged += editAppointmentStartDatePicker_ValueChanged;
             editAppointmentEndDatePicker.ValueChanged += editAppointmentEndDatePicker_ValueChanged;
             editAppointmentStartTimeCombo.SelectedIndexChanged += EditAppointmentStartTimeCombo_SelectedIndexChanged;
@@ -104,8 +103,11 @@ namespace C969.Forms
                 editAppointmentStartDatePicker.Value = appointmentDetails.Start.Date;
                 editAppointmentEndDatePicker.Value = appointmentDetails.End.Date;
 
+                SetupTimeComboBoxes();
                 editAppointmentStartTimeCombo.SelectedItem = appointmentDetails.Start.ToString("hh:mm tt");
                 editAppointmentEndTimeCombo.SelectedItem = appointmentDetails.End.ToString("hh:mm tt");
+
+                
 
                 editAppointmentCustomerNameCombo.DataSource = new BindingSource(_customerDataHandler.GetCustomerNameAndId(), null);
                 editAppointmentCustomerNameCombo.DisplayMember = "Value";
