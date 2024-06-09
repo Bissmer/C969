@@ -151,8 +151,10 @@ namespace C969.Forms
         }
 
         /// <summary>
-        /// Generate time slots for the appointment time combo boxes
+        /// Generate time slots for the appointment start and end times
         /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
         /// <returns></returns>
         private List<string> GenerateTimeSlots(DateTime startTime, DateTime endTime)
         {
@@ -277,11 +279,21 @@ namespace C969.Forms
 
         }
 
+        /// <summary>
+        /// Method to handle the Add Appointment button click event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addAppointmentSaveBtn_Click(object sender, EventArgs e)
         {
             SaveAppointment();
         }
 
+        /// <summary>
+        /// Button click event to cancel adding an appointment
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addAppointmentCancelBtn_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Are you sure you want to cancel adding the appointment?", "Cancel Appointment",
@@ -290,29 +302,6 @@ namespace C969.Forms
             {
                 this.Close();
             }
-        }
-        #endregion
-
-        #region Misc (Overalpping logic, Default dates adjustment, combos setup)
-        /// <summary>
-        /// Load the customer names into the addAppointmentCustomerNameCombo combo box
-        /// </summary>
-        private void LoadCustomerNames()
-        {
-            var customerData = _customerDataHandler.GetCustomerNameAndId();
-            addAppointmentCustomerNameCombo.DataSource = new BindingSource(customerData, null);
-            addAppointmentCustomerNameCombo.DisplayMember = "Value"; //this will show the customer name
-            addAppointmentCustomerNameCombo.ValueMember = "Key"; //this will store the customer id
-
-        }
-
-        /// <summary>
-        /// Display the current user in the form
-        /// </summary>
-        private void DisplayCurrentUser()
-        {
-            addAppointmentCurrentUserText.Text = UserSession.CurrentUser;
-            addAppointmentCurrentUserText.ReadOnly = true;
         }
 
         /// <summary>
@@ -335,6 +324,30 @@ namespace C969.Forms
 
             return null;
         }
+        #endregion
+
+        #region Misc (Default dates adjustment, Combos setup)
+        /// <summary>
+        /// Load the customer names into the addAppointmentCustomerNameCombo combo box
+        /// </summary>
+        private void LoadCustomerNames()
+        {
+            var customerData = _customerDataHandler.GetCustomerNameAndId();
+            addAppointmentCustomerNameCombo.DataSource = new BindingSource(customerData, null);
+            addAppointmentCustomerNameCombo.DisplayMember = "Value"; //this will show the customer name
+            addAppointmentCustomerNameCombo.ValueMember = "Key"; //this will store the customer id
+
+        }
+
+        /// <summary>
+        /// Display the current user in the form
+        /// </summary>
+        private void DisplayCurrentUser()
+        {
+            addAppointmentCurrentUserText.Text = UserSession.CurrentUser;
+            addAppointmentCurrentUserText.ReadOnly = true;
+        }
+
 
         /// <summary>
         /// Adjust the default dates for the appointment to the next available weekday, if the selection was on a weekend

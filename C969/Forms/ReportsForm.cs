@@ -19,6 +19,8 @@ namespace C969.Forms
 
         private readonly ReportsDataHandler _reportsDataHandler;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+
+
         
         public ReportsForm()
         {
@@ -44,36 +46,12 @@ namespace C969.Forms
             LoadMonthlyReport();
         }
 
-        private void LoadUsers()
-        {
-            var users = _reportsDataHandler.GetAllUsers();
-            reportsFormUsersCombo.DataSource = users;
-            reportsFormUsersCombo.DisplayMember = "userName";
-            reportsFormUsersCombo.ValueMember = "userId";
-        }
 
-        private void reportsFormUsersCombo_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if (reportsFormUsersCombo.SelectedValue != null && int.TryParse(reportsFormUsersCombo.SelectedValue.ToString(), out int selectedUserId))
-                {
-                    LoadAppointmentsByUser(selectedUserId);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        #region Report DataGridViews Columns Configuration
 
-        private void LoadAppointmentsByUser(int userId)
-        {
-            var appointments = _reportsDataHandler.GetAppointmentsByUserId(userId);
-            reportsFormDgvAppointmentsByUser.DataSource = appointments;
-            reportsFormDgvAppointmentsByUser.Refresh();
-        }
-
+        /// <summary>
+        /// Method to configure tables in Schedules By User DGV
+        /// </summary>
         private void ConfigureAppointmentsDataGridView()
         {
             reportsFormDgvAppointmentsByUser.AutoGenerateColumns = false;
@@ -124,33 +102,59 @@ namespace C969.Forms
         }
 
         /// <summary>
-        /// Load the default appointments for the first user in the combo box
+        /// Method to configure tables in Appointments By Months DGV
         /// </summary>
-        private void LoadDefaultAppointments()
+        private void ConfigureMonthlyReportDataGridView()
         {
-            if (reportsFormUsersCombo.Items.Count > 0)
+            reportsFormDgvAppointmentsByMonth.AutoGenerateColumns = false;
+            reportsFormDgvAppointmentsByMonth.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
             {
-                reportsFormUsersCombo.SelectedIndex = 0; // Select the first item by default
-                int selectedUserId = (int)reportsFormUsersCombo.SelectedValue;
-                LoadAppointmentsByUser(selectedUserId);
-            }
+                DataPropertyName = "MonthName",
+                HeaderText = "Month"
+            });
+
+            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Type",
+                HeaderText = "Type"
+            });
+
+            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Count",
+                HeaderText = "Count"
+            });
         }
 
-        private void reportsFormDownloadSchedulesByUser_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Method to configure tables in Customer Appointments Breakdown DGV
+        /// </summary>
+        private void ConfigureCustomerCountByCountryCityDataGridView()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Filter = "CSV files (*.csv)|*.csv",
-                Title = "Save schedules by user"
-            };
-            
+            reportsFormDgvCustomerCountByCountry.AutoGenerateColumns = false;
+            reportsFormDgvCustomerCountByCountry.Columns.Clear();
+            reportsFormDgvCustomerCountByCountry.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            reportsFormDgvCustomerCountByCountry.Columns.Add(new DataGridViewTextBoxColumn
             {
-                ExportReportsToCsv(reportsFormDgvAppointmentsByUser, saveFileDialog.FileName);
-            }
+                DataPropertyName = "Name",
+                HeaderText = "Name",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
+
+            reportsFormDgvCustomerCountByCountry.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "CusCount",
+                HeaderText = "Customer Count",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            });
         }
 
+        #endregion
+
+        #region Reports Export Methods
         /// <summary>
         /// Load the appointments for the selected user and export them to a CSV file
         /// </summary>
@@ -180,31 +184,91 @@ namespace C969.Forms
                 MessageBox.Show($"An error occurred while exporting data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        #endregion
 
-        private void ConfigureMonthlyReportDataGridView()
+        #region Schedules by User report controls and logic
+
+        /// <summary>
+        /// Method to load users data into the user combo box
+        /// </summary>
+        private void LoadUsers()
         {
-            reportsFormDgvAppointmentsByMonth.AutoGenerateColumns = false;
-            reportsFormDgvAppointmentsByMonth.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "MonthName",
-                HeaderText = "Month"
-            });
-
-            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Type",
-                HeaderText = "Type"
-            });
-
-            reportsFormDgvAppointmentsByMonth.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Count",
-                HeaderText = "Count"
-            });
+            var users = _reportsDataHandler.GetAllUsers();
+            reportsFormUsersCombo.DataSource = users;
+            reportsFormUsersCombo.DisplayMember = "userName";
+            reportsFormUsersCombo.ValueMember = "userId";
         }
 
+        /// <summary>
+        /// Handler to load Schedules by User when a user is selected from the combo box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void reportsFormUsersCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (reportsFormUsersCombo.SelectedValue != null && int.TryParse(reportsFormUsersCombo.SelectedValue.ToString(), out int selectedUserId))
+                {
+                    LoadAppointmentsByUser(selectedUserId);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Method to load appointments for a chosen user
+        /// </summary>
+        /// <param name="userId"></param>
+        private void LoadAppointmentsByUser(int userId)
+        {
+            var appointments = _reportsDataHandler.GetAppointmentsByUserId(userId);
+            reportsFormDgvAppointmentsByUser.DataSource = appointments;
+            reportsFormDgvAppointmentsByUser.Refresh();
+        }
+
+        /// <summary>
+        /// Load the default appointments for the first user in the combo box
+        /// </summary>
+        private void LoadDefaultAppointments()
+        {
+            if (reportsFormUsersCombo.Items.Count > 0)
+            {
+                reportsFormUsersCombo.SelectedIndex = 0; // Select the first item by default
+                int selectedUserId = (int)reportsFormUsersCombo.SelectedValue;
+                LoadAppointmentsByUser(selectedUserId);
+            }
+        }
+
+        /// <summary>
+        /// Save the Schedules by User report to a CSV file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void reportsFormDownloadSchedulesByUser_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "CSV files (*.csv)|*.csv",
+                Title = "Save schedules by user"
+            };
+
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                ExportReportsToCsv(reportsFormDgvAppointmentsByUser, saveFileDialog.FileName);
+            }
+        }
+        #endregion
+
+        #region Appointments by Months report controls and logic
+
+        /// <summary>
+        /// Method to load the appointments by month report when the Report form is loaded
+        /// </summary>
         private void LoadMonthlyReport()
         {
             var monthlyReport = _reportsDataHandler.GetAppointmentTypesByMonth();
@@ -212,6 +276,11 @@ namespace C969.Forms
             reportsFormDgvAppointmentsByMonth.Refresh();
         }
 
+        /// <summary>
+        /// Handler to save the Appointments by Month report to a CSV file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void reportsFormDownloadAppointmentsByMonth_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -226,28 +295,13 @@ namespace C969.Forms
             }
         }
 
+        #endregion
 
-        private void ConfigureCustomerCountByCountryCityDataGridView()
-        {
-            reportsFormDgvCustomerCountByCountry.AutoGenerateColumns = false;
-            reportsFormDgvCustomerCountByCountry.Columns.Clear();
-            reportsFormDgvCustomerCountByCountry.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        #region Customer Appointments Breakdown report controls and logic
 
-            reportsFormDgvCustomerCountByCountry.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Name",
-                HeaderText = "Name",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            });
-
-            reportsFormDgvCustomerCountByCountry.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "CusCount",
-                HeaderText = "Customer Count",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            });
-        }
-
+        /// <summary>
+        /// Method to load the customer list into Customer Appointments Breakdown countries combo box
+        /// </summary>
         private void LoadCountries()
         {
             var countries = _reportsDataHandler.GetAllCountries();
@@ -256,26 +310,61 @@ namespace C969.Forms
             reportsFormCountriesCombo.ValueMember = "CountryId";
         }
 
+        /// <summary>
+        /// Method to load the customer count by country report when the Report form is loaded
+        /// </summary>
         private void LoadCustomerCountByCountry()
         {
             var customerCounts = _reportsDataHandler.GetCustomerCountByCountry();
             reportsFormDgvCustomerCountByCountry.DataSource = customerCounts;
+            reportsFormDgvCustomerCountByCountry.Refresh();
 
         }
 
+        /// <summary>
+        /// Handler that loads the report depending on the selected country
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void reportsFormCountriesCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (reportsFormCountriesCombo.SelectedValue != null && int.TryParse(reportsFormCountriesCombo.SelectedValue.ToString(), out int selectedCountryId)) 
+            if (reportsFormCountriesCombo.SelectedValue != null && int.TryParse(reportsFormCountriesCombo.SelectedValue.ToString(), out int selectedCountryId))
             {
                 LoadCustomerCountByCity(selectedCountryId);
             }
         }
 
+        /// <summary>
+        /// Method to load the customer count by city
+        /// </summary>
+        /// <param name="countryId"></param>
         private void LoadCustomerCountByCity(int countryId)
         {
             var customerCounts = _reportsDataHandler.GetCustomerCountByCity(countryId);
             reportsFormDgvCustomerCountByCountry.DataSource = customerCounts;
         }
+
+        #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     }

@@ -38,6 +38,74 @@ namespace C969.Forms
             editAppointmentStartTimeCombo.SelectedIndexChanged += EditAppointmentStartTimeCombo_SelectedIndexChanged;
         }
 
+        #region Date and Time event handlers
+        private void editAppointmentStartDatePicker_ValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreEvent) return;
+
+            DateTimePicker picker = (DateTimePicker)sender;
+            if (picker.Value.DayOfWeek == DayOfWeek.Saturday)
+            {
+                ignoreEvent = true;
+                MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
+                picker.Value = picker.Value.AddDays(2); // Adjust to next Monday
+                ignoreEvent = false;
+            }
+            else if (picker.Value.DayOfWeek == DayOfWeek.Sunday)
+            {
+                ignoreEvent = true;
+                MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
+                picker.Value = picker.Value.AddDays(1); // Adjust to next Monday
+                ignoreEvent = false;
+            }
+
+            if (editAppointmentEndDatePicker.Value.Date != picker.Value.Date)
+            {
+                ignoreEvent = true;
+                MessageBox.Show("End date cannot be different from start date. Adjusting to match the start date.");
+                editAppointmentEndDatePicker.Value = picker.Value;
+                ignoreEvent = false;
+            }
+        }
+        private void editAppointmentEndDatePicker_ValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreEvent) return;
+
+            DateTimePicker picker = (DateTimePicker)sender;
+            if (picker.Value.DayOfWeek == DayOfWeek.Saturday)
+            {
+                ignoreEvent = true;
+                MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
+                picker.Value = picker.Value.AddDays(2); // Adjust to next Monday
+                ignoreEvent = false;
+            }
+            else if (picker.Value.DayOfWeek == DayOfWeek.Sunday)
+            {
+                ignoreEvent = true;
+                MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
+                picker.Value = picker.Value.AddDays(1); // Adjust to next Monday
+                ignoreEvent = false;
+            }
+
+            if (picker.Value.Date != editAppointmentStartDatePicker.Value.Date)
+            {
+                ignoreEvent = true;
+                MessageBox.Show("End date cannot be different from start date. Adjusting to match the start date.");
+                picker.Value = editAppointmentStartDatePicker.Value;
+                ignoreEvent = false;
+            }
+        }
+        private void EditAppointmentStartTimeCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateEndTimeComboBox();
+        }
+        #endregion
+
+        #region Time ComboBoxes Logic
+
+        /// <summary>
+        /// Setup the time combo boxes for the appointment start and end times
+        /// </summary>
         private void SetupTimeComboBoxes()
         {
             var userTimeZone = UserSession.CurrentTimeZone;
@@ -61,7 +129,12 @@ namespace C969.Forms
             UpdateEndTimeComboBox();
 
         }
-
+        /// <summary>
+        /// Generate time slots for the appointment start and end times
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
         private List<string> GenerateTimeSlots(DateTime startTime, DateTime endTime)
         {
             List<string> timeSlots = new List<string>();
@@ -75,64 +148,38 @@ namespace C969.Forms
             return timeSlots;
         }
 
-        private void LoadCustomerNames()
+        /// <summary>
+        /// Update the end time combo box based on the selected start time
+        /// </summary>
+        private void UpdateEndTimeComboBox()
         {
-            var customerData = _customerDataHandler.GetCustomerNameAndId();
-            editAppointmentCustomerNameCombo.DataSource = new BindingSource(customerData, null);
-            editAppointmentCustomerNameCombo.DisplayMember = "Value";
-            editAppointmentCustomerNameCombo.ValueMember = "Key";
+            if (editAppointmentStartTimeCombo.SelectedIndex == -1) return;
 
-        }
+            string selectedStartTime = editAppointmentStartTimeCombo.SelectedItem.ToString();
+            DateTime startTime = DateTime.Parse(selectedStartTime, new CultureInfo("en-US"));
 
-        private void DisplayCurrentUser()
-        {
-            editAppointmentCurrentUserText.Text = UserSession.CurrentUser;
-            editAppointmentCurrentUserText.ReadOnly = true;
-        }
+            // Clear current items and add only times that are later than the selected start time
+            editAppointmentEndTimeCombo.Items.Clear();
+            List<string> slots = GenerateTimeSlots(startTime, startTime.AddHours(8)); // 8 hours working period
 
-        private void LoadAppointmentData()
-        {
-            var appointmentDetails = _customerDataHandler.GetAppointmentById(_appointmentId);
-            if (appointmentDetails != null)
+            foreach (string slot in slots)
             {
-                editAppointmentTitleText.Text = appointmentDetails.Title;
-                editAppointmentTypeText.Text = appointmentDetails.Type;
-                editAppointmentDescriptionText.Text = appointmentDetails.Description;
-                editAppointmentLocationText.Text = appointmentDetails.Location;
-                editAppointmentContactText.Text = appointmentDetails.Contact;
-                editAppointmentUrlText.Text = appointmentDetails.Url;
-
-
-                // Set date and time values
-                editAppointmentStartDatePicker.Value = appointmentDetails.Start.Date;
-                editAppointmentEndDatePicker.Value = appointmentDetails.End.Date;
-                SetupTimeComboBoxes();
-                editAppointmentStartTimeCombo.SelectedItem = appointmentDetails.Start.ToString("hh:mm tt");
-                editAppointmentEndTimeCombo.SelectedItem = appointmentDetails.End.ToString("hh:mm tt");
-
-
-                // Set customer
-                editAppointmentCustomerNameCombo.DataSource = new BindingSource(_customerDataHandler.GetCustomerNameAndId(), null);
-                editAppointmentCustomerNameCombo.DisplayMember = "Value";
-                editAppointmentCustomerNameCombo.ValueMember = "Key";
-                editAppointmentCustomerNameCombo.SelectedValue = appointmentDetails.CustomerId;
-
-                // Set current user (readonly)
-                editAppointmentCurrentUserText.Text = UserSession.CurrentUser;
-                editAppointmentCurrentUserText.ReadOnly = true;
+                DateTime slotTime = DateTime.Parse(slot, new CultureInfo("en-US"));
+                if (slotTime > startTime)
+                {
+                    editAppointmentEndTimeCombo.Items.Add(slot);
+                }
             }
-            else
-            {
-                MessageBox.Show("Appointment not found.");
-                this.Close();
-            }
-        }
 
-        private void editAppointmentSaveBtn_Click(object sender, EventArgs e)
-        {
-           SaveAppointmentEdit();
+            editAppointmentEndTimeCombo.SelectedIndex = 0;
         }
+        #endregion
 
+        #region Save Edit Appointment Logic
+
+        /// <summary>
+        /// Method to save the edited appointment data
+        /// </summary>
         public void SaveAppointmentEdit()
         {
             if (ValidateAppointment())
@@ -211,6 +258,12 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Method to check if the edited appointment overlaps with an existing appointment
+        /// </summary>
+        /// <param name="newAppointment"></param>
+        /// <param name="excludeAppointmentId"></param>
+        /// <returns></returns>
         private AppointmentDetails GetOverlappingAppointment(AppointmentDetails newAppointment, int excludeAppointmentId = 0)
         {
             var existingAppointments = _customerDataHandler.GetAppointmentsByCustomerName(editAppointmentCustomerNameCombo.Text);
@@ -229,6 +282,31 @@ namespace C969.Forms
         }
 
         /// <summary>
+        /// Button click event to save the edited appointment data
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editAppointmentSaveBtn_Click(object sender, EventArgs e)
+        {
+            SaveAppointmentEdit();
+        }
+
+        /// <summary>
+        /// Button click event to cancel editing the appointment
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editAppointmentCancelBtn_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are you sure you want to cancel editing the appointment?", "Cancel Edit",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                this.Close();
+            }
+        }
+
+        /// <summary>
         /// Function to validate the appointment data before saving
         /// </summary>
         /// <returns></returns>
@@ -238,7 +316,7 @@ namespace C969.Forms
 
                 DateTime startDateTime = DateTime.Parse($"{editAppointmentStartDatePicker.Value.ToShortDateString()} {editAppointmentStartTimeCombo.SelectedItem}");
                 DateTime endDateTime = DateTime.Parse($"{editAppointmentEndDatePicker.Value.ToShortDateString()} {editAppointmentEndTimeCombo.SelectedItem}");
-                
+
 
                 if (endDateTime <= startDateTime)
                 {
@@ -253,103 +331,79 @@ namespace C969.Forms
                 }
 
                 return true;
-            }   
-        }
-
-        private void editAppointmentStartDatePicker_ValueChanged(object sender, EventArgs e)
-        {
-            if (ignoreEvent) return;
-
-            DateTimePicker picker = (DateTimePicker)sender;
-            if (picker.Value.DayOfWeek == DayOfWeek.Saturday)
-            {
-                ignoreEvent = true;
-                MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
-                picker.Value = picker.Value.AddDays(2); // Adjust to next Monday
-                ignoreEvent = false;
-            }
-            else if (picker.Value.DayOfWeek == DayOfWeek.Sunday)
-            {
-                ignoreEvent = true;
-                MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
-                picker.Value = picker.Value.AddDays(1); // Adjust to next Monday
-                ignoreEvent = false;
-            }
-
-            if (editAppointmentEndDatePicker.Value.Date != picker.Value.Date)
-            {
-                ignoreEvent = true;
-                MessageBox.Show("End date cannot be different from start date. Adjusting to match the start date.");
-                editAppointmentEndDatePicker.Value = picker.Value;
-                ignoreEvent = false;
-            }
-        }
-        private void editAppointmentEndDatePicker_ValueChanged(object sender, EventArgs e)
-        {
-            if (ignoreEvent) return;
-
-            DateTimePicker picker = (DateTimePicker)sender;
-            if (picker.Value.DayOfWeek == DayOfWeek.Saturday)
-            {
-                ignoreEvent = true;
-                MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
-                picker.Value = picker.Value.AddDays(2); // Adjust to next Monday
-                ignoreEvent = false;
-            }
-            else if (picker.Value.DayOfWeek == DayOfWeek.Sunday)
-            {
-                ignoreEvent = true;
-                MessageBox.Show("Appointments cannot be scheduled on weekends. Please select a weekday.");
-                picker.Value = picker.Value.AddDays(1); // Adjust to next Monday
-                ignoreEvent = false;
-            }
-
-            if (picker.Value.Date != editAppointmentStartDatePicker.Value.Date)
-            {
-                ignoreEvent = true;
-                MessageBox.Show("End date cannot be different from start date. Adjusting to match the start date.");
-                picker.Value = editAppointmentStartDatePicker.Value;
-                ignoreEvent = false;
             }
         }
 
-        private void EditAppointmentStartTimeCombo_SelectedIndexChanged(object sender, EventArgs e)
+        #endregion
+
+        #region Misc (Load Customer Names, Display Current User)
+        private void LoadCustomerNames()
         {
-            UpdateEndTimeComboBox();
+            var customerData = _customerDataHandler.GetCustomerNameAndId();
+            editAppointmentCustomerNameCombo.DataSource = new BindingSource(customerData, null);
+            editAppointmentCustomerNameCombo.DisplayMember = "Value";
+            editAppointmentCustomerNameCombo.ValueMember = "Key";
+
         }
 
-        private void UpdateEndTimeComboBox()
+        private void DisplayCurrentUser()
         {
-            if (editAppointmentStartTimeCombo.SelectedIndex == -1) return;
+            editAppointmentCurrentUserText.Text = UserSession.CurrentUser;
+            editAppointmentCurrentUserText.ReadOnly = true;
+        }
+        #endregion
 
-            string selectedStartTime = editAppointmentStartTimeCombo.SelectedItem.ToString();
-            DateTime startTime = DateTime.Parse(selectedStartTime, new CultureInfo("en-US"));
+        #region Load Appointment Data
 
-            // Clear current items and add only times that are later than the selected start time
-            editAppointmentEndTimeCombo.Items.Clear();
-            List<string> slots = GenerateTimeSlots(startTime, startTime.AddHours(8)); // 8 hours working period
-
-            foreach (string slot in slots)
+        /// <summary>
+        /// Method to load the appointment data to the form for editing
+        /// </summary>
+        private void LoadAppointmentData()
+        {
+            var appointmentDetails = _customerDataHandler.GetAppointmentById(_appointmentId);
+            if (appointmentDetails != null)
             {
-                DateTime slotTime = DateTime.Parse(slot, new CultureInfo("en-US"));
-                if (slotTime > startTime)
-                {
-                    editAppointmentEndTimeCombo.Items.Add(slot);
-                }
+                editAppointmentTitleText.Text = appointmentDetails.Title;
+                editAppointmentTypeText.Text = appointmentDetails.Type;
+                editAppointmentDescriptionText.Text = appointmentDetails.Description;
+                editAppointmentLocationText.Text = appointmentDetails.Location;
+                editAppointmentContactText.Text = appointmentDetails.Contact;
+                editAppointmentUrlText.Text = appointmentDetails.Url;
+
+
+                // Set date and time values
+                editAppointmentStartDatePicker.Value = appointmentDetails.Start.Date;
+                editAppointmentEndDatePicker.Value = appointmentDetails.End.Date;
+                SetupTimeComboBoxes();
+                editAppointmentStartTimeCombo.SelectedItem = appointmentDetails.Start.ToString("hh:mm tt");
+                editAppointmentEndTimeCombo.SelectedItem = appointmentDetails.End.ToString("hh:mm tt");
+
+
+                // Set customer
+                editAppointmentCustomerNameCombo.DataSource = new BindingSource(_customerDataHandler.GetCustomerNameAndId(), null);
+                editAppointmentCustomerNameCombo.DisplayMember = "Value";
+                editAppointmentCustomerNameCombo.ValueMember = "Key";
+                editAppointmentCustomerNameCombo.SelectedValue = appointmentDetails.CustomerId;
+
+                // Set current user (readonly)
+                editAppointmentCurrentUserText.Text = UserSession.CurrentUser;
+                editAppointmentCurrentUserText.ReadOnly = true;
             }
-
-            editAppointmentEndTimeCombo.SelectedIndex = 0;
-        }
-
-        private void editAppointmentCancelBtn_Click(object sender, EventArgs e)
-        {
-            DialogResult result = MessageBox.Show("Are you sure you want to cancel editing the appointment?", "Cancel Edit",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
+            else
             {
+                MessageBox.Show("Appointment not found.");
                 this.Close();
             }
+
         }
+        #endregion
+
+
+
+
+
+
+
 
 
     }

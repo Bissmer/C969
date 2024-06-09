@@ -59,6 +59,11 @@ namespace C969.Forms
             }
         }
 
+        /// <summary>
+        /// Method that saves the customer details to the database
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addCustomerSaveBtn_Click(object sender, EventArgs e)
         {
             try
@@ -90,7 +95,6 @@ namespace C969.Forms
                     return;
                 }
 
-
                 bool result = _customerDataHandler.AddCustomerWithDetails(customerName, address, address2, phone, city,
                     postalCode, country, isActive);
 
@@ -113,6 +117,11 @@ namespace C969.Forms
 
         }
 
+        /// <summary>
+        /// Method that cancels the adding of a customer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addCustomerCancelBtn_Click(object sender, EventArgs e)
         {
             

@@ -80,6 +80,11 @@ namespace C969.Forms
 
         }
 
+        /// <summary>
+        /// Method to save the edited customer details on Save button click
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void editCustomerSaveBtn_Click(object sender, EventArgs e)
         {
             try
@@ -130,7 +135,11 @@ namespace C969.Forms
             }
         }
 
-
+        /// <summary>
+        /// Method to cancel editing customer details on Cancel button click
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void editCustomerCancelBtn_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(

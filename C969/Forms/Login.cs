@@ -32,7 +32,10 @@ namespace C969
         CultureInfo currentCulture = CultureInfo.CurrentUICulture;
         ResourceManager _rm;
         
-        //Localization using ResourceManager and CultureInfo
+        /// <summary>
+        /// Method to set the language of the form, using resource files
+        /// </summary>
+        /// <param name="culture"></param>
         private void SetLanguage(CultureInfo culture)
         {
 
@@ -50,6 +53,12 @@ namespace C969
 
         }
 
+        /// <summary>
+        /// Method to authenticate the user by checking the username and password against the database
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         private int AuthenticateUser(string username, string password)
         {
             using (var conn = new MySqlConnection(_connString))
@@ -67,6 +76,11 @@ namespace C969
 
         }
 
+        /// <summary>
+        /// Method to handle the Login button click event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void loginLoginButton_Click(object sender, EventArgs e)
         {
             string username = loginUserNametxt.Text;
@@ -93,6 +107,11 @@ namespace C969
 
         }
 
+        /// <summary>
+        /// Method to handle the Quit button click event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void loginQuitButton_Click(object sender, EventArgs e)
         {
             DialogResult dialogResult = MessageBox.Show(_rm.GetString("QuitMessage", currentCulture), _rm.GetString("QuitTitle", currentCulture), MessageBoxButtons.YesNo);
