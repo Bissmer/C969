@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Org.BouncyCastle.Asn1.Cmp;
 using System.Globalization;
+using MySql.Data.MySqlClient;
 
 namespace C969.Forms
 {
@@ -36,7 +37,6 @@ namespace C969.Forms
             editAppointmentEndDatePicker.ValueChanged += editAppointmentEndDatePicker_ValueChanged;
             editAppointmentStartTimeCombo.SelectedIndexChanged += EditAppointmentStartTimeCombo_SelectedIndexChanged;
         }
-
 
         private void SetupTimeComboBoxes()
         {
@@ -130,6 +130,11 @@ namespace C969.Forms
 
         private void editAppointmentSaveBtn_Click(object sender, EventArgs e)
         {
+           SaveAppointmentEdit();
+        }
+
+        public void SaveAppointmentEdit()
+        {
             if (ValidateAppointment())
             {
                 try
@@ -156,11 +161,9 @@ namespace C969.Forms
                         LastUpdate = DateTime.UtcNow,
                         LastUpdateBy = editAppointmentCurrentUserText.Text,
                         Url = editAppointmentUrlText.Text
-
                     };
 
                     var overlappingAppointment = GetOverlappingAppointment(appointment, _appointmentId);
-
 
                     if (overlappingAppointment != null)
                     {
@@ -185,11 +188,26 @@ namespace C969.Forms
                         MessageBox.Show("Failed to update appointment. Check the data and try again.");
                     }
                 }
+                catch (FormatException fe)
+                {
+                    MessageBox.Show($"Date/Time format is incorrect: {fe.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch (InvalidCastException ice)
+                {
+                    MessageBox.Show($"Invalid data type: {ice.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch (NullReferenceException nre)
+                {
+                    MessageBox.Show($"A required field is missing: {nre.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch (MySqlException mse)
+                {
+                    MessageBox.Show($"A database error occurred: {mse.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"An error occurred while updating the appointment: {ex.Message}");
+                    MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
             }
         }
 
@@ -333,14 +351,6 @@ namespace C969.Forms
             }
         }
 
-        private bool IsOverlappingAppointment(AppointmentDetails newAppointment)
-        {
-            var existingAppointments = _reportDataHandler.GetAppointmentsByUserId(UserSession.UserId);
-            return existingAppointments.Any(existingAppointment =>
-                newAppointment.AppointmentId != existingAppointment.AppointmentId && // Exclude the current appointment being edited
-                newAppointment.Start < existingAppointment.End &&
-                newAppointment.End > existingAppointment.Start);
-        }
 
     }
 }

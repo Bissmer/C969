@@ -876,48 +876,5 @@ namespace C969.Controllers
             return upcomingAppointments;
         }
 
-        public List<(DateTime start, DateTime end)> GetAvailableHours(DateTime selectedDate, TimeZoneInfo userTimeZone)
-        {
-            var availableHours = new List<(DateTime start, DateTime end)>();
-
-            // Define working hours in EST
-            var estStartWork = new DateTime(selectedDate.Year, selectedDate.Month, selectedDate.Day, 9, 0, 0);
-            var estEndWork = new DateTime(selectedDate.Year, selectedDate.Month, selectedDate.Day, 17, 0, 0);
-
-            // Convert to user's time zone
-            var userStartWork = TimeZoneHandler.ConvertToUserTimeZone(estStartWork, userTimeZone);
-            var userEndWork = TimeZoneHandler.ConvertToUserTimeZone(estEndWork, userTimeZone);
-
-            // Fetch appointments for the selected date
-            var appointments = GetAppointmentsByDate(selectedDate);
-
-            // Get overlapping appointments in user's time zone
-            var overlappingAppointments = appointments
-                .Where(app => app.Start.Date == selectedDate.Date)
-                .Select(app => (
-                    start: TimeZoneHandler.ConvertToUserTimeZone(app.Start, userTimeZone),
-                    end: TimeZoneHandler.ConvertToUserTimeZone(app.End, userTimeZone)
-                ))
-                .ToList();
-
-            // Calculate available hours
-            DateTime currentTime = userStartWork;
-            foreach (var appt in overlappingAppointments.OrderBy(a => a.start))
-            {
-                if (appt.start > currentTime)
-                {
-                    availableHours.Add((currentTime, appt.start));
-                }
-                currentTime = appt.end > currentTime ? appt.end : currentTime;
-            }
-
-            if (currentTime < userEndWork)
-            {
-                availableHours.Add((currentTime, userEndWork));
-            }
-
-            return availableHours;
-        }
-
     }
 }
