@@ -106,9 +106,9 @@ namespace C969.Controllers
                 string insertFields = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName.Substring(1)));
                 string insertValues = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName));
                 string insertQuery = $@"
-            INSERT INTO {tableName} ({insertFields}, createDate, createdBy, lastUpdate, lastUpdateBy)
-            VALUES ({insertValues}, @now, @user, @now, @user); 
-            SELECT LAST_INSERT_ID();";
+                INSERT INTO {tableName} ({insertFields}, createDate, createdBy, lastUpdate, lastUpdateBy)
+                VALUES ({insertValues}, @now, @user, @now, @user); 
+                SELECT LAST_INSERT_ID();";
 
                 cmd.CommandText = insertQuery;
                 cmd.Parameters.AddRange(parameters);  // Re-add parameters for the insert operation
@@ -529,7 +529,7 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Adds an appointment to the database.
+        /// Method to add an appointment to the database.
         /// </summary>
         /// <param name="appointment"></param>
         /// <returns></returns>
@@ -567,6 +567,11 @@ namespace C969.Controllers
             }
         }
 
+        /// <summary>
+        /// Method to retrieve appointments by customer name.
+        /// </summary>
+        /// <param name="customerName"></param>
+        /// <returns></returns>
         public List<AppointmentDetails> GetAppointmentsByCustomerName(string customerName)
         {
             List<AppointmentDetails> filteredAppointments = new List<AppointmentDetails>();
@@ -603,9 +608,6 @@ namespace C969.Controllers
         public AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader, TimeZoneInfo userTimeZone )
         {
 
-            // Get the time zone for Eastern Standard Time
-            TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-
             // Read the start and end times from the database as EST
             DateTime estStart = reader.GetDateTime("start");
             DateTime estEnd = reader.GetDateTime("end");
@@ -638,7 +640,7 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Retrieves an appointment by its ID.
+        /// Method that retrieves an appointment by its ID.
         /// </summary>
         /// <param name="appointmentId"></param>
         /// <returns></returns>
@@ -706,7 +708,6 @@ namespace C969.Controllers
                             cmd.Parameters.AddWithValue("@lastUpdateBy", UserSession.CurrentUser);
                             cmd.Parameters.AddWithValue("@appointmentId", appointment.AppointmentId);
 
-                            Console.WriteLine($"Updating appointment with ID: {appointment.AppointmentId}");
                             int result = cmd.ExecuteNonQuery();
                             trans.Commit();
                             return result > 0;
@@ -734,7 +735,7 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Function to delete an appointment from the database.
+        /// Method to delete an appointment from the database.
         /// </summary>
         /// <param name="appointmentId"></param>
         /// <returns></returns>
@@ -754,7 +755,7 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Function to retrieve appointments by date.
+        /// Method to retrieve appointments by date.
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
@@ -794,6 +795,7 @@ namespace C969.Controllers
             }
             return appointments;
         }
+
         /// <summary>
         /// Method to retrieve a list of dates with appointments.
         /// </summary>

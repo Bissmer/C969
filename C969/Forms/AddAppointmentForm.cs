@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using C969.Models;
+using MySql.Data.MySqlClient;
 
 namespace C969.Forms
 {
@@ -260,17 +261,9 @@ namespace C969.Forms
                     MessageBox.Show("Failed to add appointment. Check the data and try again.");
                 }
             }
-            catch (FormatException fe)
+            catch (MySqlException mse)
             {
-                MessageBox.Show($"Date/Time format is incorrect: {fe.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (InvalidCastException ice)
-            {
-                MessageBox.Show($"Invalid data type: {ice.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (NullReferenceException nre)
-            {
-                MessageBox.Show($"A required field is missing: {nre.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"A database error occurred: {mse.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
