@@ -31,7 +31,6 @@ namespace C969.Forms
             _customerDataHandler = new CustomerDataHandler(_connString);
             _reportDataHandler = new ReportsDataHandler(_connString);
             LoadAppointmentData();
-            LoadCustomerNames();
             DisplayCurrentUser();
             editAppointmentStartDatePicker.ValueChanged += editAppointmentStartDatePicker_ValueChanged;
             editAppointmentEndDatePicker.ValueChanged += editAppointmentEndDatePicker_ValueChanged;
@@ -367,10 +366,10 @@ namespace C969.Forms
                 editAppointmentEndTimeCombo.SelectedItem = appointmentDetails.End.ToString("hh:mm tt");
 
 
+                // Set customer data source
+                LoadCustomerNames();
+
                 // Set customer
-                editAppointmentCustomerNameCombo.DataSource = new BindingSource(_customerDataHandler.GetCustomerNameAndId(), null);
-                editAppointmentCustomerNameCombo.DisplayMember = "Value";
-                editAppointmentCustomerNameCombo.ValueMember = "Key";
                 editAppointmentCustomerNameCombo.SelectedValue = appointmentDetails.CustomerId;
 
                 // Set current user (readonly)
