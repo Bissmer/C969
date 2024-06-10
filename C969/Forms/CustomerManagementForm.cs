@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using C969.Models;
+using MySql.Data.MySqlClient;
 
 namespace C969.Forms
 {
@@ -55,8 +56,10 @@ namespace C969.Forms
 
         }
 
+        #region Forms open
+
         /// <summary>
-        /// Triggers the add customer form open
+        /// Triggers the Add Customer form open
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -68,7 +71,21 @@ namespace C969.Forms
         }
 
         /// <summary>
-        /// Triggers the edit customer form open for the selected customer on the Customer data grid view
+        /// Handler to trigger an Add Appointment form open
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtAddAppointmentButton_Click(object sender, EventArgs e)
+        {
+            var addForm = new AddAppointmentForm();
+            addForm.ShowDialog();
+            LoadAppointments();
+            UpdateCalendarHighlights();
+
+        }
+
+        /// <summary>
+        /// Triggers the Edit Customer form open for the selected customer on the Customer data grid view
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -84,6 +101,100 @@ namespace C969.Forms
                 }
             }
         }
+
+        /// <summary>
+        /// Triggers the edit appointment form output for the selected appointment on the Appointments data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtEditAppointmentButton_Click(object sender, EventArgs e)
+        {
+            if (cusMgmtDgvAppontments.CurrentRow != null)
+            {
+                int appointmentId = Convert.ToInt32(cusMgmtDgvAppontments.CurrentRow.Cells["AppointmentID"].Value);
+                EditAppointmentForm editForm = new EditAppointmentForm(appointmentId);
+                editForm.ShowDialog();
+                LoadAppointments();
+                UpdateCalendarHighlights();
+            }
+        }
+
+        /// <summary>
+        /// Enables or disables the edit and delete buttons based on the selection of a row in the Customers data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtDgvCustomers_SelectionChanged(object sender, EventArgs e)
+        {
+            bool isRowSelected = cusMgmtDgvCustomers.SelectedRows.Count > 0;
+            cusMgmtEditCustomerButton.Enabled = isRowSelected;
+            cusMgmtDeleteCustomerButton.Enabled = isRowSelected;
+        }
+
+        /// <summary>
+        /// Enables or disables the edit and delete buttons based on the selection of a row in the Appointments data grid view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtDgvAppontments_SelectionChanged(object sender, EventArgs e)
+        {
+            bool isRowSelected = cusMgmtDgvAppontments.SelectedRows.Count > 0;
+            cusMgmtEditAppointmentButton.Enabled = isRowSelected;
+            cusMgmtDeleteAppointmentButton.Enabled = isRowSelected;
+        }
+
+        /// <summary>
+        /// Triggers the reports form open
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtReportsButton_Click(object sender, EventArgs e)
+        {
+            var reportsForm = new ReportsForm();
+            reportsForm.ShowDialog();
+        }
+
+        #endregion
+
+        #region Upcoming appointments alerts handling
+
+        /// <summary>
+        /// Handle the event of the form to show an alert for upcoming appointments
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CustomerManagementForm_Shown(object sender, EventArgs e)
+        {
+            ShowUpcomingAppointmentsAlert();
+        }
+
+        /// <summary>
+        ///Method to show an alert for upcoming appointments
+        /// </summary>
+        private void ShowUpcomingAppointmentsAlert()
+        {
+            int userId = UserSession.UserId;
+            List<AppointmentDetails> upcomingAppointments = _customerDataHandler.GetUpcomingAppointments(userId);
+
+            if (upcomingAppointments.Count > 0)
+            {
+                StringBuilder appointmentAlert = new StringBuilder("You have the following appointments within the next 15 minutes:\n\n");
+                foreach (var appointment in upcomingAppointments)
+                {
+                    appointmentAlert.AppendLine(
+                        $"{appointment.Title} is about to start at {appointment.Start.ToShortTimeString()}");
+                }
+                MessageBox.Show(appointmentAlert.ToString(), "Upcoming Appointments", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("There are no upcoming appointments within the next 15 minutes.", "No Upcoming Appointments", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        #endregion
+
+        #region Delete actions handling
 
         /// <summary>
         /// Triggers a delete operation on the selected customer on the Customer data grid view
@@ -109,126 +220,18 @@ namespace C969.Forms
                         MessageBox.Show("Failed to delete customer.");
                     }
                 }
-                catch (InvalidOperationException ex)
+                catch (MySqlException ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show($"Database error: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
             {
-                MessageBox.Show("Please select a customer to delete.");
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cusMgmtAddAppointmentButton_Click(object sender, EventArgs e)
-        {
-            var addForm = new AddAppointmentForm();
-            addForm.ShowDialog();
-            LoadAppointments();
-            UpdateCalendarHighlights();
-
-        }
-
-        /// <summary>
-        /// Triggers the end session and closes the application
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cusMgmtEndSessionButton_Click(object sender, EventArgs e)
-        {
-            ExitApplication();
-        }
-
-
-
-        /// <summary>
-        /// Debug label to show current user
-        /// </summary>
-        private void LoadCurrentUser()
-        {
-            cusMgmCurrentUserlbl.Text = !string.IsNullOrEmpty(_currentUser) ? $"Welcome back, {_currentUser}." : "Unknown user";
-        }
-
-
-        /// <summary>
-        /// Function to load all customers and refresh the Customers data grid view
-        /// </summary>
-        private void LoadCustomers()
-        {
-            var customers = _customerDataHandler.GetAllCustomers();
-            cusMgmtDgvCustomers.DataSource = customers;
-            cusMgmtDgvCustomers.Refresh();
-        }
-
-        /// <summary>
-        /// Fuction that loads all appointments and refreshes the Appointments data grid view
-        /// </summary>
-        private void LoadAppointments()
-        {
-            var appointments = _customerDataHandler.GetAllAppointments();
-            cusMgmtDgvAppontments.DataSource = appointments;
-            cusMgmtDgvAppontments.Refresh();
-        }
-
-        /// <summary>
-        /// Function to exit the application
-        /// </summary>
-        private void ExitApplication()
-        {
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to end the session and exit?", "End Session", 
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (dialogResult == DialogResult.Yes)
-            {
-                Application.Exit();
-            }
-        }
-
-
-        /// <summary>
-        /// Triggers filtering appointments by customer name
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cusMgmtSearchAppByCustomer_TextChanged(object sender, EventArgs e)
-        {
-            FilterAppointmentsByCustomerName(cusMgmtSearchAppByCustomer.Text);
-        }
-
-        /// <summary>
-        /// Function to filter appointments by customer name
-        /// </summary>
-        /// <param name="customerName"></param>
-        private void FilterAppointmentsByCustomerName(string customerName)
-        {
-            if (string.IsNullOrWhiteSpace(customerName))
-            {
-                LoadAppointments(); // Reload all if the search box is cleared
-                return;
-            }
-
-            var filteredAppointments = _customerDataHandler.GetAppointmentsByCustomerName(customerName);
-            cusMgmtDgvAppontments.DataSource = filteredAppointments;
-        }
-
-        /// <summary>
-        /// Triggers the edit appointment form for the selected appointment on the Appointments data grid view
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cusMgmtEditAppointmentButton_Click(object sender, EventArgs e)
-        {
-            if (cusMgmtDgvAppontments.CurrentRow != null)
-            {
-                int appointmentId = Convert.ToInt32(cusMgmtDgvAppontments.CurrentRow.Cells["AppointmentID"].Value);
-                EditAppointmentForm editForm = new EditAppointmentForm(appointmentId);
-                editForm.ShowDialog();
-                LoadAppointments();
-                UpdateCalendarHighlights();
+                MessageBox.Show("Please select a customer to delete.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -242,35 +245,43 @@ namespace C969.Forms
             if (cusMgmtDgvAppontments.SelectedRows.Count > 0)
             {
                 var result = MessageBox.Show("Are you sure you want to delete the selected appointment?", "Delete Appointment",
-                                       MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
                     int appointmentId = Convert.ToInt32(cusMgmtDgvAppontments.SelectedRows[0].Cells["AppointmentId"].Value);
-                    if (_customerDataHandler.DeleteAppointment(appointmentId))
+
+                    try
                     {
-                        MessageBox.Show("Appointment deleted successfully.");
-                        LoadAppointments();
-                        UpdateCalendarHighlights();
+                        if (_customerDataHandler.DeleteAppointment(appointmentId))
+                        {
+                            MessageBox.Show("Appointment deleted successfully.");
+                            LoadAppointments();
+                            UpdateCalendarHighlights();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to delete the appointment. Please try again.");
+                        }
                     }
-                    else
+                    catch (MySqlException ex)
                     {
-                        MessageBox.Show("Failed to delete the appointment. Please try again.");
+                        MessageBox.Show($"Database error: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select an appointment to delete.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
 
-        /// <summary>
-        /// Function to load appointments for the selected date
-        /// </summary>
-        /// <param name="selectedDate"></param>
-        private void LoadAppointmentsForSelectedDate(DateTime selectedDate)
-        {
-            // Assuming _dataHandler is your database access object
-            var appointments = _customerDataHandler.GetAppointmentsByDate(selectedDate);
-            cusMgmtDgvAppontments.DataSource = appointments;
-        }
+        #endregion
+
+        #region Calendar handling
 
         /// <summary>
         /// Function to handle the date change event on the calendar
@@ -299,18 +310,13 @@ namespace C969.Forms
         }
 
         /// <summary>
-        /// Function to find the next weekday
+        /// Function to load appointments for the selected date from a calendar
         /// </summary>
-        /// <param name="startDate"></param>
-        /// <returns></returns>
-        private DateTime FindNextWeekday(DateTime startDate)
+        /// <param name="selectedDate"></param>
+        private void LoadAppointmentsForSelectedDate(DateTime selectedDate)
         {
-            DateTime nextDate = startDate;
-            while (nextDate.DayOfWeek == DayOfWeek.Saturday || nextDate.DayOfWeek == DayOfWeek.Sunday)
-            {
-                nextDate = nextDate.AddDays(1);
-            }
-            return nextDate;
+            var appointments = _customerDataHandler.GetAppointmentsByDate(selectedDate);
+            cusMgmtDgvAppontments.DataSource = appointments;
         }
 
         /// <summary>
@@ -330,6 +336,51 @@ namespace C969.Forms
             BoldAppointmentDates();
             cusMgmtAppointmentsCalendar.UpdateBoldedDates();  // Refreshes the calendar display
         }
+
+        /// <summary>
+        /// Function to find the next weekday
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <returns></returns>
+        private DateTime FindNextWeekday(DateTime startDate)
+        {
+            DateTime nextDate = startDate;
+            while (nextDate.DayOfWeek == DayOfWeek.Saturday || nextDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                nextDate = nextDate.AddDays(1);
+            }
+            return nextDate;
+        }
+
+        #endregion
+
+        #region Search by customer name on the Appointments data grid view
+        /// <summary>
+        /// Function to filter appointments by customer name
+        /// </summary>
+        /// <param name="customerName"></param>
+        private void FilterAppointmentsByCustomerName(string customerName)
+        {
+            if (string.IsNullOrWhiteSpace(customerName))
+            {
+                LoadAppointments(); // Reload all if the search box is cleared
+                return;
+            }
+
+            var filteredAppointments = _customerDataHandler.GetAppointmentsByCustomerName(customerName);
+            cusMgmtDgvAppontments.DataSource = filteredAppointments;
+        }
+
+        /// <summary>
+        /// Triggers filtering appointments by customer name
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cusMgmtSearchAppByCustomer_TextChanged(object sender, EventArgs e)
+        {
+            FilterAppointmentsByCustomerName(cusMgmtSearchAppByCustomer.Text);
+        }
+
 
         /// <summary>
         /// Removes the default text in the search box when it is clicked
@@ -361,40 +412,59 @@ namespace C969.Forms
             }
         }
 
+        #endregion
+
+        #region Datagrid view data loading
 
         /// <summary>
-        /// Handle the event of the form to show an alert for upcoming appointments
+        /// Function to load all customers and refresh the Customers data grid view
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CustomerManagementForm_Shown(object sender, EventArgs e)
+        private void LoadCustomers()
         {
-            ShowUpcomingAppointmentsAlert();
+            var customers = _customerDataHandler.GetAllCustomers();
+            cusMgmtDgvCustomers.DataSource = customers;
+            cusMgmtDgvCustomers.Refresh();
         }
 
         /// <summary>
-        /// Enables or disables the edit and delete buttons based on the selection of a row in the Customers data grid view
+        /// Function that loads all appointments and refreshes the Appointments data grid view
+        /// </summary>
+        private void LoadAppointments()
+        {
+            var appointments = _customerDataHandler.GetAllAppointments();
+            cusMgmtDgvAppontments.DataSource = appointments;
+            cusMgmtDgvAppontments.Refresh();
+        }
+
+        #endregion
+
+        #region End session and exit application
+
+        /// <summary>
+        /// Triggers the end session and closes the application
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void cusMgmtDgvCustomers_SelectionChanged(object sender, EventArgs e)
+        private void cusMgmtEndSessionButton_Click(object sender, EventArgs e)
         {
-            bool isRowSelected = cusMgmtDgvCustomers.SelectedRows.Count > 0;
-            cusMgmtEditCustomerButton.Enabled = isRowSelected;
-            cusMgmtDeleteCustomerButton.Enabled = isRowSelected;
+            ExitApplication();
         }
 
         /// <summary>
-        /// Enables or disables the edit and delete buttons based on the selection of a row in the Appointments data grid view
+        /// Function to exit the application
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cusMgmtDgvAppontments_SelectionChanged(object sender, EventArgs e)
+        private void ExitApplication()
         {
-            bool isRowSelected = cusMgmtDgvAppontments.SelectedRows.Count > 0;
-            cusMgmtEditAppointmentButton.Enabled = isRowSelected;
-            cusMgmtDeleteAppointmentButton.Enabled = isRowSelected;
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to end the session and exit?", "End Session",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialogResult == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
         }
+        #endregion
+
+        #region Debugging and misc
 
         /// <summary>
         /// Click event handler for the Show All Appointments button
@@ -405,7 +475,6 @@ namespace C969.Forms
         {
             try
             {
-                // Fetch all appointments
                 LoadAppointments();
             }
             catch (Exception ex)
@@ -413,40 +482,18 @@ namespace C969.Forms
                 MessageBox.Show($"An error occured during the retrieval of appointments: {ex.Message}");
             }
         }
-        /// <summary>
-        ///Method to show an alert for upcoming appointments
-        /// </summary>
-        private void ShowUpcomingAppointmentsAlert()
-        {
-            int userId = UserSession.UserId;
-            List<AppointmentDetails> upcomingAppointments = _customerDataHandler.GetUpcomingAppointments(userId);
-
-            if (upcomingAppointments.Count > 0)
-            {
-                StringBuilder appointmentAlert = new StringBuilder("You have the following appointments within the next 15 minutes:\n\n");
-                foreach (var appointment in upcomingAppointments)
-                {
-                    appointmentAlert.AppendLine(
-                        $"{appointment.Title} is about to start at {appointment.Start.ToShortTimeString()}");
-                }
-                MessageBox.Show(appointmentAlert.ToString(), "Upcoming Appointments", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                MessageBox.Show("There are no upcoming appointments within the next 15 minutes.", "No Upcoming Appointments", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
 
         /// <summary>
-        /// Triggers the reports form open
+        /// Debug label to show current user
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cusMgmtReportsButton_Click(object sender, EventArgs e)
+        private void LoadCurrentUser()
         {
-            var reportsForm = new ReportsForm();
-            reportsForm.ShowDialog();
+            cusMgmCurrentUserlbl.Text = !string.IsNullOrEmpty(_currentUser) ? $"Welcome back, {_currentUser}." : "Unknown user";
         }
+
+
+        #endregion
+
     }
 }
 

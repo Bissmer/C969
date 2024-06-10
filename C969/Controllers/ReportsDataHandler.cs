@@ -10,6 +10,9 @@ using C969.Controllers;
 
 namespace C969.Controllers
 {
+    /// <summary>
+    /// Class that handles the data for the reports.
+    /// </summary>
     public class ReportsDataHandler
     {
         private readonly MySqlConnection _connection;
@@ -18,12 +21,17 @@ namespace C969.Controllers
 
         private readonly CustomerDataHandler _customerDataHandler;
 
+
         public ReportsDataHandler(string currentUser)
         {
             _connection = new MySqlConnection(_connString);
             _customerDataHandler = new CustomerDataHandler(currentUser);
         }
 
+        /// <summary>
+        /// Method to get all users. Returns a list of users.
+        /// </summary>
+        /// <returns></returns>
         public List<User> GetAllUsers()
         {
             List<User> users = new List<User>();
@@ -110,6 +118,7 @@ namespace C969.Controllers
                 }
             }
 
+            //Groups appointments by month and type
             var groupedAppointments = appointments.GroupBy(app => new{app.Start.Month, AppointmentType = app.Type})
                     .Select(group => new AppointmentTypesByMonths
                         {
@@ -231,9 +240,10 @@ namespace C969.Controllers
             List<Customer> customers = GetAllCustomers();
             List<City> cities = GetAllCities();
 
+            // Get the count of customers by city
             var result = cities
                 .Where(city=> city.CountryId == countryId)
-                .GroupJoin(
+                .GroupJoin( // Join cities with customers` address
                     customers,
                     city => city.CityId,
                     customer => customer.AddressID,
@@ -255,6 +265,7 @@ namespace C969.Controllers
             List<City> cities = GetAllCities();
             List<Country> countries = GetAllCountries();
 
+ 
             var result = countries
                 .GroupJoin( // Join countries with cities
                     cities,
@@ -262,7 +273,7 @@ namespace C969.Controllers
                     city => city.CountryId,
                     (country, cityGroup) => new { country, cityGroup }
                 )
-                .SelectMany( // Flatten the result
+                .SelectMany(
                     x => x.cityGroup.DefaultIfEmpty(),
                     (x, city) => new { x.country, city }
                     )
@@ -270,7 +281,7 @@ namespace C969.Controllers
 
                     customers,
                     x => x.city?.CityId,
-                    customer => customer.AddressID, // Assuming AddressID maps to CityId
+                    customer => customer.AddressID, 
                     (x, customerGroup) => new
                     {
                         CountryName = x.country.CountryName,
@@ -278,12 +289,12 @@ namespace C969.Controllers
                     }
                     )
                 .GroupBy(x => x.CountryName) // Group by country name
-                .Select(g => new CustomerCount // Select the result
+                .Select(g => new CustomerCount //Retrieve the result
                 {
                     Name = g.Key,
                     CusCount = g.Sum(x => x.CusCount)
                 })
-                .ToList(); // Convert to list
+                .ToList();
 
             return result;
         }

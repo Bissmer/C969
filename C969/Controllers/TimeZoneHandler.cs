@@ -2,9 +2,21 @@
 
 namespace C969.Controllers
 {
+    /// <summary>
+    /// Class to handle time zone conversion between the user's time zone and EST
+    /// </summary>
     public class TimeZoneHandler
     {
         private static readonly TimeZoneInfo _estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+
+        /// <summary>
+        /// Converts a start and end time to EST
+        /// </summary>
+        /// <param name="startLocal"></param>
+        /// <param name="endLocal"></param>
+        /// <param name="nowLocal"></param>
+        /// <param name="userTimeZone"></param>
+        /// <returns></returns>
         public static (DateTime, DateTime, DateTime) ConvertToEst(DateTime startLocal, DateTime endLocal, DateTime nowLocal, TimeZoneInfo userTimeZone)
         {
             // Ensure the appointment start and end times are treated as local times relative to the user's time zone without any predefined kind
@@ -21,12 +33,12 @@ namespace C969.Controllers
             return (estStart, estEnd, estNow);
         }
 
-        public static DateTime ConvertToEst(DateTime dateTime, TimeZoneInfo userTimeZone)
-        {
-            dateTime = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
-            return TimeZoneInfo.ConvertTime(dateTime, userTimeZone, _estTimeZone);
-        }
-
+        /// <summary>
+        /// Converts a DateTime object to the user's time zone
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <param name="userTimeZone"></param>
+        /// <returns></returns>
         public static DateTime ConvertToUserTimeZone(DateTime dateTime, TimeZoneInfo userTimeZone)
         {
             dateTime = DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);

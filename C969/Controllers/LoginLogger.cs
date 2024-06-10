@@ -9,12 +9,20 @@ namespace C969.Controllers
 {
     public static class LoginLogger
     {
-        private const string logFilePath = "Login_History.txt";
+        //set the directory of Logs in Project/Bin/Debug and puts a file called Login_History.txt in it
+        private static readonly string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
+        private static readonly string _logFilePath = Path.Combine(logDirectory, "Login_History.txt");
 
         public static void LogLogger(string username)
         {
-            string logMessage = $"{DateTime.UtcNow}: {username} logged in.";
-            File.AppendAllText(logFilePath, logMessage + Environment.NewLine);
+            if (!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+            DateTime utcNow = DateTime.UtcNow;
+            DateTime userTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, TimeZoneInfo.Local);
+            string logMessage = $"{userTime}: {username} logged in.";
+            File.AppendAllText(_logFilePath, logMessage + Environment.NewLine);
         }
     }
 }
