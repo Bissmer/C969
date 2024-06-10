@@ -31,7 +31,6 @@ namespace C969.Forms
             _customerDataHandler = new CustomerDataHandler(_connString);
             _reportDataHandler = new ReportsDataHandler(_connString);
             LoadAppointmentData();
-            DisplayCurrentUser();
             editAppointmentStartDatePicker.ValueChanged += editAppointmentStartDatePicker_ValueChanged;
             editAppointmentEndDatePicker.ValueChanged += editAppointmentEndDatePicker_ValueChanged;
             editAppointmentStartTimeCombo.SelectedIndexChanged += EditAppointmentStartTimeCombo_SelectedIndexChanged;
@@ -324,6 +323,10 @@ namespace C969.Forms
         #endregion
 
         #region Misc (Load Customer Names, Display Current User)
+
+        /// <summary>
+        /// Method to load the customer names to the combo box
+        /// </summary>
         private void LoadCustomerNames()
         {
             var customerData = _customerDataHandler.GetCustomerNameAndId();
@@ -333,6 +336,9 @@ namespace C969.Forms
 
         }
 
+        /// <summary>
+        /// Method to display the current user in the form
+        /// </summary>
         private void DisplayCurrentUser()
         {
             editAppointmentCurrentUserText.Text = UserSession.CurrentUser;
@@ -373,8 +379,7 @@ namespace C969.Forms
                 editAppointmentCustomerNameCombo.SelectedValue = appointmentDetails.CustomerId;
 
                 // Set current user (readonly)
-                editAppointmentCurrentUserText.Text = UserSession.CurrentUser;
-                editAppointmentCurrentUserText.ReadOnly = true;
+                DisplayCurrentUser();
             }
             else
             {
