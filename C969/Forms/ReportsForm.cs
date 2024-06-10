@@ -396,6 +396,7 @@ namespace C969.Forms
         {
             var customerCounts = _reportsDataHandler.GetCustomerCountByCity(countryId);
             reportsFormDgvCustomerCountByCountryCity.DataSource = customerCounts;
+            reportsFormDgvCustomerCountByCountryCity.Refresh();
         }
 
         #endregion
