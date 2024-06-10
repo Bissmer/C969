@@ -21,6 +21,8 @@ namespace C969.Controllers
 
         private readonly CustomerDataHandler _customerDataHandler;
 
+        private TimeZoneInfo _userTimeZone = UserSession.CurrentTimeZone;
+
 
         public ReportsDataHandler(string currentUser)
         {
@@ -298,6 +300,18 @@ namespace C969.Controllers
 
             return result;
         }
+
+        /// <summary>
+        /// Get the Customer Name by its Id
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
+        public string GetCustomerNameById(int customerId)
+        {
+            var customer = _customerDataHandler.GetCustomerDetails(customerId);
+            return customer != null ? customer.CustomerName : "Unknown";
+        }
+
 
 
     }

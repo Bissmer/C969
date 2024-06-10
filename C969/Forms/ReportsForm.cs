@@ -1,4 +1,5 @@
 ﻿using C969.Controllers;
+using C969.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,18 +19,19 @@ namespace C969.Forms
     {
 
         private readonly ReportsDataHandler _reportsDataHandler;
+        private readonly CustomerDataHandler _customerDataHandler;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private TimeZoneInfo _userTimeZone = UserSession.CurrentTimeZone;
 
 
-        
+
         public ReportsForm()
         {
+            _customerDataHandler = new CustomerDataHandler(_connString);
             InitializeComponent();
             _reportsDataHandler = new ReportsDataHandler(_connString);
             this.Load += ReportsForm_Load;
-            this.reportsFormDownloadSchedulesByUser.Click += reportsFormDownloadSchedulesByUser_Click;
             reportsFormUsersCombo.SelectedIndexChanged += reportsFormUsersCombo_SelectedIndexChanged;
-            reportsFormDownloadAppointmentsByMonth.Click += reportsFormDownloadAppointmentsByMonth_Click;
             reportsFormCountriesCombo.SelectedIndexChanged += reportsFormCountriesCombo_SelectedIndexChanged;
             
         }
@@ -89,6 +91,12 @@ namespace C969.Forms
 
             reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
             {
+                DataPropertyName = "Type",
+                HeaderText = "Type"
+            });
+
+            reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
+            {
                 DataPropertyName = "Start",
                 HeaderText = "Start Time"
             });
@@ -97,6 +105,12 @@ namespace C969.Forms
             {
                 DataPropertyName = "End",
                 HeaderText = "End Time"
+            });
+
+            reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "CustomerName",
+                HeaderText = "Customer Name"
             });
 
         }
@@ -133,18 +147,18 @@ namespace C969.Forms
         /// </summary>
         private void ConfigureCustomerCountByCountryCityDataGridView()
         {
-            reportsFormDgvCustomerCountByCountry.AutoGenerateColumns = false;
-            reportsFormDgvCustomerCountByCountry.Columns.Clear();
-            reportsFormDgvCustomerCountByCountry.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            reportsFormDgvCustomerCountByCountryCity.AutoGenerateColumns = false;
+            reportsFormDgvCustomerCountByCountryCity.Columns.Clear();
+            reportsFormDgvCustomerCountByCountryCity.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            reportsFormDgvCustomerCountByCountry.Columns.Add(new DataGridViewTextBoxColumn
+            reportsFormDgvCustomerCountByCountryCity.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Name",
-                HeaderText = "Name",
+                HeaderText = "City Name",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
 
-            reportsFormDgvCustomerCountByCountry.Columns.Add(new DataGridViewTextBoxColumn
+            reportsFormDgvCustomerCountByCountryCity.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "CusCount",
                 HeaderText = "Customer Count",
@@ -226,7 +240,21 @@ namespace C969.Forms
         private void LoadAppointmentsByUser(int userId)
         {
             var appointments = _reportsDataHandler.GetAppointmentsByUserId(userId);
-            reportsFormDgvAppointmentsByUser.DataSource = appointments;
+
+            var appointmentsInUserTimeZone = appointments.Select(a => new
+            {
+                AppointmentId = a.AppointmentId,
+                Title = a.Title,
+                Description = a.Description,
+                Location = a.Location,
+                Contact = a.Contact,
+                Type = a.Type,
+                Start = a.Start,
+                End = a.End,
+                CustomerName = _reportsDataHandler.GetCustomerNameById(a.CustomerId),
+            }).ToList();
+
+            reportsFormDgvAppointmentsByUser.DataSource = appointmentsInUserTimeZone;
             reportsFormDgvAppointmentsByUser.Refresh();
         }
 
@@ -261,6 +289,32 @@ namespace C969.Forms
             {
                 ExportReportsToCsv(reportsFormDgvAppointmentsByUser, saveFileDialog.FileName);
             }
+        }
+
+        private void reportsFormDisplaySchedulesByUser_Click(object sender, EventArgs e)
+        {
+            LoadAllAppointments();
+        }
+
+        private void LoadAllAppointments()
+        {
+            var appointments = _customerDataHandler.GetAllAppointments();
+
+            var appointmentsInUserTimeZone = appointments.Select(a => new
+            {
+                AppointmentId = a.AppointmentId,
+                Title = a.Title,
+                Description = a.Description,
+                Location = a.Location,
+                Contact = a.Contact,
+                Type = a.Type,
+                Start = a.Start,
+                End = a.End,
+                CustomerName = _reportsDataHandler.GetCustomerNameById(a.CustomerId),
+            }).ToList();
+
+            reportsFormDgvAppointmentsByUser.DataSource = appointmentsInUserTimeZone;
+            reportsFormDgvAppointmentsByUser.Refresh();
         }
         #endregion
 
@@ -316,8 +370,8 @@ namespace C969.Forms
         private void LoadCustomerCountByCountry()
         {
             var customerCounts = _reportsDataHandler.GetCustomerCountByCountry();
-            reportsFormDgvCustomerCountByCountry.DataSource = customerCounts;
-            reportsFormDgvCustomerCountByCountry.Refresh();
+            reportsFormDgvCustomerCountByCountryCity.DataSource = customerCounts;
+            reportsFormDgvCustomerCountByCountryCity.Refresh();
 
         }
 
@@ -341,31 +395,11 @@ namespace C969.Forms
         private void LoadCustomerCountByCity(int countryId)
         {
             var customerCounts = _reportsDataHandler.GetCustomerCountByCity(countryId);
-            reportsFormDgvCustomerCountByCountry.DataSource = customerCounts;
+            reportsFormDgvCustomerCountByCountryCity.DataSource = customerCounts;
         }
 
         #endregion
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+       
     }
 }

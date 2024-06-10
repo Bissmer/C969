@@ -224,7 +224,7 @@ namespace C969.Controllers
                             cmd.ExecuteNonQuery();
                         }
 
-                        // Update the Customer record
+                        // Update the Customer 
                         string updateCustomer = @"
                         UPDATE Customer
                         SET customerName = @customerName, active = @active
@@ -609,15 +609,17 @@ namespace C969.Controllers
         {
 
             // Read the start and end times from the database as EST
-            DateTime estStart = reader.GetDateTime("start");
-            DateTime estEnd = reader.GetDateTime("end");
+
+            DateTime estStart = DateTime.SpecifyKind(reader.GetDateTime("start"), DateTimeKind.Unspecified); ;
+            DateTime estEnd = DateTime.SpecifyKind(reader.GetDateTime("end"),DateTimeKind.Unspecified); ;
+            DateTime estCreate = DateTime.SpecifyKind(reader.GetDateTime("createDate"), DateTimeKind.Unspecified);
+            DateTime estUpdate = DateTime.SpecifyKind(reader.GetDateTime("lastUpdate"), DateTimeKind.Unspecified);
 
             // Convert the start and end times from EST to the user's local time zone
             DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
             DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
-
-            DateTime localCreateDate = reader.GetDateTime("createDate");
-            DateTime localLastUpdate = reader.GetDateTime("lastUpdate");
+            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, estTimeZone, userTimeZone);
+            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estUpdate, estTimeZone, userTimeZone);
 
             return new AppointmentDetails
             {
@@ -674,7 +676,7 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool UpdateAppointment(AppointmentDetails appointment)
         {
-            var (estStart, estEnd, estNow) = TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, DateTime.UtcNow, UserSession.CurrentTimeZone);
+            var (estStart, estEnd, estNow) = TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, DateTime.Now, UserSession.CurrentTimeZone);
 
             using (var conn = new MySqlConnection(_connString))
             {

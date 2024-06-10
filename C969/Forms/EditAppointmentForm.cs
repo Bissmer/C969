@@ -203,7 +203,7 @@ namespace C969.Forms
                         CustomerId = (int)editAppointmentCustomerNameCombo.SelectedValue,
                         UserId = UserSession.UserId,
                         CreatedBy = editAppointmentCurrentUserText.Text,
-                        LastUpdate = DateTime.UtcNow,
+                        LastUpdate = DateTime.Now,
                         LastUpdateBy = editAppointmentCurrentUserText.Text,
                         Url = editAppointmentUrlText.Text
                     };
