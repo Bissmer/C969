@@ -14,14 +14,19 @@ using System.Windows.Forms;
 
 namespace C969.Forms
 {
-    
+
     public partial class ReportsForm : Form
     {
 
         private readonly ReportsDataHandler _reportsDataHandler;
         private readonly CustomerDataHandler _customerDataHandler;
-        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+
+        private readonly string _connString =
+            ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+
         private TimeZoneInfo _userTimeZone = UserSession.CurrentTimeZone;
+        private List<AppointmentCountByCustomer> _appointmentCountsByCustomer;
+        private string _timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
 
 
 
@@ -32,20 +37,20 @@ namespace C969.Forms
             _reportsDataHandler = new ReportsDataHandler(_connString);
             this.Load += ReportsForm_Load;
             reportsFormUsersCombo.SelectedIndexChanged += reportsFormUsersCombo_SelectedIndexChanged;
-            reportsFormCountriesCombo.SelectedIndexChanged += reportsFormCountriesCombo_SelectedIndexChanged;
-            
+            //reportsFormCountriesCombo.SelectedIndexChanged += reportsFormCountriesCombo_SelectedIndexChanged;
+
         }
 
         private void ReportsForm_Load(object sender, EventArgs e)
         {
             LoadUsers();
-            LoadCountries();
-            LoadCustomerCountByCountry();
             ConfigureAppointmentsDataGridView();
             ConfigureMonthlyReportDataGridView();
-            ConfigureCustomerCountByCountryCityDataGridView();
+            ConfigureAppointmentsByCountryDataGridView();
             LoadDefaultAppointments();
             LoadMonthlyReport();
+            LoadCustomerCountByCountry();
+            LoadAppointmentCountsByCustomer();
         }
 
 
@@ -145,23 +150,23 @@ namespace C969.Forms
         /// <summary>
         /// Method to configure tables in Customer Appointments Breakdown DGV
         /// </summary>
-        private void ConfigureCustomerCountByCountryCityDataGridView()
+        private void ConfigureAppointmentsByCountryDataGridView()
         {
-            reportsFormDgvCustomerCountByCountryCity.AutoGenerateColumns = false;
-            reportsFormDgvCustomerCountByCountryCity.Columns.Clear();
-            reportsFormDgvCustomerCountByCountryCity.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            reportsFormDgvAppointmentsByCustomer.AutoGenerateColumns = false;
+            reportsFormDgvAppointmentsByCustomer.Columns.Clear();
+            reportsFormDgvAppointmentsByCustomer.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            reportsFormDgvCustomerCountByCountryCity.Columns.Add(new DataGridViewTextBoxColumn
+            reportsFormDgvAppointmentsByCustomer.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "Name",
-                HeaderText = "City Name",
+                DataPropertyName = "CustomerName",
+                HeaderText = "Customer Name",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
 
-            reportsFormDgvCustomerCountByCountryCity.Columns.Add(new DataGridViewTextBoxColumn
+            reportsFormDgvAppointmentsByCustomer.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "CusCount",
-                HeaderText = "Customer Count",
+                DataPropertyName = "AppointmentsCount",
+                HeaderText = "Appointments Count",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
         }
@@ -169,6 +174,7 @@ namespace C969.Forms
         #endregion
 
         #region Reports Export Methods
+
         /// <summary>
         /// Load the appointments for the selected user and export them to a CSV file
         /// </summary>
@@ -181,13 +187,16 @@ namespace C969.Forms
                 var sb = new StringBuilder();
                 var headers = dgv.Columns.Cast<DataGridViewColumn>();
 
-                sb.AppendLine(string.Join(",", headers.Select(column => "\"" + column.HeaderText + "\"").ToArray())); // Write the headers to the file
+                sb.AppendLine(string.Join(",",
+                    headers.Select(column => "\"" + column.HeaderText + "\"")
+                        .ToArray())); // Write the headers to the file
 
                 // Write the data to the file
                 foreach (DataGridViewRow row in dgv.Rows)
                 {
                     var cells = row.Cells.Cast<DataGridViewCell>();
-                    sb.AppendLine(string.Join(",", cells.Select(cell => "\"" + cell.Value?.ToString() + "\"").ToArray()));
+                    sb.AppendLine(
+                        string.Join(",", cells.Select(cell => "\"" + cell.Value?.ToString() + "\"").ToArray()));
                 }
 
                 File.WriteAllText(fileName, sb.ToString());
@@ -195,9 +204,11 @@ namespace C969.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred while exporting data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"An error occurred while exporting data: {ex.Message}", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
+
         #endregion
 
         #region Schedules by User report controls and logic
@@ -222,14 +233,16 @@ namespace C969.Forms
         {
             try
             {
-                if (reportsFormUsersCombo.SelectedValue != null && int.TryParse(reportsFormUsersCombo.SelectedValue.ToString(), out int selectedUserId))
+                if (reportsFormUsersCombo.SelectedValue != null &&
+                    int.TryParse(reportsFormUsersCombo.SelectedValue.ToString(), out int selectedUserId))
                 {
                     LoadAppointmentsByUser(selectedUserId);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
@@ -316,6 +329,7 @@ namespace C969.Forms
             reportsFormDgvAppointmentsByUser.DataSource = appointmentsInUserTimeZone;
             reportsFormDgvAppointmentsByUser.Refresh();
         }
+
         #endregion
 
         #region Appointments by Months report controls and logic
@@ -353,16 +367,6 @@ namespace C969.Forms
 
         #region Customer Appointments Breakdown report controls and logic
 
-        /// <summary>
-        /// Method to load the customer list into Customer Appointments Breakdown countries combo box
-        /// </summary>
-        private void LoadCountries()
-        {
-            var countries = _reportsDataHandler.GetAllCountries();
-            reportsFormCountriesCombo.DataSource = countries;
-            reportsFormCountriesCombo.DisplayMember = "CountryName";
-            reportsFormCountriesCombo.ValueMember = "CountryId";
-        }
 
         /// <summary>
         /// Method to load the customer count by country report when the Report form is loaded
@@ -370,37 +374,53 @@ namespace C969.Forms
         private void LoadCustomerCountByCountry()
         {
             var customerCounts = _reportsDataHandler.GetCustomerCountByCountry();
-            reportsFormDgvCustomerCountByCountryCity.DataSource = customerCounts;
-            reportsFormDgvCustomerCountByCountryCity.Refresh();
+            reportsFormDgvAppointmentsByCustomer.DataSource = customerCounts;
+            reportsFormDgvAppointmentsByCustomer.Refresh();
 
         }
 
         /// <summary>
-        /// Handler that loads the report depending on the selected country
+        /// Method to load the appointments count by customer report when the Report form is loaded
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void reportsFormCountriesCombo_SelectedIndexChanged(object sender, EventArgs e)
+        private void LoadAppointmentCountsByCustomer()
         {
-            if (reportsFormCountriesCombo.SelectedValue != null && int.TryParse(reportsFormCountriesCombo.SelectedValue.ToString(), out int selectedCountryId))
+            _appointmentCountsByCustomer = _reportsDataHandler.GetAppointmentsCountByCustomer();
+            reportsFormDgvAppointmentsByCustomer.DataSource =
+                new BindingList<AppointmentCountByCustomer>(_appointmentCountsByCustomer);
+        }
+
+        private void reportsFormDownloadCustomerCountByCountryCity_Click(object sender, EventArgs e)
+        {
+
+
+            string defaultFileName = $"AppointmentsByCustomer_{_timestamp}.csv";
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                LoadCustomerCountByCity(selectedCountryId);
+                Filter = "CSV files (*.csv)|*.csv",
+                Title = "Save appointments by month",
+                FileName = defaultFileName
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                ExportReportsToCsv(reportsFormDgvAppointmentsByCustomer, saveFileDialog.FileName);
             }
         }
 
-        /// <summary>
-        /// Method to load the customer count by city
-        /// </summary>
-        /// <param name="countryId"></param>
-        private void LoadCustomerCountByCity(int countryId)
-        {
-            var customerCounts = _reportsDataHandler.GetCustomerCountByCity(countryId);
-            reportsFormDgvCustomerCountByCountryCity.DataSource = customerCounts;
-            reportsFormDgvCustomerCountByCountryCity.Refresh();
-        }
 
         #endregion
 
-       
+        #region Reports Form Quit Button
+        private void reportsFormQuitBtn_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to close the Reports Form?", "Close the Reports Form", MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                this.Close();
+            }
+        }
+        #endregion
+
     }
 }

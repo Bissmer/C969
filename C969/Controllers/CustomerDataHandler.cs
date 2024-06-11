@@ -676,6 +676,7 @@ namespace C969.Controllers
         /// <returns></returns>
         public bool UpdateAppointment(AppointmentDetails appointment)
         {
+
             var (estStart, estEnd, estNow) = TimeZoneHandler.ConvertToEst(appointment.Start, appointment.End, DateTime.Now, UserSession.CurrentTimeZone);
 
             using (var conn = new MySqlConnection(_connString))
@@ -712,6 +713,7 @@ namespace C969.Controllers
 
                             int result = cmd.ExecuteNonQuery();
                             trans.Commit();
+
                             return result > 0;
                         }
                     }

@@ -41,6 +41,7 @@
             // 
             // loginHeaderLabel
             // 
+            this.loginHeaderLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.loginHeaderLabel.AutoSize = true;
             this.loginHeaderLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.loginHeaderLabel.Location = new System.Drawing.Point(137, 98);
@@ -133,6 +134,8 @@
             this.Controls.Add(this.loginPasswordtxt);
             this.Controls.Add(this.loginUserNametxt);
             this.Controls.Add(this.loginHeaderLabel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "Login";
             this.Text = "Sceduling App Login Window";
             this.ResumeLayout(false);

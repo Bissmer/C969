@@ -163,6 +163,8 @@
     <Compile Include="Forms\ReportsForm.Designer.cs">
       <DependentUpon>ReportsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\AppointmentCountByCountry.cs" />
+    <Compile Include="Models\AppointmentCountByCustomer.cs" />
     <Compile Include="Models\AppointmentDetails.cs" />
     <Compile Include="Models\AppointmentTypesByMonths.cs" />
     <Compile Include="Models\City.cs" />

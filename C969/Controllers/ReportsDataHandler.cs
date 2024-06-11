@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using C969.Models;
 using MySql.Data.MySqlClient;
 using C969.Controllers;
+using System.Windows.Forms;
 
 namespace C969.Controllers
 {
@@ -17,7 +18,8 @@ namespace C969.Controllers
     {
         private readonly MySqlConnection _connection;
 
-        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private readonly string _connString =
+            ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
         private readonly CustomerDataHandler _customerDataHandler;
 
@@ -91,6 +93,7 @@ namespace C969.Controllers
                     }
                 }
             }
+
             return appointments;
         }
 
@@ -114,20 +117,22 @@ namespace C969.Controllers
                     {
                         while (reader.Read())
                         {
-                            appointments.Add(_customerDataHandler.MapReaderToAppointmentDetails(reader, UserSession.CurrentTimeZone));
+                            appointments.Add(
+                                _customerDataHandler.MapReaderToAppointmentDetails(reader,
+                                    UserSession.CurrentTimeZone));
                         }
                     }
                 }
             }
 
             //Groups appointments by month and type
-            var groupedAppointments = appointments.GroupBy(app => new{app.Start.Month, AppointmentType = app.Type})
-                    .Select(group => new AppointmentTypesByMonths
-                        {
-                            Month = group.Key.Month,
-                            Type = group.Key.AppointmentType,
-                            Count = group.Count()
-                        }).ToList();
+            var groupedAppointments = appointments.GroupBy(app => new { app.Start.Month, AppointmentType = app.Type })
+                .Select(group => new AppointmentTypesByMonths
+                {
+                    Month = group.Key.Month,
+                    Type = group.Key.AppointmentType,
+                    Count = group.Count()
+                }).ToList();
 
             return groupedAppointments;
 
@@ -143,7 +148,8 @@ namespace C969.Controllers
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
-                string query = "SELECT customerId, customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM customer";
+                string query =
+                    "SELECT customerId, customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM customer";
 
 
                 using (var cmd = new MySqlCommand(query, conn))
@@ -167,6 +173,7 @@ namespace C969.Controllers
                     }
                 }
             }
+
             return customers;
         }
 
@@ -189,15 +196,16 @@ namespace C969.Controllers
                         while (reader.Read())
                         {
                             cities.Add(new City
-                                {
-                                    CityId = reader.GetInt32("cityId"),
-                                    CountryId = reader.GetInt32("countryId"),
-                                    CityName = reader.GetString("city")
+                            {
+                                CityId = reader.GetInt32("cityId"),
+                                CountryId = reader.GetInt32("countryId"),
+                                CityName = reader.GetString("city")
                             });
                         }
                     }
                 }
             }
+
             return cities;
         }
 
@@ -211,7 +219,7 @@ namespace C969.Controllers
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
-                string query = "SELECT countryId, country FROM country ORDER BY country";
+                string query = "SELECT countryId, country FROM country";
 
                 using (var cmd = new MySqlCommand(query, conn))
                 {
@@ -228,6 +236,7 @@ namespace C969.Controllers
                     }
                 }
             }
+
             return countries;
         }
 
@@ -244,7 +253,7 @@ namespace C969.Controllers
 
             // Get the count of customers by city
             var result = cities
-                .Where(city=> city.CountryId == countryId)
+                .Where(city => city.CountryId == countryId)
                 .GroupJoin( // Join cities with customers` address
                     customers,
                     city => city.CityId,
@@ -254,8 +263,8 @@ namespace C969.Controllers
                         Name = city.CityName,
                         CusCount = customerGroup.Count()
                     }
-                    ).ToList();
-                return result;
+                ).ToList();
+            return result;
         }
 
         /// <summary>
@@ -267,38 +276,69 @@ namespace C969.Controllers
             List<City> cities = GetAllCities();
             List<Country> countries = GetAllCountries();
 
- 
-            var result = countries
-                .GroupJoin( // Join countries with cities
-                    cities,
-                    country => country.CountryId,
-                    city => city.CountryId,
-                    (country, cityGroup) => new { country, cityGroup }
-                )
-                .SelectMany(
-                    x => x.cityGroup.DefaultIfEmpty(),
-                    (x, city) => new { x.country, city }
-                    )
-                .GroupJoin( // Join the result with customers
 
-                    customers,
-                    x => x.city?.CityId,
-                    customer => customer.AddressID, 
-                    (x, customerGroup) => new
-                    {
-                        CountryName = x.country.CountryName,
-                        CusCount = customerGroup.Count()
-                    }
-                    )
-                .GroupBy(x => x.CountryName) // Group by country name
-                .Select(g => new CustomerCount //Retrieve the result
+            if (customers == null || cities == null || countries == null)
+            {
+                throw new InvalidOperationException("Unable to load necessary data for customer count computation.");
+            }
+
+            // Step 1: Group customers by city
+            var customerGroupsByCity = customers.GroupBy(c => c.AddressID)
+                .Select(g => new
                 {
-                    Name = g.Key,
-                    CusCount = g.Sum(x => x.CusCount)
-                })
-                .ToList();
+                    CityId = g.Key,
+                    CustomerCount = g.Count()
+                }).ToList();
 
-            return result;
+            Console.WriteLine("Customer Groups by City:");
+            foreach (var group in customerGroupsByCity)
+            {
+                Console.WriteLine($"CityId: {group.CityId}, CustomerCount: {group.CustomerCount}");
+            }
+
+            // Step 2: Join cities with their customer counts
+            var cityCustomerCounts = cities
+                .GroupJoin(
+                    customerGroupsByCity,
+                    city => city.CityId,
+                    customerGroup => customerGroup.CityId,
+                    (city, customerGroup) => new
+                    {
+                        City = city,
+                        CustomerCount = customerGroup.FirstOrDefault()?.CustomerCount ?? 0
+                    }).ToList();
+
+            Console.WriteLine("City Customer Counts:");
+            foreach (var count in cityCustomerCounts)
+            {
+                Console.WriteLine($"City: {count.City.CityName}, CustomerCount: {count.CustomerCount}");
+            }
+
+            // Step 3: Group by country and sum the customer counts
+            var countryCustomerCounts = countries
+                .GroupJoin(
+                    cityCustomerCounts,
+                    country => country.CountryId,
+                    cityCustomerCount => cityCustomerCount.City.CountryId,
+                    (country, cityGroup) => new
+                    {
+                        Country = country,
+                        CustomerCount = cityGroup.Sum(c => c.CustomerCount)
+                    })
+                .Select(g => new CustomerCount
+                {
+                    Name = g.Country.CountryName,
+                    CusCount = g.CustomerCount
+                }).ToList();
+
+            Console.WriteLine("Country Customer Counts:");
+            foreach (var count in countryCustomerCounts)
+            {
+                Console.WriteLine($"Country: {count.Name}, CustomerCount: {count.CusCount}");
+            }
+
+
+            return countryCustomerCounts;
         }
 
         /// <summary>
@@ -312,6 +352,68 @@ namespace C969.Controllers
             return customer != null ? customer.CustomerName : "Unknown";
         }
 
+        public List<AppointmentCountByCountry> GetAppointmentCountByCountry()
+        {
+            List<AppointmentDetails> appointments = _customerDataHandler.GetAllAppointments();
+            List<City> cities = GetAllCities();
+            List<Country> countries = GetAllCountries();
+
+            var output = countries
+                .GroupJoin(
+                    cities,
+                    country => country.CountryId,
+                    city => city.CountryId,
+                    (country, cityGroup) => new { Country = country, Cities = cityGroup }
+                )
+                .SelectMany(
+                    countryCity => countryCity.Cities.DefaultIfEmpty(),
+                    (countryCity, city) => new { countryCity.Country, CityId = city?.CityId }
+                )
+                .GroupJoin(
+                    appointments,
+                    countryCity => countryCity.CityId,
+                    appointment => appointment.CustomerId,
+                    (countryCity, appointmentGroup) => new
+                    {
+                        countryCity.Country.CountryName,
+                        AppointmentCount = appointmentGroup.Count()
+                    }
+                )
+                .GroupBy(result => result.CountryName)
+                .Select(group => new AppointmentCountByCountry
+                {
+                    CountryName = group.Key,
+                    AppointmentCount = group.Sum(g => g.AppointmentCount)
+                })
+                .ToList();
+
+            return output;
+        }
+
+        public List<AppointmentCountByCustomer> GetAppointmentsCountByCustomer()
+        {
+            {
+                List<AppointmentDetails> appointments = _customerDataHandler.GetAllAppointments();
+                List<Customer> customers = GetAllCustomers();
+
+                var appointmentsByCustomer = customers
+                    .GroupJoin(
+                        appointments,
+                        customer => customer.CustomerID,
+                        appointment => appointment.CustomerId,
+                        (customer, appointmentGroup) => new AppointmentCountByCustomer
+                        {
+                            CustomerId = customer.CustomerID,
+                            CustomerName = customer.CustomerName,
+                            AppointmentsCount = appointmentGroup.Count()
+                        }
+                    )
+                    .ToList();
+
+                return appointmentsByCustomer;
+            }
+
+        }
 
 
     }
