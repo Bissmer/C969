@@ -76,7 +76,7 @@
             // editCustomerActiveLabel
             // 
             this.editCustomerActiveLabel.AutoSize = true;
-            this.editCustomerActiveLabel.Location = new System.Drawing.Point(74, 364);
+            this.editCustomerActiveLabel.Location = new System.Drawing.Point(71, 364);
             this.editCustomerActiveLabel.Name = "editCustomerActiveLabel";
             this.editCustomerActiveLabel.Size = new System.Drawing.Size(43, 13);
             this.editCustomerActiveLabel.TabIndex = 35;
@@ -137,7 +137,7 @@
             // editCustomerAddressLabel
             // 
             this.editCustomerAddressLabel.AutoSize = true;
-            this.editCustomerAddressLabel.Location = new System.Drawing.Point(74, 150);
+            this.editCustomerAddressLabel.Location = new System.Drawing.Point(71, 147);
             this.editCustomerAddressLabel.Name = "editCustomerAddressLabel";
             this.editCustomerAddressLabel.Size = new System.Drawing.Size(45, 13);
             this.editCustomerAddressLabel.TabIndex = 28;
@@ -241,6 +241,7 @@
             this.Controls.Add(this.editCustomerNameText);
             this.Controls.Add(this.editCustomerCancelBtn);
             this.Controls.Add(this.editCustomerSaveBtn);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "EditCustomerForm";
             this.Text = "Edit a Customer";
             this.ResumeLayout(false);

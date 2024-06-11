@@ -58,9 +58,9 @@
             // 
             // addCustomerSaveBtn
             // 
-            this.addCustomerSaveBtn.Location = new System.Drawing.Point(163, 444);
+            this.addCustomerSaveBtn.Location = new System.Drawing.Point(163, 443);
             this.addCustomerSaveBtn.Name = "addCustomerSaveBtn";
-            this.addCustomerSaveBtn.Size = new System.Drawing.Size(75, 23);
+            this.addCustomerSaveBtn.Size = new System.Drawing.Size(116, 23);
             this.addCustomerSaveBtn.TabIndex = 1;
             this.addCustomerSaveBtn.Text = "Save";
             this.addCustomerSaveBtn.UseVisualStyleBackColor = true;
@@ -68,9 +68,9 @@
             // 
             // addCustomerCancelBtn
             // 
-            this.addCustomerCancelBtn.Location = new System.Drawing.Point(163, 488);
+            this.addCustomerCancelBtn.Location = new System.Drawing.Point(163, 487);
             this.addCustomerCancelBtn.Name = "addCustomerCancelBtn";
-            this.addCustomerCancelBtn.Size = new System.Drawing.Size(75, 23);
+            this.addCustomerCancelBtn.Size = new System.Drawing.Size(116, 23);
             this.addCustomerCancelBtn.TabIndex = 2;
             this.addCustomerCancelBtn.Text = "Cancel";
             this.addCustomerCancelBtn.UseVisualStyleBackColor = true;
@@ -241,6 +241,7 @@
             this.Controls.Add(this.addCustomerNameText);
             this.Controls.Add(this.addCustomerCancelBtn);
             this.Controls.Add(this.addCustomerSaveBtn);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "AddCustomerForm";
             this.Text = "AddCustomerForm";
             this.ResumeLayout(false);

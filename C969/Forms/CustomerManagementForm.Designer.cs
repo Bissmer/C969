@@ -95,7 +95,7 @@ namespace C969.Forms
             // cusMgmCurrentUserlbl
             // 
             this.cusMgmCurrentUserlbl.AutoSize = true;
-            this.cusMgmCurrentUserlbl.Location = new System.Drawing.Point(815, 17);
+            this.cusMgmCurrentUserlbl.Location = new System.Drawing.Point(15, 9);
             this.cusMgmCurrentUserlbl.Name = "cusMgmCurrentUserlbl";
             this.cusMgmCurrentUserlbl.Size = new System.Drawing.Size(35, 13);
             this.cusMgmCurrentUserlbl.TabIndex = 4;
@@ -162,9 +162,9 @@ namespace C969.Forms
             // 
             // cusMgmtEndSessionButton
             // 
-            this.cusMgmtEndSessionButton.Location = new System.Drawing.Point(1091, 755);
+            this.cusMgmtEndSessionButton.Location = new System.Drawing.Point(999, 182);
             this.cusMgmtEndSessionButton.Name = "cusMgmtEndSessionButton";
-            this.cusMgmtEndSessionButton.Size = new System.Drawing.Size(96, 40);
+            this.cusMgmtEndSessionButton.Size = new System.Drawing.Size(234, 60);
             this.cusMgmtEndSessionButton.TabIndex = 11;
             this.cusMgmtEndSessionButton.Text = "End Session";
             this.cusMgmtEndSessionButton.UseVisualStyleBackColor = true;
@@ -181,7 +181,7 @@ namespace C969.Forms
             // 
             // cusMgmtAppointmentsCalendar
             // 
-            this.cusMgmtAppointmentsCalendar.Location = new System.Drawing.Point(963, 466);
+            this.cusMgmtAppointmentsCalendar.Location = new System.Drawing.Point(1006, 459);
             this.cusMgmtAppointmentsCalendar.MaxSelectionCount = 1;
             this.cusMgmtAppointmentsCalendar.MinDate = new System.DateTime(2018, 12, 1, 0, 0, 0, 0);
             this.cusMgmtAppointmentsCalendar.Name = "cusMgmtAppointmentsCalendar";
@@ -192,7 +192,7 @@ namespace C969.Forms
             this.label1.AutoEllipsis = true;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(963, 430);
+            this.label1.Location = new System.Drawing.Point(1002, 430);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(224, 20);
             this.label1.TabIndex = 15;
@@ -200,7 +200,7 @@ namespace C969.Forms
             // 
             // cusMgmtShowAllAppts
             // 
-            this.cusMgmtShowAllAppts.Location = new System.Drawing.Point(1008, 659);
+            this.cusMgmtShowAllAppts.Location = new System.Drawing.Point(1045, 659);
             this.cusMgmtShowAllAppts.Name = "cusMgmtShowAllAppts";
             this.cusMgmtShowAllAppts.Size = new System.Drawing.Size(146, 23);
             this.cusMgmtShowAllAppts.TabIndex = 16;
@@ -210,9 +210,9 @@ namespace C969.Forms
             // 
             // cusMgmtReportsButton
             // 
-            this.cusMgmtReportsButton.Location = new System.Drawing.Point(975, 755);
+            this.cusMgmtReportsButton.Location = new System.Drawing.Point(999, 94);
             this.cusMgmtReportsButton.Name = "cusMgmtReportsButton";
-            this.cusMgmtReportsButton.Size = new System.Drawing.Size(93, 40);
+            this.cusMgmtReportsButton.Size = new System.Drawing.Size(234, 57);
             this.cusMgmtReportsButton.TabIndex = 17;
             this.cusMgmtReportsButton.Text = "Reports";
             this.cusMgmtReportsButton.UseVisualStyleBackColor = true;
@@ -221,18 +221,19 @@ namespace C969.Forms
             // label2
             // 
             this.label2.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.label2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label2.ForeColor = System.Drawing.SystemColors.AppWorkspace;
             this.label2.Location = new System.Drawing.Point(12, 351);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(923, 10);
+            this.label2.Size = new System.Drawing.Size(1217, 1);
             this.label2.TabIndex = 18;
             // 
             // CustomerManagementForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1222, 807);
+            this.ClientSize = new System.Drawing.Size(1290, 728);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cusMgmtReportsButton);
             this.Controls.Add(this.cusMgmtShowAllAppts);
@@ -251,6 +252,8 @@ namespace C969.Forms
             this.Controls.Add(this.cusMgmtDeleteCustomerButton);
             this.Controls.Add(this.cusMgmtEditCustomerButton);
             this.Controls.Add(this.cusMgmtAddCustomerButton);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "CustomerManagementForm";
             this.Text = "CustomerManagementForm";
             ((System.ComponentModel.ISupportInitialize)(this.cusMgmtDgvCustomers)).EndInit();

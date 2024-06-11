@@ -207,31 +207,37 @@ namespace C969.Forms
             {
                 int customerId = Convert.ToInt32(cusMgmtDgvCustomers.SelectedRows[0].Cells["customerId"].Value);
 
-                try
+                var result = MessageBox.Show("Are you sure you want to delete the selected customer?", "Delete Customer",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    var result = _customerDataHandler.DeleteCustomer(customerId);
-                    if (result)
+                    try
                     {
-                        MessageBox.Show("Customer deleted successfully.");
-                        LoadCustomers();
+                        var deleteResult = _customerDataHandler.DeleteCustomer(customerId);
+                        if (deleteResult)
+                        {
+                            MessageBox.Show("Customer deleted successfully.", "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            LoadCustomers();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to delete customer.");
+                        }
                     }
-                    else
+                    catch (MySqlException ex)
                     {
-                        MessageBox.Show("Failed to delete customer.");
+                        MessageBox.Show($"Database error: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show($"Database error: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
             else
             {
-                MessageBox.Show("Please select a customer to delete.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("No Customers to Delete", "No Customers", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -254,7 +260,7 @@ namespace C969.Forms
                     {
                         if (_customerDataHandler.DeleteAppointment(appointmentId))
                         {
-                            MessageBox.Show("Appointment deleted successfully.");
+                            MessageBox.Show("Appointment deleted successfully.", "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             LoadAppointments();
                             UpdateCalendarHighlights();
                         }
@@ -272,10 +278,10 @@ namespace C969.Forms
                         MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-                else
-                {
-                    MessageBox.Show("Please select an appointment to delete.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+            }
+            else
+            {
+                MessageBox.Show("No Appointments Exist", "No Appoitnments", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

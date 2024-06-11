@@ -147,9 +147,9 @@ namespace C969.Forms
             // 
             // addAppointmentCancelBtn
             // 
-            this.addAppointmentCancelBtn.Location = new System.Drawing.Point(184, 638);
+            this.addAppointmentCancelBtn.Location = new System.Drawing.Point(154, 638);
             this.addAppointmentCancelBtn.Name = "addAppointmentCancelBtn";
-            this.addAppointmentCancelBtn.Size = new System.Drawing.Size(75, 23);
+            this.addAppointmentCancelBtn.Size = new System.Drawing.Size(116, 23);
             this.addAppointmentCancelBtn.TabIndex = 22;
             this.addAppointmentCancelBtn.Text = "Cancel";
             this.addAppointmentCancelBtn.UseVisualStyleBackColor = true;
@@ -157,9 +157,9 @@ namespace C969.Forms
             // 
             // addAppointmentSaveBtn
             // 
-            this.addAppointmentSaveBtn.Location = new System.Drawing.Point(184, 594);
+            this.addAppointmentSaveBtn.Location = new System.Drawing.Point(154, 594);
             this.addAppointmentSaveBtn.Name = "addAppointmentSaveBtn";
-            this.addAppointmentSaveBtn.Size = new System.Drawing.Size(75, 23);
+            this.addAppointmentSaveBtn.Size = new System.Drawing.Size(116, 23);
             this.addAppointmentSaveBtn.TabIndex = 21;
             this.addAppointmentSaveBtn.Text = "Save";
             this.addAppointmentSaveBtn.UseVisualStyleBackColor = true;

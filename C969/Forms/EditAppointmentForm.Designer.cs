@@ -69,7 +69,7 @@ namespace C969.Forms
             // editAppointmentUrlLabel
             // 
             this.editAppointmentUrlLabel.AutoSize = true;
-            this.editAppointmentUrlLabel.Location = new System.Drawing.Point(84, 503);
+            this.editAppointmentUrlLabel.Location = new System.Drawing.Point(80, 503);
             this.editAppointmentUrlLabel.Name = "editAppointmentUrlLabel";
             this.editAppointmentUrlLabel.Size = new System.Drawing.Size(20, 13);
             this.editAppointmentUrlLabel.TabIndex = 80;
@@ -272,9 +272,9 @@ namespace C969.Forms
             // 
             // editAppointmentCancelBtn
             // 
-            this.editAppointmentCancelBtn.Location = new System.Drawing.Point(180, 618);
+            this.editAppointmentCancelBtn.Location = new System.Drawing.Point(166, 618);
             this.editAppointmentCancelBtn.Name = "editAppointmentCancelBtn";
-            this.editAppointmentCancelBtn.Size = new System.Drawing.Size(75, 23);
+            this.editAppointmentCancelBtn.Size = new System.Drawing.Size(116, 23);
             this.editAppointmentCancelBtn.TabIndex = 56;
             this.editAppointmentCancelBtn.Text = "Cancel";
             this.editAppointmentCancelBtn.UseVisualStyleBackColor = true;
@@ -282,9 +282,9 @@ namespace C969.Forms
             // 
             // editAppointmentSaveBtn
             // 
-            this.editAppointmentSaveBtn.Location = new System.Drawing.Point(180, 574);
+            this.editAppointmentSaveBtn.Location = new System.Drawing.Point(166, 574);
             this.editAppointmentSaveBtn.Name = "editAppointmentSaveBtn";
-            this.editAppointmentSaveBtn.Size = new System.Drawing.Size(75, 23);
+            this.editAppointmentSaveBtn.Size = new System.Drawing.Size(116, 23);
             this.editAppointmentSaveBtn.TabIndex = 55;
             this.editAppointmentSaveBtn.Text = "Save";
             this.editAppointmentSaveBtn.UseVisualStyleBackColor = true;
@@ -322,6 +322,7 @@ namespace C969.Forms
             this.Controls.Add(this.editAppointmentTitleText);
             this.Controls.Add(this.editAppointmentCancelBtn);
             this.Controls.Add(this.editAppointmentSaveBtn);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "EditAppointmentForm";
             this.Text = "EditAppointment";
             this.ResumeLayout(false);

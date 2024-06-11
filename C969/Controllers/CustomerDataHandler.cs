@@ -16,13 +16,14 @@ namespace C969.Controllers
     public class CustomerDataHandler
     {
         private readonly MySqlConnection _connection;
-        private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        private readonly string _connString;
         private readonly string _currentUser;
         public TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
 
-        public CustomerDataHandler(string _connString)
+        public CustomerDataHandler(string connString)
         {
+            _connString = connString;
             _connection = new MySqlConnection(_connString);
             _currentUser = UserSession.CurrentUser;
         }
@@ -97,7 +98,7 @@ namespace C969.Controllers
                 cmd.Parameters.AddRange(parameters);
                 var result = cmd.ExecuteScalar();
 
-                // Clear parameters after executing the select command to avoid "parameter already defined" error.
+                // Clearing parameters after executing the select command to avoid "parameter already defined" error.
                 cmd.Parameters.Clear();
 
                 if (result != null)
@@ -204,9 +205,9 @@ namespace C969.Controllers
                     try
                     {
                         // Update or add the country first to get the countryId
-                        int countryId = EnsureCountry(customer.Country, conn, trans);
+                        int countryId = EnsureEntity(customer.Country, trans, new MySqlParameter("@country", customer.Country));
                         // Update the city first to get the cityId
-                        int cityId = EnsureCity(customer.City, countryId, conn, trans);
+                        int cityId = EnsureEntity(customer.City, trans, new MySqlParameter("@city", customer.City), new MySqlParameter("@countryId", countryId));
 
                         // Update the Address
                         string updateAddress = @"
@@ -239,7 +240,7 @@ namespace C969.Controllers
                         }
 
                         trans.Commit();
-                        Console.WriteLine($"Updating Customer ID: {customer.CustomerID}");
+                        Console.WriteLine($"Updating Customer ID: {customer.CustomerID}");//debugging
                         return true;
                     }
                     catch (Exception ex)
@@ -252,101 +253,7 @@ namespace C969.Controllers
             }
         }
 
-        /// <summary>
-        /// Ensures that the given city exists in the database. If it does not exist, it is inserted and the new city ID is returned.
-        /// </summary>
-        /// <param name="cityName"></param>
-        /// <param name="countryId"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        private int EnsureCity(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
-        {
-            int cityId = GetCityId(cityName, countryId, conn, trans);
-            if (cityId == 0)
-            {
-                string insertCity = @"
-                    INSERT INTO City (city, countryId, createDate, createdBy, lastUpdate, lastUpdateBy)
-                    VALUES (@cityName, @countryId, NOW(), @createdBy, NOW(), @lastUpdateBy);
-                    SELECT LAST_INSERT_ID();";
-
-                using (var cmd = new MySqlCommand(insertCity, conn, trans))
-                {
-                    cmd.Parameters.AddWithValue("@cityName", cityName); 
-                    cmd.Parameters.AddWithValue("@countryId", countryId);
-                    cmd.Parameters.AddWithValue("@createDate", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@createdBy", _currentUser);
-                    cmd.Parameters.AddWithValue("@lastUpdateBy", _currentUser);
-                    cityId = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-            }
-            return cityId;
-        }
-
-        /// <summary>
-        /// Retrieves the city ID for the given city name and country ID.
-        /// </summary>
-        /// <param name="cityName"></param>
-        /// <param name="countryId"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        private int GetCityId(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
-        {
-            string query = "SELECT cityId FROM City WHERE city = @cityName AND countryId = @countryId;";
-            using (var cmd = new MySqlCommand(query, conn, trans))
-            {
-                cmd.Parameters.AddWithValue("@cityName", cityName);
-                cmd.Parameters.AddWithValue("@countryId", countryId);
-                var result = cmd.ExecuteScalar();
-                return result != null ? Convert.ToInt32(result) : 0;
-            }
-        }
-
-        /// <summary>
-        /// Ensures that the given country exists in the database. If it does not exist, it is inserted and the new country ID is returned.
-        /// </summary>
-        /// <param name="countryName"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        private int EnsureCountry(string countryName, MySqlConnection conn, MySqlTransaction trans)
-        {
-            int countryId = GetCountryId(countryName, conn, trans);
-            if (countryId == 0)
-            {
-                string insertCountry = "INSERT INTO Country (country) VALUES (@countryName); SELECT LAST_INSERT_ID();";
-                using (var cmd = new MySqlCommand(insertCountry, conn, trans))
-                {
-                    cmd.Parameters.AddWithValue("@countryName", countryName);
-                    countryId = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-            }
-            return countryId;
-        }
-
-        /// <summary>
-        /// Retrieves the country ID for the given country name.
-        /// </summary>
-        /// <param name="countryName"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        public int GetCountryId(string countryName, MySqlConnection conn, MySqlTransaction trans)
-        {
-            string query = "SELECT countryId FROM Country WHERE country = @countryName;";
-            using (var cmd = new MySqlCommand(query, conn, trans))
-            {
-                cmd.Parameters.AddWithValue("@countryName", countryName);
-                var result = cmd.ExecuteScalar();
-                return result != null ? Convert.ToInt32(result) : 0;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves a list of all countries from the database.
-        /// </summary>
-        /// <returns></returns>
+       
         public List<string> GetCountries()
         {
             List<string> countries = new List<string>();
