@@ -95,11 +95,13 @@ namespace C969.Forms
             // cusMgmCurrentUserlbl
             // 
             this.cusMgmCurrentUserlbl.AutoSize = true;
-            this.cusMgmCurrentUserlbl.Location = new System.Drawing.Point(15, 9);
+            this.cusMgmCurrentUserlbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cusMgmCurrentUserlbl.Location = new System.Drawing.Point(996, 34);
             this.cusMgmCurrentUserlbl.Name = "cusMgmCurrentUserlbl";
-            this.cusMgmCurrentUserlbl.Size = new System.Drawing.Size(35, 13);
+            this.cusMgmCurrentUserlbl.Size = new System.Drawing.Size(229, 20);
             this.cusMgmCurrentUserlbl.TabIndex = 4;
-            this.cusMgmCurrentUserlbl.Text = "label1";
+            this.cusMgmCurrentUserlbl.Text = "Currently Logged In User Label";
+            this.cusMgmCurrentUserlbl.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // cusMgmtCustomersLabel
             // 

@@ -79,6 +79,15 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Incorrect credentials.
+        /// </summary>
+        public static string LoginFailedCaption {
+            get {
+                return ResourceManager.GetString("LoginFailedCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Login Failed. Please check your credentials and try again..
         /// </summary>
         public static string LoginFailedMessage {
@@ -165,6 +174,15 @@ namespace C969.Resources {
         public static string QuitTitle {
             get {
                 return ResourceManager.GetString("QuitTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Username or Pasword.
+        /// </summary>
+        public static string UserNamePwdEmptyCaption {
+            get {
+                return ResourceManager.GetString("UserNamePwdEmptyCaption", resourceCulture);
             }
         }
         

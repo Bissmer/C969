@@ -14,12 +14,15 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using C969.Models;
 using C969.Controllers;
+using System.Text.RegularExpressions;
 
 namespace C969
 {
     public partial class Login : Form
     {
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
+        ResourceManager _rm;
+        CultureInfo currentCulture = CultureInfo.CurrentUICulture;
         public Login()
         {
             
@@ -28,12 +31,9 @@ namespace C969
             InitializeTimeZoneLabel();
 
         }
-
-        CultureInfo currentCulture = CultureInfo.CurrentUICulture;
-        ResourceManager _rm;
         
         /// <summary>
-        /// Method to set the language of the form, using resource files
+        /// Method to set the language of the form based on the culture passed
         /// </summary>
         /// <param name="culture"></param>
         private void SetLanguage(CultureInfo culture)
@@ -50,6 +50,16 @@ namespace C969
             loginUsernameLabel.Text = _rm.GetString("loginUsernameLabel", culture);
             loginQuitButton.Text = _rm.GetString("loginQuitButton", culture);
             this.Text = _rm.GetString("Login", culture);
+
+            if (culture.TwoLetterISOLanguageName == "ru")
+            {
+
+                loginHeaderLabel.Location = new Point(loginHeaderLabel.Location.X - 80, loginHeaderLabel.Location.Y);
+            }
+            else
+            {
+                loginHeaderLabel.Location = new Point(137, loginHeaderLabel.Location.Y);
+            }
 
         }
 
@@ -88,7 +98,9 @@ namespace C969
 
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show(_rm.GetString("UsernamePwdEmptyMessage", currentCulture));
+                string message = _rm.GetString("UsernamePwdEmptyMessage", currentCulture);
+                string caption = _rm.GetString("UserNamePwdEmptyCaption", currentCulture);
+                MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             int userId = AuthenticateUser(username, password);
@@ -102,7 +114,9 @@ namespace C969
             }
             else
             {
-                MessageBox.Show(_rm.GetString("LoginFailedMessage", currentCulture));
+                string message = _rm.GetString("LoginFailedMessage", currentCulture);
+                string caption = _rm.GetString("LoginFailedCaption", currentCulture);
+                MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
@@ -114,7 +128,9 @@ namespace C969
         /// <param name="e"></param>
         private void loginQuitButton_Click(object sender, EventArgs e)
         {
-            DialogResult dialogResult = MessageBox.Show(_rm.GetString("QuitMessage", currentCulture), _rm.GetString("QuitTitle", currentCulture), MessageBoxButtons.YesNo);
+            string message = _rm.GetString("QuitMessage", currentCulture);
+            string caption = _rm.GetString("QuitTitle", currentCulture);
+            DialogResult dialogResult = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dialogResult == DialogResult.Yes)
             {
                 Application.Exit();

@@ -118,7 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Login" xml:space="preserve">
-    <value>Окно для входа в приложение расписаний</value>
+    <value>Окно для входа в приложение</value>
+  </data>
+  <data name="LoginFailedCaption" xml:space="preserve">
+    <value>Неправильные логин или пароль</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
     <value>Вход не был выполнен. Пожалуйста проверьте логин и пароль.</value>
@@ -149,6 +152,9 @@
   </data>
   <data name="QuitTitle" xml:space="preserve">
     <value>Выход из приложения</value>
+  </data>
+  <data name="UserNamePwdEmptyCaption" xml:space="preserve">
+    <value>Юзернейм или пароль не предоставлены</value>
   </data>
   <data name="UsernamePwdEmptyMessage" xml:space="preserve">
     <value>Юзернейм и пароль не могут быть пустыми.</value>

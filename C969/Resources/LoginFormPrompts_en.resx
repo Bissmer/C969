@@ -123,6 +123,9 @@
   <data name="Login" xml:space="preserve">
     <value>Sceduling App Login Window</value>
   </data>
+  <data name="LoginFailedCaption" xml:space="preserve">
+    <value>Incorrect credentials</value>
+  </data>
   <data name="LoginFailedMessage" xml:space="preserve">
     <value>Login Failed. Please check your credentials and try again.</value>
   </data>
@@ -152,6 +155,9 @@
   </data>
   <data name="QuitTitle" xml:space="preserve">
     <value>Quit the application</value>
+  </data>
+  <data name="UserNamePwdEmptyCaption" xml:space="preserve">
+    <value>No Username or Pasword</value>
   </data>
   <data name="UsernamePwdEmptyMessage" xml:space="preserve">
     <value>Username and password cannot be empty.</value>

@@ -61,11 +61,20 @@ namespace C969.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Окно для входа в приложение расписаний.
+        ///   Looks up a localized string similar to Окно для входа в приложение.
         /// </summary>
         internal static string Login {
             get {
                 return ResourceManager.GetString("Login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Неправильные логин или пароль.
+        /// </summary>
+        internal static string LoginFailedCaption {
+            get {
+                return ResourceManager.GetString("LoginFailedCaption", resourceCulture);
             }
         }
         
@@ -156,6 +165,15 @@ namespace C969.Resources {
         internal static string QuitTitle {
             get {
                 return ResourceManager.GetString("QuitTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Юзернейм или пароль не предоставлены.
+        /// </summary>
+        internal static string UserNamePwdEmptyCaption {
+            get {
+                return ResourceManager.GetString("UserNamePwdEmptyCaption", resourceCulture);
             }
         }
         

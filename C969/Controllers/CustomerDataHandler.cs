@@ -28,6 +28,9 @@ namespace C969.Controllers
             _currentUser = UserSession.CurrentUser;
         }
 
+
+        #region Customer Data Methods
+
         /// <summary>
         /// Adds a customer to the database with the given details.
         /// </summary>
@@ -81,47 +84,7 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Searches for an entity in the database and returns its ID if found. If not found, inserts the entity and returns the new ID.
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="transaction"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        public int EnsureEntity(string tableName, MySqlTransaction transaction, params MySqlParameter[] parameters)
-        {
-
-            string whereConditions = string.Join(" AND ", Array.ConvertAll(parameters, p => $"{p.ParameterName.Substring(1)} = {p.ParameterName}"));
-            string selectQuery = $"SELECT {tableName}Id FROM {tableName} WHERE {whereConditions}";
-
-            using (var cmd = new MySqlCommand(selectQuery, _connection, transaction))
-            {
-                cmd.Parameters.AddRange(parameters);
-                var result = cmd.ExecuteScalar();
-
-                // Clearing parameters after executing the select command to avoid "parameter already defined" error.
-                cmd.Parameters.Clear();
-
-                if (result != null)
-                    return Convert.ToInt32(result);
-
-                string insertFields = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName.Substring(1)));
-                string insertValues = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName));
-                string insertQuery = $@"
-                INSERT INTO {tableName} ({insertFields}, createDate, createdBy, lastUpdate, lastUpdateBy)
-                VALUES ({insertValues}, @now, @user, @now, @user); 
-                SELECT LAST_INSERT_ID();";
-
-                cmd.CommandText = insertQuery;
-                cmd.Parameters.AddRange(parameters);  // Re-add parameters for the insert operation
-                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow);
-                cmd.Parameters.AddWithValue("@user", _currentUser);
-                return Convert.ToInt32(cmd.ExecuteScalar());
-            }
-
-        }
-
-        /// <summary>
-        /// Inserts a new customer into the database.
+        /// Inserts a new customer entry into the database.
         /// </summary>
         /// <param name="customerName"></param>
         /// <param name="addressId"></param>
@@ -190,6 +153,8 @@ namespace C969.Controllers
             return details;
         }
 
+
+
         /// <summary>
         /// Updates the details of a customer in the database.
         /// </summary>
@@ -253,28 +218,6 @@ namespace C969.Controllers
             }
         }
 
-       
-        public List<string> GetCountries()
-        {
-            List<string> countries = new List<string>();
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                string query = "SELECT country FROM Country ORDER BY country;";
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            countries.Add(reader["country"].ToString());
-                        }
-                    }
-                }
-            }
-
-            return countries;
-        }
 
         /// <summary>
         /// Retrieves all customers from the database.
@@ -345,6 +288,101 @@ namespace C969.Controllers
         }
 
         /// <summary>
+        /// Retrieves a list of all customer names with their IDs.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<int, string> GetCustomerNameAndId()
+        {
+            var customers = new Dictionary<int, string>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT customerId, customerName FROM Customer";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int customerId = reader.GetInt32("customerId");
+                            string customerName = reader.GetString("customerName");
+                            customers.Add(customerId, customerName);
+                        }
+                    }
+                }
+
+            }
+            return customers;
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// Searches for an entity in the database and returns its ID if found. If not found, inserts the entity and returns the new ID.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public int EnsureEntity(string tableName, MySqlTransaction transaction, params MySqlParameter[] parameters)
+        {
+
+            string whereConditions = string.Join(" AND ", Array.ConvertAll(parameters, p => $"{p.ParameterName.Substring(1)} = {p.ParameterName}"));
+            string selectQuery = $"SELECT {tableName}Id FROM {tableName} WHERE {whereConditions}";
+
+            using (var cmd = new MySqlCommand(selectQuery, _connection, transaction))
+            {
+                cmd.Parameters.AddRange(parameters);
+                var result = cmd.ExecuteScalar();
+
+                // Clearing parameters after executing the select command to avoid "parameter already defined" error.
+                cmd.Parameters.Clear();
+
+                if (result != null)
+                    return Convert.ToInt32(result);
+
+                string insertFields = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName.Substring(1)));
+                string insertValues = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName));
+                string insertQuery = $@"
+                INSERT INTO {tableName} ({insertFields}, createDate, createdBy, lastUpdate, lastUpdateBy)
+                VALUES ({insertValues}, @now, @user, @now, @user); 
+                SELECT LAST_INSERT_ID();";
+
+                cmd.CommandText = insertQuery;
+                cmd.Parameters.AddRange(parameters);  // Re-add parameters for the insert operation
+                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@user", _currentUser);
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+
+        }
+
+        public List<string> GetCountries()
+        {
+            List<string> countries = new List<string>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT country FROM Country ORDER BY country;";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            countries.Add(reader["country"].ToString());
+                        }
+                    }
+                }
+            }
+
+            return countries;
+        }
+
+        
+
+        /// <summary>
         /// Retrieves all appointments from the database.
         /// </summary>
         /// <returns></returns>
@@ -407,33 +445,7 @@ namespace C969.Controllers
             return appointments;
         }
 
-        /// <summary>
-        /// Retrieves a list of all customer names with their IDs.
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<int, string> GetCustomerNameAndId()
-        {
-            var customers = new Dictionary<int, string>();
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                string query = "SELECT customerId, customerName FROM Customer";
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int customerId = reader.GetInt32("customerId");
-                            string customerName = reader.GetString("customerName");
-                            customers.Add(customerId, customerName);
-                        }
-                    }
-                }
-
-            }
-            return customers;
-        }
+        
 
         /// <summary>
         /// Method to add an appointment to the database.
