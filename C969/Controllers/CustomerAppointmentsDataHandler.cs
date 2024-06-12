@@ -599,6 +599,102 @@ namespace C969.Controllers
             return upcomingAppointments;
         }
 
+        /// <summary>
+        /// Retrieves all appointments from the database.
+        /// </summary>
+        /// <returns></returns>
+        public List<AppointmentDetails> GetAllAppointments()
+        {
+            List<AppointmentDetails> appointments = new List<AppointmentDetails>();
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+                SELECT appointmentId, customerId, userId, title, description, location, contact, type, url,
+                   start, end, createDate, createdBy, lastUpdate, lastUpdateBy
+                FROM appointment";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Read the start and end times from the database and specify the DateTimeKind
+                            DateTime estStart = DateTime.SpecifyKind(reader.GetDateTime("start"), DateTimeKind.Unspecified);
+                            DateTime estEnd = DateTime.SpecifyKind(reader.GetDateTime("end"), DateTimeKind.Unspecified);
+                            DateTime estCreate = DateTime.SpecifyKind(reader.GetDateTime("createDate"), DateTimeKind.Unspecified);
+                            DateTime estLastUpdate = DateTime.SpecifyKind(reader.GetDateTime("lastUpdate"), DateTimeKind.Unspecified);
+
+
+                            // Convert the start and end times from EST to the user's local time zone
+                            DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
+                            DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
+                            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, estTimeZone, userTimeZone);
+                            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estLastUpdate, estTimeZone, userTimeZone);
+
+
+
+                            appointments.Add(new AppointmentDetails
+                            {
+                                AppointmentId = reader.GetInt32("appointmentId"),
+                                CustomerId = reader.GetInt32("customerId"),
+                                UserId = reader.GetInt32("userId"),
+                                Title = reader.GetString("title"),
+                                Description = reader.GetString("description"),
+                                Location = reader.GetString("location"),
+                                Contact = reader.GetString("contact"),
+                                Type = reader.GetString("type"),
+                                Url = reader.GetString("url"),
+                                Start = localStart,
+                                End = localEnd,
+                                CreateDate = localCreateDate,
+                                CreatedBy = reader.GetString("createdBy"),
+                                LastUpdate = localLastUpdate,
+                                LastUpdateBy = reader.GetString("lastUpdateBy")
+                            });
+                        }
+                    }
+                }
+            }
+            return appointments;
+        }
+
+        /// <summary>
+        /// Method to retrieve appointments by customer name.
+        /// </summary>
+        /// <param name="customerName"></param>
+        /// <returns></returns>
+        public List<AppointmentDetails> GetAppointmentsByCustomerName(string customerName)
+        {
+            List<AppointmentDetails> filteredAppointments = new List<AppointmentDetails>();
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+                SELECT a.* FROM appointment a
+                JOIN customer c ON a.customerId = c.customerId
+                WHERE c.customerName LIKE @customerName";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@customerName", "%" + customerName + "%");
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            filteredAppointments.Add(MapReaderToAppointmentDetails(reader, userTimeZone));
+                        }
+                    }
+                }
+            }
+            return filteredAppointments;
+        }
+
         #endregion
         #region Database Utility Methods
 
