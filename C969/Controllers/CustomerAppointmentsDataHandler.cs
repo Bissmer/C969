@@ -600,7 +600,7 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Retrieves all appointments from the database.
+        /// Methods to obtain all appointments from the database w/o specification.
         /// </summary>
         /// <returns></returns>
         public List<AppointmentDetails> GetAllAppointments()

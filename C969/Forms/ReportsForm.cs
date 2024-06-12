@@ -277,7 +277,7 @@ namespace C969.Forms
         {
             if (reportsFormUsersCombo.Items.Count > 0)
             {
-                reportsFormUsersCombo.SelectedIndex = 0; // Select the first item by default
+                reportsFormUsersCombo.SelectedIndex = 0;
                 int selectedUserId = (int)reportsFormUsersCombo.SelectedValue;
                 LoadAppointmentsByUser(selectedUserId);
             }
@@ -290,10 +290,12 @@ namespace C969.Forms
         /// <param name="e"></param>
         private void reportsFormDownloadSchedulesByUser_Click(object sender, EventArgs e)
         {
+            string defaultFileName = $"SchedulesByUserReport_{_timestamp}.csv";
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 Filter = "CSV files (*.csv)|*.csv",
-                Title = "Save schedules by user"
+                Title = "Save schedules by user",
+                FileName = defaultFileName
             };
 
 
@@ -350,10 +352,12 @@ namespace C969.Forms
         /// <param name="e"></param>
         private void reportsFormDownloadAppointmentsByMonth_Click(object sender, EventArgs e)
         {
+            string defaultFileName = $"AppointmentsByMonthReport_{_timestamp}.csv";
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 Filter = "CSV files (*.csv)|*.csv",
-                Title = "Save appointments by month"
+                Title = "Save appointments by month",
+                FileName = defaultFileName
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -385,7 +389,7 @@ namespace C969.Forms
         {
 
 
-            string defaultFileName = $"AppointmentsByCustomer_{_timestamp}.csv";
+            string defaultFileName = $"AppointmentsByCustomerReport_{_timestamp}.csv";
 
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
