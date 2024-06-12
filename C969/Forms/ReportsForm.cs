@@ -49,7 +49,6 @@ namespace C969.Forms
             ConfigureAppointmentsByCountryDataGridView();
             LoadDefaultAppointments();
             LoadMonthlyReport();
-            LoadCustomerCountByCountry();
             LoadAppointmentCountsByCustomer();
         }
 
@@ -371,13 +370,6 @@ namespace C969.Forms
         /// <summary>
         /// Method to load the customer count by country report when the Report form is loaded
         /// </summary>
-        private void LoadCustomerCountByCountry()
-        {
-            var customerCounts = _reportsDataHandler.GetCustomerCountByCountry();
-            reportsFormDgvAppointmentsByCustomer.DataSource = customerCounts;
-            reportsFormDgvAppointmentsByCustomer.Refresh();
-
-        }
 
         /// <summary>
         /// Method to load the appointments count by customer report when the Report form is loaded

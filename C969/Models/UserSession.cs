@@ -20,17 +20,7 @@ namespace C969.Models
         {
             UserId = userId;
             CurrentUser = userName;
-            CurrentTimeZone = TimeZoneInfo.Local; // Initialize time zone during login
-        }
-
-        /// <summary>
-        /// Clear the current user session
-        /// </summary>
-        public static void Logout()
-        {
-            UserId = 0;
-            CurrentUser = string.Empty;
-            CurrentTimeZone = null; // Clear time zone during logout
+            CurrentTimeZone = TimeZoneInfo.Local; 
         }
 
     }

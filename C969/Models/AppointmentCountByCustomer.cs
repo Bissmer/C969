@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace C969.Models
 {
+
+    /// <summary>
+    /// This class is used to store the count of appointments by customer
+    /// </summary>
     public class AppointmentCountByCustomer
     {
 

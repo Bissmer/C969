@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace C969.Models
 {
+    /// <summary>
+    /// This class is used to store the details and data of an appointment
+    /// </summary>
     public class AppointmentDetails
     {
         public int AppointmentId { get; set;}

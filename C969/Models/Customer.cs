@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace C969.Models
 {
+    /// <summary>
+    /// This class is used to store the customer information
+    /// </summary>
     public class Customer
     {
         public int CustomerID { get; set; }
@@ -20,19 +23,6 @@ namespace C969.Models
         public DateTime LastUpdate { get; set; }
         public string LastUpdateBy { get; set; }
 
-
-        //Constructor to create  a Customer w/o an ID
-
-        public Customer(string customerName, int addressID, int active, string createdBy, string lastUpdateBy)
-        {
-            CustomerName = customerName.Trim();
-            AddressID = addressID;
-            Active = active;
-            CreateDate = DateTime.UtcNow; //assuming that the CreateDate is the current date and time
-            CreatedBy = createdBy;
-            LastUpdate = DateTime.UtcNow; // Assuming last update is set to the current date/time for new records
-            LastUpdateBy = lastUpdateBy;
-        }
 
         // Constructor for existing customer records where CustomerID is known
 
