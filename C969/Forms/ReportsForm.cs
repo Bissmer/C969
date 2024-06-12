@@ -19,7 +19,7 @@ namespace C969.Forms
     {
 
         private readonly ReportsDataHandler _reportsDataHandler;
-        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly CustomerAppointmentsDataHandler _customerAppointmentsDataHandler;
 
         private readonly string _connString =
             ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
@@ -32,7 +32,7 @@ namespace C969.Forms
 
         public ReportsForm()
         {
-            _customerDataHandler = new CustomerDataHandler(_connString);
+            _customerAppointmentsDataHandler = new CustomerAppointmentsDataHandler(_connString);
             InitializeComponent();
             _reportsDataHandler = new ReportsDataHandler(_connString);
             this.Load += ReportsForm_Load;
@@ -310,7 +310,7 @@ namespace C969.Forms
 
         private void LoadAllAppointments()
         {
-            var appointments = _customerDataHandler.GetAllAppointments();
+            var appointments = _customerAppointmentsDataHandler.GetAllAppointments();
 
             var appointmentsInUserTimeZone = appointments.Select(a => new
             {

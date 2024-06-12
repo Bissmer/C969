@@ -19,7 +19,7 @@ namespace C969.Forms
     public partial class EditAppointmentForm : Form
     {
         private readonly int _appointmentId;
-        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly CustomerAppointmentsDataHandler _customerAppointmentsDataHandler;
         private readonly ReportsDataHandler _reportDataHandler;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         private bool ignoreEvent = false; //Flag to prevent infinite loop in DateTimePicker event handler
@@ -28,7 +28,7 @@ namespace C969.Forms
         {
             InitializeComponent();
             _appointmentId = appointmentId;
-            _customerDataHandler = new CustomerDataHandler(_connString);
+            _customerAppointmentsDataHandler = new CustomerAppointmentsDataHandler(_connString);
             _reportDataHandler = new ReportsDataHandler(_connString);
             LoadAppointmentData();
             editAppointmentStartDatePicker.ValueChanged += editAppointmentStartDatePicker_ValueChanged;
@@ -223,7 +223,7 @@ namespace C969.Forms
                         return;
                     }
 
-                    if (_customerDataHandler.UpdateAppointment(appointment))
+                    if (_customerAppointmentsDataHandler.UpdateAppointment(appointment))
                     {
                         MessageBox.Show("Appointment updated successfully.");
                         this.Close();
@@ -252,7 +252,7 @@ namespace C969.Forms
         /// <returns></returns>
         private AppointmentDetails GetOverlappingAppointment(AppointmentDetails newAppointment, int excludeAppointmentId = 0)
         {
-            var existingAppointments = _customerDataHandler.GetAppointmentsByCustomerName(editAppointmentCustomerNameCombo.Text);
+            var existingAppointments = _customerAppointmentsDataHandler.GetAppointmentsByCustomerName(editAppointmentCustomerNameCombo.Text);
 
             foreach (var appointment in existingAppointments)
             {
@@ -329,7 +329,7 @@ namespace C969.Forms
         /// </summary>
         private void LoadCustomerNames()
         {
-            var customerData = _customerDataHandler.GetCustomerNameAndId();
+            var customerData = _customerAppointmentsDataHandler.GetCustomerNameAndId();
             editAppointmentCustomerNameCombo.DataSource = new BindingSource(customerData, null);
             editAppointmentCustomerNameCombo.DisplayMember = "Value";
             editAppointmentCustomerNameCombo.ValueMember = "Key";
@@ -353,7 +353,7 @@ namespace C969.Forms
         /// </summary>
         private void LoadAppointmentData()
         {
-            var appointmentDetails = _customerDataHandler.GetAppointmentById(_appointmentId);
+            var appointmentDetails = _customerAppointmentsDataHandler.GetAppointmentById(_appointmentId);
             if (appointmentDetails != null)
             {
                 editAppointmentTitleText.Text = appointmentDetails.Title;

@@ -3,7 +3,7 @@
 namespace C969.Controllers
 {
     /// <summary>
-    /// Class to handle time zone conversion between the user's time zone and EST
+    /// Class to handle time zone conversion between the user's time zone and EST.
     /// </summary>
     public class TimeZoneHandler
     {

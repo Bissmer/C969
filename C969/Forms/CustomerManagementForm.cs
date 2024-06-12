@@ -17,14 +17,14 @@ namespace C969.Forms
     public partial class CustomerManagementForm : Form
     {
         private bool _isProgrammaticallyAdjusting = false; // Flag to prevent infinite loop when adjusting the calendar date
-        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly CustomerAppointmentsDataHandler _customerAppointmentsDataHandler;
         private  readonly string _currentUser = UserSession.CurrentUser;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         public CustomerManagementForm()
         {
             InitializeComponent();
             this.Load += CustomerManagementForm_Load;
-            _customerDataHandler = new CustomerDataHandler(_connString);
+            _customerAppointmentsDataHandler = new CustomerAppointmentsDataHandler(_connString);
             LoadAppointmentsForSelectedDate(cusMgmtAppointmentsCalendar.SelectionStart); // Load appointments for the selected date
             LoadCurrentUser();
             LoadCustomers();
@@ -94,7 +94,7 @@ namespace C969.Forms
             if (cusMgmtDgvCustomers.CurrentRow != null)
             {
                 int customerId = Convert.ToInt32(cusMgmtDgvCustomers.CurrentRow.Cells["CustomerID"].Value);
-                var editForm = new EditCustomerForm(customerId, _customerDataHandler);
+                var editForm = new EditCustomerForm(customerId, _customerAppointmentsDataHandler);
                 if (editForm.ShowDialog() == DialogResult.OK)
                 {
                     LoadCustomers();
@@ -174,7 +174,7 @@ namespace C969.Forms
         private void ShowUpcomingAppointmentsAlert()
         {
             int userId = UserSession.UserId;
-            List<AppointmentDetails> upcomingAppointments = _customerDataHandler.GetUpcomingAppointments(userId);
+            List<AppointmentDetails> upcomingAppointments = _customerAppointmentsDataHandler.GetUpcomingAppointments(userId);
 
             if (upcomingAppointments.Count > 0)
             {
@@ -214,7 +214,7 @@ namespace C969.Forms
                 {
                     try
                     {
-                        var deleteResult = _customerDataHandler.DeleteCustomer(customerId);
+                        var deleteResult = _customerAppointmentsDataHandler.DeleteCustomer(customerId);
                         if (deleteResult)
                         {
                             MessageBox.Show("Customer deleted successfully.", "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
@@ -258,7 +258,7 @@ namespace C969.Forms
 
                     try
                     {
-                        if (_customerDataHandler.DeleteAppointment(appointmentId))
+                        if (_customerAppointmentsDataHandler.DeleteAppointment(appointmentId))
                         {
                             MessageBox.Show("Appointment deleted successfully.", "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             LoadAppointments();
@@ -321,7 +321,7 @@ namespace C969.Forms
         /// <param name="selectedDate"></param>
         private void LoadAppointmentsForSelectedDate(DateTime selectedDate)
         {
-            var appointments = _customerDataHandler.GetAppointmentsByDate(selectedDate);
+            var appointments = _customerAppointmentsDataHandler.GetAppointmentsByDate(selectedDate);
             cusMgmtDgvAppontments.DataSource = appointments;
         }
 
@@ -330,7 +330,7 @@ namespace C969.Forms
         /// </summary>
         private void BoldAppointmentDates()
         {
-            List<DateTime> datesWithAppointments = _customerDataHandler.GetDatesWithAppointments(); // Fetch or calculate these dates
+            List<DateTime> datesWithAppointments = _customerAppointmentsDataHandler.GetDatesWithAppointments(); // Fetch or calculate these dates
             cusMgmtAppointmentsCalendar.BoldedDates = datesWithAppointments.ToArray();
         }
 
@@ -373,7 +373,7 @@ namespace C969.Forms
                 return;
             }
 
-            var filteredAppointments = _customerDataHandler.GetAppointmentsByCustomerName(customerName);
+            var filteredAppointments = _customerAppointmentsDataHandler.GetAppointmentsByCustomerName(customerName);
             cusMgmtDgvAppontments.DataSource = filteredAppointments;
         }
 
@@ -427,7 +427,7 @@ namespace C969.Forms
         /// </summary>
         private void LoadCustomers()
         {
-            var customers = _customerDataHandler.GetAllCustomers();
+            var customers = _customerAppointmentsDataHandler.GetAllCustomers();
             cusMgmtDgvCustomers.DataSource = customers;
             cusMgmtDgvCustomers.Refresh();
         }
@@ -437,7 +437,7 @@ namespace C969.Forms
         /// </summary>
         private void LoadAppointments()
         {
-            var appointments = _customerDataHandler.GetAllAppointments();
+            var appointments = _customerAppointmentsDataHandler.GetAllAppointments();
             cusMgmtDgvAppontments.DataSource = appointments;
             cusMgmtDgvAppontments.Refresh();
         }

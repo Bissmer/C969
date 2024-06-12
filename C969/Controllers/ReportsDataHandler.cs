@@ -21,7 +21,7 @@ namespace C969.Controllers
         private readonly string _connString =
             ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
-        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly CustomerAppointmentsDataHandler _customerAppointmentsDataHandler;
 
         private TimeZoneInfo _userTimeZone = UserSession.CurrentTimeZone;
 
@@ -29,7 +29,7 @@ namespace C969.Controllers
         public ReportsDataHandler(string currentUser)
         {
             _connection = new MySqlConnection(_connString);
-            _customerDataHandler = new CustomerDataHandler(currentUser);
+            _customerAppointmentsDataHandler = new CustomerAppointmentsDataHandler(currentUser);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace C969.Controllers
                     {
                         while (reader.Read())
                         {
-                            appointments.Add(_customerDataHandler.MapReaderToAppointmentDetails(reader, userTimeZone));
+                            appointments.Add(_customerAppointmentsDataHandler.MapReaderToAppointmentDetails(reader, userTimeZone));
                         }
                     }
                 }
@@ -118,7 +118,7 @@ namespace C969.Controllers
                         while (reader.Read())
                         {
                             appointments.Add(
-                                _customerDataHandler.MapReaderToAppointmentDetails(reader,
+                                _customerAppointmentsDataHandler.MapReaderToAppointmentDetails(reader,
                                     UserSession.CurrentTimeZone));
                         }
                     }
@@ -248,7 +248,7 @@ namespace C969.Controllers
         /// <returns></returns>
         public string GetCustomerNameById(int customerId)
         {
-            var customer = _customerDataHandler.GetCustomerDetails(customerId);
+            var customer = _customerAppointmentsDataHandler.GetCustomerDetails(customerId);
             return customer != null ? customer.CustomerName : "Unknown";
         }
 
@@ -256,7 +256,7 @@ namespace C969.Controllers
         public List<AppointmentCountByCustomer> GetAppointmentsCountByCustomer()
         {
             {
-                List<AppointmentDetails> appointments = _customerDataHandler.GetAllAppointments();
+                List<AppointmentDetails> appointments = _customerAppointmentsDataHandler.GetAllAppointments();
                 List<Customer> customers = GetAllCustomers();
 
                 var appointmentsByCustomer = customers

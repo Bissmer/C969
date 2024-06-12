@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace C969.Controllers
 {
+    /// <summary>
+    /// Class to log the login history of users.
+    /// </summary>
     public static class LoginLogger
     {
         //set the directory of Logs in Project/Bin/Debug and puts a file called Login_History.txt in it

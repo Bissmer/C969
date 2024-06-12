@@ -17,16 +17,16 @@ namespace C969.Forms
     public partial class EditCustomerForm : Form
     {
         private readonly int _customerId;
-        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly CustomerAppointmentsDataHandler _customerAppointmentsDataHandler;
 
         private readonly string _connString =
             ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
-        public EditCustomerForm(int customerId, CustomerDataHandler customerDataHandler)
+        public EditCustomerForm(int customerId, CustomerAppointmentsDataHandler customerAppointmentsDataHandler)
         {
             InitializeComponent();
             _customerId = customerId;
-            _customerDataHandler = customerDataHandler;
+            _customerAppointmentsDataHandler = customerAppointmentsDataHandler;
             LoadCountries();
             LoadCustomerData();
             editCustomerPhoneText.KeyPress += new KeyPressEventHandler(PhoneTextBox_KeyPress);
@@ -58,7 +58,7 @@ namespace C969.Forms
         /// </summary>
         private void LoadCustomerData()
         {
-            var customerDetails = _customerDataHandler.GetCustomerDetails(_customerId);
+            var customerDetails = _customerAppointmentsDataHandler.GetCustomerDetails(_customerId);
             if (customerDetails != null)
             {
                 editCustomerNameText.Text = customerDetails.CustomerName;
@@ -69,7 +69,7 @@ namespace C969.Forms
                 editCustomerZipText.Text = customerDetails.PostalCode;
                 editCustomerActiveCheck.Checked = customerDetails.IsActive;
 
-                editCustomerCountryCombo.DataSource = _customerDataHandler.GetCountries();
+                editCustomerCountryCombo.DataSource = _customerAppointmentsDataHandler.GetCountries();
                 editCustomerCountryCombo.SelectedItem = customerDetails.Country;
             }
             else
@@ -118,7 +118,7 @@ namespace C969.Forms
                     IsActive = editCustomerActiveCheck.Checked
                 };
 
-                if (_customerDataHandler.UpdateCustomerDetails(customer))
+                if (_customerAppointmentsDataHandler.UpdateCustomerDetails(customer))
                 {
                     MessageBox.Show("Customer updated successfully.");
                     this.DialogResult = DialogResult.OK;

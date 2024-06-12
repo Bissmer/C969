@@ -17,7 +17,7 @@ namespace C969.Forms
 {
     public partial class AddAppointmentForm : Form
     {
-        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly CustomerAppointmentsDataHandler _customerAppointmentsDataHandler;
         private readonly ReportsDataHandler _reportDataHandler;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
         private bool _ignoreEvent = false; //Flag to prevent infinite loop in DateTimePicker event handler
@@ -27,7 +27,7 @@ namespace C969.Forms
         public AddAppointmentForm()
         {
             InitializeComponent();
-            _customerDataHandler = new CustomerDataHandler(_connString);
+            _customerAppointmentsDataHandler = new CustomerAppointmentsDataHandler(_connString);
             _reportDataHandler = new ReportsDataHandler(_connString);
             this.addAppointmentStartDatePicker.ValueChanged += AddAppointmentStartDatePicker_ValueChanged;
             this.addAppointmentEndDatePicker.ValueChanged += AddAppointmentEndDatePicker_ValueChanged;
@@ -251,7 +251,7 @@ namespace C969.Forms
                     return;
                 }
 
-                if (_customerDataHandler.AddAppointment(appointment))
+                if (_customerAppointmentsDataHandler.AddAppointment(appointment))
                 {
                     MessageBox.Show("Appointment added successfully.");
                     this.Close();
@@ -304,7 +304,7 @@ namespace C969.Forms
         /// <returns></returns>
         private AppointmentDetails GetOverlappingAppointment(AppointmentDetails newAppointment)
         {
-            var existingAppointments = _customerDataHandler.GetAppointmentsByCustomerName(addAppointmentCustomerNameCombo.Text);
+            var existingAppointments = _customerAppointmentsDataHandler.GetAppointmentsByCustomerName(addAppointmentCustomerNameCombo.Text);
             // Check if the new appointment overlaps with any existing appointments
             foreach (var appointment in existingAppointments)
             {
@@ -325,7 +325,7 @@ namespace C969.Forms
         /// </summary>
         private void LoadCustomerNames()
         {
-            var customerData = _customerDataHandler.GetCustomerNameAndId();
+            var customerData = _customerAppointmentsDataHandler.GetCustomerNameAndId();
             addAppointmentCustomerNameCombo.DataSource = new BindingSource(customerData, null);
             addAppointmentCustomerNameCombo.DisplayMember = "Value"; //this will show the customer name
             addAppointmentCustomerNameCombo.ValueMember = "Key"; //this will store the customer id

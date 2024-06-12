@@ -16,13 +16,13 @@ namespace C969.Forms
 {
     public partial class AddCustomerForm : Form
     {
-        private readonly CustomerDataHandler _customerDataHandler;
+        private readonly CustomerAppointmentsDataHandler _customerAppointmentsDataHandler;
         private readonly string _connString = ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
 
         public AddCustomerForm()
         {
             InitializeComponent();
-            _customerDataHandler = new CustomerDataHandler(_connString);
+            _customerAppointmentsDataHandler = new CustomerAppointmentsDataHandler(_connString);
             LoadCountries();
             addCustomerPhoneText.KeyPress += new KeyPressEventHandler(PhoneTextBox_KeyPress);
         }
@@ -95,7 +95,7 @@ namespace C969.Forms
                     return;
                 }
 
-                bool result = _customerDataHandler.AddCustomerWithDetails(customerName, address, address2, phone, city,
+                bool result = _customerAppointmentsDataHandler.AddCustomerWithDetails(customerName, address, address2, phone, city,
                     postalCode, country, isActive);
 
                 if (result)
