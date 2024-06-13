@@ -61,6 +61,24 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Database connection error.
+        /// </summary>
+        public static string ConnectionFailedCaption {
+            get {
+                return ResourceManager.GetString("ConnectionFailedCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Database connection failure. Please check database connection settings..
+        /// </summary>
+        public static string ConnectionFailedMessage {
+            get {
+                return ResourceManager.GetString("ConnectionFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Couldn&apos;t establish connection with the database. Check if SQL server is up..
         /// </summary>
         public static string DBConnectionFailureMessage {

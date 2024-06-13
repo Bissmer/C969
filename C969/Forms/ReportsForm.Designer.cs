@@ -82,6 +82,7 @@
             this.reportsFormDgvAppointmentsByUser.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.reportsFormDgvAppointmentsByUser.Location = new System.Drawing.Point(14, 103);
             this.reportsFormDgvAppointmentsByUser.Name = "reportsFormDgvAppointmentsByUser";
+            this.reportsFormDgvAppointmentsByUser.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.reportsFormDgvAppointmentsByUser.Size = new System.Drawing.Size(698, 150);
             this.reportsFormDgvAppointmentsByUser.TabIndex = 3;
             // 
@@ -120,6 +121,7 @@
             this.reportsFormDgvAppointmentsByMonth.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.reportsFormDgvAppointmentsByMonth.Location = new System.Drawing.Point(16, 357);
             this.reportsFormDgvAppointmentsByMonth.Name = "reportsFormDgvAppointmentsByMonth";
+            this.reportsFormDgvAppointmentsByMonth.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.reportsFormDgvAppointmentsByMonth.Size = new System.Drawing.Size(698, 150);
             this.reportsFormDgvAppointmentsByMonth.TabIndex = 8;
             // 
@@ -178,6 +180,7 @@
             this.reportsFormDgvAppointmentsByCustomer.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.reportsFormDgvAppointmentsByCustomer.Location = new System.Drawing.Point(16, 623);
             this.reportsFormDgvAppointmentsByCustomer.Name = "reportsFormDgvAppointmentsByCustomer";
+            this.reportsFormDgvAppointmentsByCustomer.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.reportsFormDgvAppointmentsByCustomer.Size = new System.Drawing.Size(701, 150);
             this.reportsFormDgvAppointmentsByCustomer.TabIndex = 12;
             // 

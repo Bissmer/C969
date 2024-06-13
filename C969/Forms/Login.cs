@@ -31,7 +31,8 @@ namespace C969
             InitializeTimeZoneLabel();
 
         }
-        
+
+
         /// <summary>
         /// Method to set the language of the form based on the culture passed
         /// </summary>
@@ -71,17 +72,24 @@ namespace C969
         /// <returns></returns>
         private int AuthenticateUser(string username, string password)
         {
-            using (var conn = new MySqlConnection(_connString))
+            try
             {
-                conn.Open();
-                var query = "SELECT UserId FROM user WHERE Username = @username AND Password = @password";  
-                using (var cmd = new MySqlCommand(query, conn))
+                using (var conn = new MySqlConnection(_connString))
                 {
-                    cmd.Parameters.AddWithValue("@username", username);
-                    cmd.Parameters.AddWithValue("@password", password);  
-                    var result = cmd.ExecuteScalar();
-                    return result != null ? Convert.ToInt32(result) : -1;
+                    conn.Open(); // Check the connection here
+                    var query = "SELECT UserId FROM user WHERE Username = @username AND Password = @password";
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@username", username);
+                        cmd.Parameters.AddWithValue("@password", password);
+                        var result = cmd.ExecuteScalar();
+                        return result != null ? Convert.ToInt32(result) : -1;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseConnectionException(_rm.GetString("ConnectionFailedMessage", currentCulture) + "\n" + ex.Message);
             }
 
         }
@@ -96,27 +104,28 @@ namespace C969
             string username = loginUserNametxt.Text;
             string password = loginPasswordtxt.Text;
 
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            try
             {
-                string message = _rm.GetString("UsernamePwdEmptyMessage", currentCulture);
-                string caption = _rm.GetString("UserNamePwdEmptyCaption", currentCulture);
-                MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                int userId = AuthenticateUser(username, password);
+                if (userId > 0)  // Check if a valid user ID was returned
+                {
+                    UserSession.Login(userId, username);  // Update the session manager
+                    CustomerManagementForm customerManagementForm = new CustomerManagementForm();
+                    customerManagementForm.Show();
+                    LoginLogger.LogLogger(username);
+                    this.Hide();
+                }
+                else
+                {
+                    string message = _rm.GetString("LoginFailedMessage", currentCulture);
+                    string caption = _rm.GetString("LoginFailedCaption", currentCulture);
+                    MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            int userId = AuthenticateUser(username, password);
-            if (userId > 0)  // Check if a valid user ID was returned
+            catch (DatabaseConnectionException dbEx)
             {
-                UserSession.Login(userId, username);  // Update the session manager
-                CustomerManagementForm customerManagementForm = new CustomerManagementForm();
-                customerManagementForm.Show();
-                LoginLogger.LogLogger(username);
-                this.Hide();
-            }
-            else
-            {
-                string message = _rm.GetString("LoginFailedMessage", currentCulture);
-                string caption = _rm.GetString("LoginFailedCaption", currentCulture);
-                MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(dbEx.Message, _rm.GetString("ConnectionFailedCaption", currentCulture), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit();
             }
 
         }
@@ -150,6 +159,7 @@ namespace C969
             loginTimeZoneText.Text = $"{localTimeZone.DisplayName}";
 
         }
+
 
     }
 }

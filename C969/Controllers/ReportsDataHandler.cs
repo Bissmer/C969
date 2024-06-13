@@ -177,69 +177,6 @@ namespace C969.Controllers
             return customers;
         }
 
-        /// <summary>
-        /// Method to get all cities. Returns a list of cities.
-        /// </summary>
-        /// <returns></returns>
-        private List<City> GetAllCities()
-        {
-            List<City> cities = new List<City>();
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                string query = "SELECT cityId, city, countryId FROM city";
-
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            cities.Add(new City
-                            {
-                                CityId = reader.GetInt32("cityId"),
-                                CountryId = reader.GetInt32("countryId"),
-                                CityName = reader.GetString("city")
-                            });
-                        }
-                    }
-                }
-            }
-
-            return cities;
-        }
-
-        /// <summary>
-        /// Method to get all countries. Returns a list of countries.
-        /// </summary>
-        /// <returns></returns>
-        public List<Country> GetAllCountries()
-        {
-            List<Country> countries = new List<Country>();
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                string query = "SELECT countryId, country FROM country";
-
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            countries.Add(new Country
-                            {
-                                CountryId = reader.GetInt32("countryId"),
-                                CountryName = reader.GetString("country")
-                            });
-                        }
-                    }
-                }
-            }
-
-            return countries;
-        }
-
      
         /// <summary>
         /// Get the Customer Name by its Id
@@ -253,6 +190,10 @@ namespace C969.Controllers
         }
 
 
+        /// <summary>
+        ///  Method to get the count of appointments by customer.
+        /// </summary>
+        /// <returns></returns>
         public List<AppointmentCountByCustomer> GetAppointmentsCountByCustomer()
         {
             {

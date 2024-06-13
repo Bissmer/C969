@@ -61,6 +61,24 @@ namespace C969.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ошибка соединения с базой данных.
+        /// </summary>
+        internal static string ConnectionFailedCaption {
+            get {
+                return ResourceManager.GetString("ConnectionFailedCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ошибка соединения с базой данных. Проверьте соединение с базой данных..
+        /// </summary>
+        internal static string ConnectionFailedMessage {
+            get {
+                return ResourceManager.GetString("ConnectionFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Окно для входа в приложение.
         /// </summary>
         internal static string Login {
@@ -70,7 +88,7 @@ namespace C969.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Неправильные логин или пароль.
+        ///   Looks up a localized string similar to Неправильные логин или пароль..
         /// </summary>
         internal static string LoginFailedCaption {
             get {
@@ -88,7 +106,7 @@ namespace C969.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Пожалуйста введите данные для входа.
+        ///   Looks up a localized string similar to Пожалуйста введите данные для входа..
         /// </summary>
         internal static string loginHeaderLabel {
             get {

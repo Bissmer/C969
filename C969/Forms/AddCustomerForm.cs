@@ -51,7 +51,7 @@ namespace C969.Forms
                 }
                 if (addCustomerCountryCombo.Items.Count > 0)
                 {
-                    addCustomerCountryCombo.SelectedIndex = 0; // Set the first item as the default
+                    addCustomerCountryCombo.SelectedIndex = 0; 
                 }
             } catch (Exception ex)
             {
@@ -94,7 +94,6 @@ namespace C969.Forms
                 {
                     return;
                 }
-
                 bool result = _customerAppointmentsDataHandler.AddCustomerWithDetails(customerName, address, address2, phone, city,
                     postalCode, country, isActive);
 

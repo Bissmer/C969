@@ -177,14 +177,14 @@ namespace C969.Forms
                 {
                     if (string.IsNullOrWhiteSpace(textBox.Text))
                     {
-                        MessageBox.Show($"{field.Key} cannot be empty.");
+                        MessageBox.Show($"{field.Key} cannot be empty.", "Empty Field", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return false;
                     }
                     if (field.Value is ComboBox comboBox)
                     {
                         if (comboBox.SelectedItem == null || string.IsNullOrWhiteSpace(comboBox.SelectedItem.ToString()))
                         {
-                            MessageBox.Show($"{field.Key} cannot be empty.");
+                            MessageBox.Show($"{field.Key} cannot be empty.", "Empty Field", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return false;
                         }
                     }

@@ -89,6 +89,7 @@ namespace C969.Forms
             this.cusMgmtDgvCustomers.Location = new System.Drawing.Point(12, 94);
             this.cusMgmtDgvCustomers.Name = "cusMgmtDgvCustomers";
             this.cusMgmtDgvCustomers.ReadOnly = true;
+            this.cusMgmtDgvCustomers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.cusMgmtDgvCustomers.Size = new System.Drawing.Size(923, 226);
             this.cusMgmtDgvCustomers.TabIndex = 3;
             // 
@@ -129,6 +130,7 @@ namespace C969.Forms
             this.cusMgmtDgvAppontments.Location = new System.Drawing.Point(12, 456);
             this.cusMgmtDgvAppontments.Name = "cusMgmtDgvAppontments";
             this.cusMgmtDgvAppontments.ReadOnly = true;
+            this.cusMgmtDgvAppontments.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.cusMgmtDgvAppontments.Size = new System.Drawing.Size(923, 226);
             this.cusMgmtDgvAppontments.TabIndex = 7;
             // 

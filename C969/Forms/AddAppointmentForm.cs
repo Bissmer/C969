@@ -131,8 +131,8 @@ namespace C969.Forms
             var userTimeZone = UserSession.CurrentTimeZone;
 
             // Define working hours in EST
-            var estStartWork = new DateTime(1, 1, 1, 9, 0, 0); // 9 AM
-            var estEndWork = new DateTime(1, 1, 1, 17, 0, 0); // 5 PM
+            var estStartWork = new DateTime(1, 1, 1, 9, 0, 0); // start work at 9am
+            var estEndWork = new DateTime(1, 1, 1, 17, 0, 0); // end work at 5pm 
 
             // Convert to user's time zone
             var userStartWork = TimeZoneHandler.ConvertToUserTimeZone(estStartWork, userTimeZone);
@@ -164,7 +164,7 @@ namespace C969.Forms
             while (startTime < endTime)
             {
                 timeSlots.Add(startTime.ToString("hh:mm tt"));
-                startTime = startTime.AddMinutes(15); // gaps are 15 minutes
+                startTime = startTime.AddMinutes(15); // 15 mins gaps
             }
 
             return timeSlots;
@@ -182,7 +182,7 @@ namespace C969.Forms
 
             // Clear current items and add only times that are later than the selected start time
             addAppointmentEndTimeCombo.Items.Clear();
-            List<string> slots = GenerateTimeSlots(startTime, startTime.AddHours(8)); // 8 hours working period
+            List<string> slots = GenerateTimeSlots(startTime, startTime.AddHours(8)); // 8 hrs work day
 
             foreach (string slot in slots)
             {
@@ -327,8 +327,8 @@ namespace C969.Forms
         {
             var customerData = _customerAppointmentsDataHandler.GetCustomerNameAndId();
             addAppointmentCustomerNameCombo.DataSource = new BindingSource(customerData, null);
-            addAppointmentCustomerNameCombo.DisplayMember = "Value"; //this will show the customer name
-            addAppointmentCustomerNameCombo.ValueMember = "Key"; //this will store the customer id
+            addAppointmentCustomerNameCombo.DisplayMember = "Value"; 
+            addAppointmentCustomerNameCombo.ValueMember = "Key"; 
 
         }
 

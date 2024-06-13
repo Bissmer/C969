@@ -24,6 +24,21 @@ namespace C969.Models
         public string LastUpdateBy { get; set; }
 
 
+
+
+        //Constructor to create  a Customer w/o an ID
+
+        public Customer(string customerName, int addressID, int active, string createdBy, string lastUpdateBy)
+        {
+            CustomerName = customerName.Trim();
+            AddressID = addressID;
+            Active = active;
+            CreateDate = DateTime.UtcNow; 
+            CreatedBy = createdBy;
+            LastUpdate = DateTime.UtcNow; 
+            LastUpdateBy = lastUpdateBy;
+        }
+
         // Constructor for existing customer records where CustomerID is known
 
         public Customer(int customerID, string customerName, int addressID, int active, DateTime createDate, string createdBy, DateTime lastUpdate,

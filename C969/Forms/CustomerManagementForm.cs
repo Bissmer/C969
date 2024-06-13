@@ -231,7 +231,7 @@ namespace C969.Forms
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }

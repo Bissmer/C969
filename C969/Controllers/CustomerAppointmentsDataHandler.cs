@@ -24,11 +24,13 @@ namespace C969.Controllers
         public TimeZoneInfo estTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
 
-       public CustomerAppointmentsDataHandler(string currentUser)
+       public CustomerAppointmentsDataHandler(string _connString)
         {
             _connection = new MySqlConnection(_connString);
-            _currentUser = currentUser;
+            _currentUser = UserSession.CurrentUser;
         }
+
+        #region Customer CDRUD
 
         /// <summary>
         /// Adds a customer to the database with the given details.
@@ -83,47 +85,7 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Searches for an entity in the database and returns its ID if found. If not found, inserts the entity and returns the new ID.
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="transaction"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        public int EnsureEntity(string tableName, MySqlTransaction transaction, params MySqlParameter[] parameters)
-        {
-
-            string whereConditions = string.Join(" AND ", Array.ConvertAll(parameters, p => $"{p.ParameterName.Substring(1)} = {p.ParameterName}"));
-            string selectQuery = $"SELECT {tableName}Id FROM {tableName} WHERE {whereConditions}";
-
-            using (var cmd = new MySqlCommand(selectQuery, _connection, transaction))
-            {
-                cmd.Parameters.AddRange(parameters);
-                var result = cmd.ExecuteScalar();
-
-                // Clear parameters after executing the select command to avoid "parameter already defined" error.
-                cmd.Parameters.Clear();
-
-                if (result != null)
-                    return Convert.ToInt32(result);
-
-                string insertFields = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName.Substring(1)));
-                string insertValues = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName));
-                string insertQuery = $@"
-            INSERT INTO {tableName} ({insertFields}, createDate, createdBy, lastUpdate, lastUpdateBy)
-            VALUES ({insertValues}, @now, @user, @now, @user); 
-            SELECT LAST_INSERT_ID();";
-
-                cmd.CommandText = insertQuery;
-                cmd.Parameters.AddRange(parameters);  // Re-add parameters for the insert operation
-                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow);
-                cmd.Parameters.AddWithValue("@user", _currentUser);
-                return Convert.ToInt32(cmd.ExecuteScalar());
-            }
-
-        }
-
-        /// <summary>
-        /// Inserts a new customer into the database.
+        /// Inserts a new customer entry into the database.
         /// </summary>
         /// <param name="customerName"></param>
         /// <param name="addressId"></param>
@@ -140,57 +102,12 @@ namespace C969.Controllers
                 cmd.Parameters.AddWithValue("@customerName", customerName);
                 cmd.Parameters.AddWithValue("@addressId", addressId);
                 cmd.Parameters.AddWithValue("@active", isActive ? 1 : 0);
-                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow); //no requirements what time zone to use, saving in default UTC
                 cmd.Parameters.AddWithValue("@user", _currentUser);
                 cmd.ExecuteNonQuery();
             }
         }
 
-        /// <summary>
-        /// Retrieves the details of a customer from the database.
-        /// </summary>
-        /// <param name="customerId"></param>
-        /// <returns></returns>
-        public CustomerDetails GetCustomerDetails(int customerId)
-        {
-            CustomerDetails details = null;
-
-            string query = @"
-        SELECT c.customerId, c.customerName, a.address, a.address2, a.phone, ct.city, a.postalCode, co.country, c.active
-        FROM Customer c
-        JOIN Address a ON c.addressId = a.addressId
-        JOIN City ct ON a.cityId = ct.cityId
-        JOIN Country co ON ct.countryId = co.countryId
-        WHERE c.customerId = @customerId";
-
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@customerId", customerId);
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            details = new CustomerDetails
-                            {
-                                CustomerID = reader.GetInt32("customerId"),
-                                CustomerName = reader["customerName"].ToString(),
-                                Address = reader["address"].ToString(),
-                                Address2 = reader["address2"].ToString(),
-                                Phone = reader["phone"].ToString(),
-                                City = reader["city"].ToString(),
-                                PostalCode = reader["postalCode"].ToString(),
-                                Country = reader["country"].ToString(),
-                                IsActive = reader.GetBoolean("active")
-                            };
-                        }
-                    }
-                }
-            }
-            return details;
-        }
 
         /// <summary>
         /// Updates the details of a customer in the database.
@@ -256,120 +173,88 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Ensures that the given city exists in the database. If it does not exist, it is inserted and the new city ID is returned.
+        /// Deletes a customer from the database.
         /// </summary>
-        /// <param name="cityName"></param>
-        /// <param name="countryId"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
+        /// <param name="customerId"></param>
         /// <returns></returns>
-        private int EnsureCity(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
+        public bool DeleteCustomer(int customerId)
         {
-            int cityId = GetCityId(cityName, countryId, conn, trans);
-            if (cityId == 0)
+            if (CustomerHasAppointments(customerId))
             {
-                string insertCity = @"
-                INSERT INTO City (city, countryId, createDate, createdBy, lastUpdate, lastUpdateBy)
-                VALUES (@cityName, @countryId, NOW(), @createdBy, NOW(), @lastUpdateBy);
-                SELECT LAST_INSERT_ID();";
-
-                using (var cmd = new MySqlCommand(insertCity, conn, trans))
-                {
-                    cmd.Parameters.AddWithValue("@cityName", cityName);
-                    cmd.Parameters.AddWithValue("@countryId", countryId);
-                    cmd.Parameters.AddWithValue("@createDate", DateTime.UtcNow);
-                    cmd.Parameters.AddWithValue("@createdBy", _currentUser);
-                    cmd.Parameters.AddWithValue("@lastUpdateBy", _currentUser);
-                    cityId = Convert.ToInt32(cmd.ExecuteScalar());
-                }
+                throw new InvalidOperationException("Customer has related appointments. Please delete the appointments first.");
             }
-            return cityId;
-        }
 
-        /// <summary>
-        /// Retrieves the city ID for the given city name and country ID.
-        /// </summary>
-        /// <param name="cityName"></param>
-        /// <param name="countryId"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        private int GetCityId(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
-        {
-            string query = "SELECT cityId FROM City WHERE city = @cityName AND countryId = @countryId;";
-            using (var cmd = new MySqlCommand(query, conn, trans))
-            {
-                cmd.Parameters.AddWithValue("@cityName", cityName);
-                cmd.Parameters.AddWithValue("@countryId", countryId);
-                var result = cmd.ExecuteScalar();
-                return result != null ? Convert.ToInt32(result) : 0;
-            }
-        }
-
-        /// <summary>
-        /// Ensures that the given country exists in the database. If it does not exist, it is inserted and the new country ID is returned.
-        /// </summary>
-        /// <param name="countryName"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        private int EnsureCountry(string countryName, MySqlConnection conn, MySqlTransaction trans)
-        {
-            int countryId = GetCountryId(countryName, conn, trans);
-            if (countryId == 0)
-            {
-                string insertCountry = "INSERT INTO Country (country) VALUES (@countryName); SELECT LAST_INSERT_ID();";
-                using (var cmd = new MySqlCommand(insertCountry, conn, trans))
-                {
-                    cmd.Parameters.AddWithValue("@countryName", countryName);
-                    countryId = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-            }
-            return countryId;
-        }
-
-        /// <summary>
-        /// Retrieves the country ID for the given country name.
-        /// </summary>
-        /// <param name="countryName"></param>
-        /// <param name="conn"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        public int GetCountryId(string countryName, MySqlConnection conn, MySqlTransaction trans)
-        {
-            string query = "SELECT countryId FROM Country WHERE country = @countryName;";
-            using (var cmd = new MySqlCommand(query, conn, trans))
-            {
-                cmd.Parameters.AddWithValue("@countryName", countryName);
-                var result = cmd.ExecuteScalar();
-                return result != null ? Convert.ToInt32(result) : 0;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves a list of all countries from the database.
-        /// </summary>
-        /// <returns></returns>
-        public List<string> GetCountries()
-        {
-            List<string> countries = new List<string>();
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
-                string query = "SELECT country FROM Country ORDER BY country;";
-                using (var cmd = new MySqlCommand(query, conn))
+                using (var transaction = conn.BeginTransaction())
                 {
-                    using (var reader = cmd.ExecuteReader())
+                    try
                     {
-                        while (reader.Read())
+                        var query = "DELETE FROM Customer WHERE CustomerID = @customerId";
+                        using (var cmd = new MySqlCommand(query, conn, transaction))
                         {
-                            countries.Add(reader["country"].ToString());
+                            cmd.Parameters.AddWithValue("@customerId", customerId);
+                            int result = cmd.ExecuteNonQuery();
+
+                            transaction.Commit();
+                            return result > 0;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        Console.WriteLine($"An error occurred: {ex.Message}");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the details of a customer from the database.
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
+        public CustomerDetails GetCustomerDetails(int customerId)
+        {
+            CustomerDetails details = null;
+
+            string query = @"
+        SELECT c.customerId, c.customerName, a.address, a.address2, a.phone, ct.city, a.postalCode, co.country, c.active
+        FROM Customer c
+        JOIN Address a ON c.addressId = a.addressId
+        JOIN City ct ON a.cityId = ct.cityId
+        JOIN Country co ON ct.countryId = co.countryId
+        WHERE c.customerId = @customerId";
+
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@customerId", customerId);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            details = new CustomerDetails
+                            {
+                                CustomerID = reader.GetInt32("customerId"),
+                                CustomerName = reader["customerName"].ToString(),
+                                Address = reader["address"].ToString(),
+                                Address2 = reader["address2"].ToString(),
+                                Phone = reader["phone"].ToString(),
+                                City = reader["city"].ToString(),
+                                PostalCode = reader["postalCode"].ToString(),
+                                Country = reader["country"].ToString(),
+                                IsActive = reader.GetBoolean("active")
+                            };
                         }
                     }
                 }
             }
-
-            return countries;
+            return details;
         }
 
         /// <summary>
@@ -415,95 +300,6 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Deletes a customer from the database.
-        /// </summary>
-        /// <param name="customerId"></param>
-        /// <returns></returns>
-        public bool DeleteCustomer(int customerId)
-        {
-
-            if (CustomerHasAppointments(customerId))
-            {
-                throw new InvalidOperationException("Customer has related appointments. Please delete the appointments first.");
-            }
-
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                var query = "DELETE FROM Customer WHERE CustomerID = @customerId";
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@customerId", customerId);
-                    int result = cmd.ExecuteNonQuery();
-                    return result > 0;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Retrieves all appointments from the database.
-        /// </summary>
-        /// <returns></returns>
-        public List<AppointmentDetails> GetAllAppointments()
-        {
-            List<AppointmentDetails> appointments = new List<AppointmentDetails>();
-            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
-
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                string query = @"
-            SELECT appointmentId, customerId, userId, title, description, location, contact, type, url,
-               start, end, createDate, createdBy, lastUpdate, lastUpdateBy
-            FROM appointment";
-
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            // Read the start and end times from the database and specify the DateTimeKind
-                            DateTime estStart = DateTime.SpecifyKind(reader.GetDateTime("start"), DateTimeKind.Unspecified);
-                            DateTime estEnd = DateTime.SpecifyKind(reader.GetDateTime("end"), DateTimeKind.Unspecified);
-                            DateTime estCreate = DateTime.SpecifyKind(reader.GetDateTime("createDate"), DateTimeKind.Unspecified);
-                            DateTime estLastUpdate = DateTime.SpecifyKind(reader.GetDateTime("lastUpdate"), DateTimeKind.Unspecified);
-
-
-                            // Convert the start and end times from EST to the user's local time zone
-                            DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
-                            DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
-                            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, estTimeZone, userTimeZone);
-                            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estLastUpdate, estTimeZone, userTimeZone);
-
-
-
-                            appointments.Add(new AppointmentDetails
-                            {
-                                AppointmentId = reader.GetInt32("appointmentId"),
-                                CustomerId = reader.GetInt32("customerId"),
-                                UserId = reader.GetInt32("userId"),
-                                Title = reader.GetString("title"),
-                                Description = reader.GetString("description"),
-                                Location = reader.GetString("location"),
-                                Contact = reader.GetString("contact"),
-                                Type = reader.GetString("type"),
-                                Url = reader.GetString("url"),
-                                Start = localStart,
-                                End = localEnd,
-                                CreateDate = localCreateDate,
-                                CreatedBy = reader.GetString("createdBy"),
-                                LastUpdate = localLastUpdate,
-                                LastUpdateBy = reader.GetString("lastUpdateBy")
-                            });
-                        }
-                    }
-                }
-            }
-            return appointments;
-        }
-
-        /// <summary>
         /// Retrieves a list of all customer names with their IDs.
         /// </summary>
         /// <returns></returns>
@@ -531,6 +327,28 @@ namespace C969.Controllers
             return customers;
         }
 
+        /// <summary>
+        /// Method to check if a customer has appointments.
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
+        public bool CustomerHasAppointments(int customerId)
+        {
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT COUNT(*) FROM appointment WHERE customerId = @customerId";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@customerId", customerId);
+                    int result = Convert.ToInt32(cmd.ExecuteScalar());
+                    return result > 0;
+                }
+            }
+        }
+
+        #endregion
+        #region Appointment CRUD
         /// <summary>
         /// Method to add an appointment to the database.
         /// </summary>
@@ -568,108 +386,6 @@ namespace C969.Controllers
                     return result > 0;
                 }
             }
-        }
-
-        /// <summary>
-        /// Method to retrieve appointments by customer name.
-        /// </summary>
-        /// <param name="customerName"></param>
-        /// <returns></returns>
-        public List<AppointmentDetails> GetAppointmentsByCustomerName(string customerName)
-        {
-            List<AppointmentDetails> filteredAppointments = new List<AppointmentDetails>();
-            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
-
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                string query = @"
-            SELECT a.* FROM appointment a
-            JOIN customer c ON a.customerId = c.customerId
-            WHERE c.customerName LIKE @customerName";
-
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@customerName", "%" + customerName + "%");
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            filteredAppointments.Add(MapReaderToAppointmentDetails(reader, userTimeZone));
-                        }
-                    }
-                }
-            }
-            return filteredAppointments;
-        }
-
-        /// <summary>
-        /// Maps the data from a MySqlDataReader to an AppointmentDetails object.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <returns></returns>
-        public AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader, TimeZoneInfo userTimeZone)
-        {
-
-            // Read the start and end times from the database as EST
-
-            DateTime estStart = DateTime.SpecifyKind(reader.GetDateTime("start"), DateTimeKind.Unspecified); ;
-            DateTime estEnd = DateTime.SpecifyKind(reader.GetDateTime("end"), DateTimeKind.Unspecified); ;
-            DateTime estCreate = DateTime.SpecifyKind(reader.GetDateTime("createDate"), DateTimeKind.Unspecified);
-            DateTime estUpdate = DateTime.SpecifyKind(reader.GetDateTime("lastUpdate"), DateTimeKind.Unspecified);
-
-            // Convert the start and end times from EST to the user's local time zone
-            DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
-            DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
-            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, estTimeZone, userTimeZone);
-            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estUpdate, estTimeZone, userTimeZone);
-
-            return new AppointmentDetails
-            {
-                AppointmentId = reader.GetInt32("appointmentId"),
-                CustomerId = reader.GetInt32("customerId"),
-                UserId = reader.GetInt32("userId"),
-                Title = reader["title"].ToString(),
-                Description = reader["description"].ToString(),
-                Location = reader["location"].ToString(),
-                Contact = reader["contact"].ToString(),
-                Type = reader["type"].ToString(),
-                Url = reader.IsDBNull(reader.GetOrdinal("url")) ? null : reader["url"].ToString(), // Handling nullable fields
-                Start = localStart,
-                End = localEnd,
-                CreateDate = localCreateDate,
-                CreatedBy = reader["createdBy"].ToString(),
-                LastUpdate = localLastUpdate,
-                LastUpdateBy = reader["lastUpdateBy"].ToString()
-            };
-        }
-
-        /// <summary>
-        /// Method that retrieves an appointment by its ID.
-        /// </summary>
-        /// <param name="appointmentId"></param>
-        /// <returns></returns>
-        public AppointmentDetails GetAppointmentById(int appointmentId)
-        {
-            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
-
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                string query = "SELECT * FROM appointment WHERE appointmentId = @appointmentId";
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@appointmentId", appointmentId);
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            return MapReaderToAppointmentDetails(reader, userTimeZone);
-                        }
-                    }
-                }
-            }
-            return null;
         }
 
         /// <summary>
@@ -762,6 +478,130 @@ namespace C969.Controllers
         }
 
         /// <summary>
+        /// Retrieves all appointments from the database.
+        /// </summary>
+        /// <returns></returns>
+        public List<AppointmentDetails> GetAllAppointments()
+        {
+            List<AppointmentDetails> appointments = new List<AppointmentDetails>();
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+            SELECT appointmentId, customerId, userId, title, description, location, contact, type, url,
+               start, end, createDate, createdBy, lastUpdate, lastUpdateBy
+            FROM appointment";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Read the start and end times from the database and specify the DateTimeKind
+                            DateTime estStart = DateTime.SpecifyKind(reader.GetDateTime("start"), DateTimeKind.Unspecified);
+                            DateTime estEnd = DateTime.SpecifyKind(reader.GetDateTime("end"), DateTimeKind.Unspecified);
+                            DateTime estCreate = DateTime.SpecifyKind(reader.GetDateTime("createDate"), DateTimeKind.Unspecified);
+                            DateTime estLastUpdate = DateTime.SpecifyKind(reader.GetDateTime("lastUpdate"), DateTimeKind.Unspecified);
+
+
+                            // Convert the start and end times from EST to the user's local time zone
+                            DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
+                            DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
+                            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, estTimeZone, userTimeZone);
+                            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estLastUpdate, estTimeZone, userTimeZone);
+
+
+
+                            appointments.Add(new AppointmentDetails
+                            {
+                                AppointmentId = reader.GetInt32("appointmentId"),
+                                CustomerId = reader.GetInt32("customerId"),
+                                UserId = reader.GetInt32("userId"),
+                                Title = reader.GetString("title"),
+                                Description = reader.GetString("description"),
+                                Location = reader.GetString("location"),
+                                Contact = reader.GetString("contact"),
+                                Type = reader.GetString("type"),
+                                Url = reader.GetString("url"),
+                                Start = localStart,
+                                End = localEnd,
+                                CreateDate = localCreateDate,
+                                CreatedBy = reader.GetString("createdBy"),
+                                LastUpdate = localLastUpdate,
+                                LastUpdateBy = reader.GetString("lastUpdateBy")
+                            });
+                        }
+                    }
+                }
+            }
+            return appointments;
+        }
+
+        /// <summary>
+        /// Method to retrieve appointments by customer name.
+        /// </summary>
+        /// <param name="customerName"></param>
+        /// <returns></returns>
+        public List<AppointmentDetails> GetAppointmentsByCustomerName(string customerName)
+        {
+            List<AppointmentDetails> filteredAppointments = new List<AppointmentDetails>();
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = @"
+            SELECT a.* FROM appointment a
+            JOIN customer c ON a.customerId = c.customerId
+            WHERE c.customerName LIKE @customerName";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@customerName", "%" + customerName + "%");
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            filteredAppointments.Add(MapReaderToAppointmentDetails(reader, userTimeZone));
+                        }
+                    }
+                }
+            }
+            return filteredAppointments;
+        }
+
+        /// <summary>
+        /// Method that retrieves an appointment by its ID.
+        /// </summary>
+        /// <param name="appointmentId"></param>
+        /// <returns></returns>
+        public AppointmentDetails GetAppointmentById(int appointmentId)
+        {
+            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT * FROM appointment WHERE appointmentId = @appointmentId";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@appointmentId", appointmentId);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return MapReaderToAppointmentDetails(reader, userTimeZone);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Method to retrieve appointments by date.
         /// </summary>
         /// <param name="date"></param>
@@ -804,49 +644,48 @@ namespace C969.Controllers
         }
 
         /// <summary>
-        /// Method to retrieve a list of dates with appointments.
+        /// Maps the data from a MySqlDataReader to an AppointmentDetails object.
         /// </summary>
+        /// <param name="reader"></param>
         /// <returns></returns>
-        public List<DateTime> GetDatesWithAppointments()
+        public AppointmentDetails MapReaderToAppointmentDetails(MySqlDataReader reader, TimeZoneInfo userTimeZone)
         {
-            List<DateTime> dates = new List<DateTime>();
-            using (var conn = new MySqlConnection(_connString))
+
+            // Read the start and end times from the database as EST
+
+            DateTime estStart = DateTime.SpecifyKind(reader.GetDateTime("start"), DateTimeKind.Unspecified); ;
+            DateTime estEnd = DateTime.SpecifyKind(reader.GetDateTime("end"), DateTimeKind.Unspecified); ;
+            DateTime estCreate = DateTime.SpecifyKind(reader.GetDateTime("createDate"), DateTimeKind.Unspecified);
+            DateTime estUpdate = DateTime.SpecifyKind(reader.GetDateTime("lastUpdate"), DateTimeKind.Unspecified);
+
+            // Convert the start and end times from EST to the user's local time zone
+            DateTime localStart = TimeZoneInfo.ConvertTime(estStart, estTimeZone, userTimeZone);
+            DateTime localEnd = TimeZoneInfo.ConvertTime(estEnd, estTimeZone, userTimeZone);
+            DateTime localCreateDate = TimeZoneInfo.ConvertTime(estCreate, estTimeZone, userTimeZone);
+            DateTime localLastUpdate = TimeZoneInfo.ConvertTime(estUpdate, estTimeZone, userTimeZone);
+
+            return new AppointmentDetails
             {
-                conn.Open();
-                string query = "SELECT DISTINCT DATE(start) AS AppointmentDate FROM appointment";
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            dates.Add(reader.GetDateTime("AppointmentDate"));
-                        }
-                    }
-                }
-            }
-            return dates;
+                AppointmentId = reader.GetInt32("appointmentId"),
+                CustomerId = reader.GetInt32("customerId"),
+                UserId = reader.GetInt32("userId"),
+                Title = reader["title"].ToString(),
+                Description = reader["description"].ToString(),
+                Location = reader["location"].ToString(),
+                Contact = reader["contact"].ToString(),
+                Type = reader["type"].ToString(),
+                Url = reader.IsDBNull(reader.GetOrdinal("url")) ? null : reader["url"].ToString(), // Handling nullable fields
+                Start = localStart,
+                End = localEnd,
+                CreateDate = localCreateDate,
+                CreatedBy = reader["createdBy"].ToString(),
+                LastUpdate = localLastUpdate,
+                LastUpdateBy = reader["lastUpdateBy"].ToString()
+            };
         }
 
-        /// <summary>
-        /// Method to check if a customer has appointments.
-        /// </summary>
-        /// <param name="customerId"></param>
-        /// <returns></returns>
-        public bool CustomerHasAppointments(int customerId)
-        {
-            using (var conn = new MySqlConnection(_connString))
-            {
-                conn.Open();
-                string query = "SELECT COUNT(*) FROM appointment WHERE customerId = @customerId";
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@customerId", customerId);
-                    int result = Convert.ToInt32(cmd.ExecuteScalar());
-                    return result > 0;
-                }
-            }
-        }
+        #endregion
+        #region Checks for Upcoming Appointments
 
         /// <summary>
         /// Method to retrieve upcoming appointments for a user.
@@ -884,6 +723,205 @@ namespace C969.Controllers
             }
             return upcomingAppointments;
         }
+        #endregion
+        #region Data Handling
+
+        /// <summary>
+        /// Searches for an entity in the database and returns its ID if found. If not found, inserts the entity and returns the new ID.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public int EnsureEntity(string tableName, MySqlTransaction transaction, params MySqlParameter[] parameters)
+        {
+
+            string whereConditions = string.Join(" AND ", Array.ConvertAll(parameters, p => $"{p.ParameterName.Substring(1)} = {p.ParameterName}"));
+            string selectQuery = $"SELECT {tableName}Id FROM {tableName} WHERE {whereConditions}";
+
+            using (var cmd = new MySqlCommand(selectQuery, _connection, transaction))
+            {
+                cmd.Parameters.AddRange(parameters);
+                var result = cmd.ExecuteScalar();
+
+                // Clear parameters after executing the select command to avoid "parameter already defined" error.
+                cmd.Parameters.Clear();
+
+                if (result != null)
+                    return Convert.ToInt32(result);
+
+                string insertFields = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName.Substring(1)));
+                string insertValues = string.Join(", ", Array.ConvertAll(parameters, p => p.ParameterName));
+                string insertQuery = $@"
+            INSERT INTO {tableName} ({insertFields}, createDate, createdBy, lastUpdate, lastUpdateBy)
+            VALUES ({insertValues}, @now, @user, @now, @user); 
+            SELECT LAST_INSERT_ID();";
+
+                cmd.CommandText = insertQuery;
+                cmd.Parameters.AddRange(parameters);  // Re-add parameters for the insert operation
+                cmd.Parameters.AddWithValue("@now", DateTime.UtcNow);
+                cmd.Parameters.AddWithValue("@user", _currentUser);
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+
+        }
+
+        /// <summary>
+        /// Ensures that the given city exists in the database. If it does not exist, it is inserted and the new city ID is returned.
+        /// </summary>
+        /// <param name="cityName"></param>
+        /// <param name="countryId"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        private int EnsureCity(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
+        {
+            int cityId = GetCityId(cityName, countryId, conn, trans);
+            if (cityId == 0)
+            {
+                string insertCity = @"
+                INSERT INTO City (city, countryId, createDate, createdBy, lastUpdate, lastUpdateBy)
+                VALUES (@cityName, @countryId, NOW(), @createdBy, NOW(), @lastUpdateBy);
+                SELECT LAST_INSERT_ID();";
+
+                using (var cmd = new MySqlCommand(insertCity, conn, trans))
+                {
+                    cmd.Parameters.AddWithValue("@cityName", cityName);
+                    cmd.Parameters.AddWithValue("@countryId", countryId);
+                    cmd.Parameters.AddWithValue("@createDate", DateTime.UtcNow);
+                    cmd.Parameters.AddWithValue("@createdBy", _currentUser);
+                    cmd.Parameters.AddWithValue("@lastUpdateBy", _currentUser);
+                    cityId = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+            return cityId;
+        }
+
+        /// <summary>
+        /// Ensures that the given country exists in the database. If it does not exist, it is inserted and the new country ID is returned.
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        private int EnsureCountry(string countryName, MySqlConnection conn, MySqlTransaction trans)
+        {
+            int countryId = GetCountryId(countryName, conn, trans);
+            if (countryId == 0)
+            {
+                string insertCountry = "INSERT INTO Country (country) VALUES (@countryName); SELECT LAST_INSERT_ID();";
+                using (var cmd = new MySqlCommand(insertCountry, conn, trans))
+                {
+                    cmd.Parameters.AddWithValue("@countryName", countryName);
+                    countryId = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+            return countryId;
+        }
+
+        /// <summary>
+        /// Retrieves the city ID for the given city name and country ID.
+        /// </summary>
+        /// <param name="cityName"></param>
+        /// <param name="countryId"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        private int GetCityId(string cityName, int countryId, MySqlConnection conn, MySqlTransaction trans)
+        {
+            string query = "SELECT cityId FROM City WHERE city = @cityName AND countryId = @countryId;";
+            using (var cmd = new MySqlCommand(query, conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@cityName", cityName);
+                cmd.Parameters.AddWithValue("@countryId", countryId);
+                var result = cmd.ExecuteScalar();
+                return result != null ? Convert.ToInt32(result) : 0;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the country ID for the given country name.
+        /// </summary>
+        /// <param name="countryName"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        public int GetCountryId(string countryName, MySqlConnection conn, MySqlTransaction trans)
+        {
+            string query = "SELECT countryId FROM Country WHERE country = @countryName;";
+            using (var cmd = new MySqlCommand(query, conn, trans))
+            {
+                cmd.Parameters.AddWithValue("@countryName", countryName);
+                var result = cmd.ExecuteScalar();
+                return result != null ? Convert.ToInt32(result) : 0;
+            }
+        }
+
+        #endregion
+        #region Misc
+        /// <summary>
+        /// Retrieves a list of all countries from the database.
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetCountries()
+        {
+            List<string> countries = new List<string>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT country FROM Country ORDER BY country;";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            countries.Add(reader["country"].ToString());
+                        }
+                    }
+                }
+            }
+
+            return countries;
+        }
+
+        /// <summary>
+        /// Method to retrieve a list of dates with appointments.
+        /// </summary>
+        /// <returns></returns>
+        public List<DateTime> GetDatesWithAppointments()
+        {
+            List<DateTime> dates = new List<DateTime>();
+            using (var conn = new MySqlConnection(_connString))
+            {
+                conn.Open();
+                string query = "SELECT DISTINCT DATE(start) AS AppointmentDate FROM appointment";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dates.Add(reader.GetDateTime("AppointmentDate"));
+                        }
+                    }
+                }
+            }
+            return dates;
+        }
+        #endregion
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 }
