@@ -696,7 +696,8 @@ namespace C969.Controllers
         {
             List<AppointmentDetails> upcomingAppointments = new List<AppointmentDetails>();
             DateTime utcNow = DateTime.UtcNow;
-            DateTime utcFuture = utcNow.AddMinutes(15); // 15 minutes from now
+            DateTime estNow = TimeZoneInfo.ConvertTimeFromUtc(utcNow, estTimeZone);
+            DateTime estFuture = estNow.AddMinutes(15); // 15 minutes from now
 
             using (var conn = new MySqlConnection(_connString))
             {
@@ -704,13 +705,13 @@ namespace C969.Controllers
                 string query = @"
             SELECT appointmentId, customerId, userId, title, description, location, contact, type, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy
             FROM appointment
-            WHERE userId = @userId AND start BETWEEN @utcNow AND @utcFuture";
+            WHERE userId = @userId AND start BETWEEN @estNow AND @estFuture";
 
                 using (var cmd = new MySqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
-                    cmd.Parameters.AddWithValue("@utcNow", utcNow);
-                    cmd.Parameters.AddWithValue("@utcFuture", utcFuture);
+                    cmd.Parameters.AddWithValue("@estNow", estNow);
+                    cmd.Parameters.AddWithValue("@estFuture", estFuture);
 
                     using (var reader = cmd.ExecuteReader())
                     {
