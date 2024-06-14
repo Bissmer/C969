@@ -20,14 +20,11 @@ namespace C969.Forms
 
         private readonly ReportsDataHandler _reportsDataHandler;
         private readonly CustomerAppointmentsDataHandler _customerAppointmentsDataHandler;
-
         private readonly string _connString =
             ConfigurationManager.ConnectionStrings["DbConnectionString"].ConnectionString;
-
         private TimeZoneInfo _userTimeZone = UserSession.CurrentTimeZone;
         private List<AppointmentCountByCustomer> _appointmentCountsByCustomer;
         private string _timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
-
 
 
         public ReportsForm()

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace C969.Models
 {
+    /// <summary>
+    /// Class to handle user schedule information
+    /// </summary>
     public class UserSchedule
     {
         public string UserName { get; set; }

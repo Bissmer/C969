@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace C969.Models
 {
     /// <summary>
-    /// Custom exception for database connection errors
+    /// Custom exception for database connection errors, used for login form
     /// </summary>
     public class DatabaseConnectionException : Exception
     {

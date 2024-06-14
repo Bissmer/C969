@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace C969.Models
 {
     /// <summary>
-    /// This class is used to store the count of appointments by month and type
+    /// Class is used to store the count of appointments by month and type
     /// </summary>
     public class AppointmentTypesByMonths
     {

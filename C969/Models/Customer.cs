@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace C969.Models
 {
     /// <summary>
-    /// This class is used to store the customer information
+    /// Class is used to store the customer information
     /// </summary>
     public class Customer
     {

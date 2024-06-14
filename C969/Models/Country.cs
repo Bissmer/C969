@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace C969.Models
 {
-    /// <summary>
-    /// This class is used to store the country information
-    /// </summary>
     public class Country
     {
         public int CountryId { get; set;}

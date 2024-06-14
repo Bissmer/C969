@@ -203,6 +203,7 @@ namespace C969.Controllers
                 List<AppointmentDetails> appointments = _customerAppointmentsDataHandler.GetAllAppointments();
                 List<Customer> customers = GetAllCustomers();
 
+                //Group appointments by customer and count
                 var appointmentsByCustomer = customers
                     .GroupJoin(
                         appointments,

@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace C969.Models
 {
-    /// <summary>
-    /// This class is used to store the city information
-    /// </summary>
     public class City
     {
         public int CityId { get; set; }

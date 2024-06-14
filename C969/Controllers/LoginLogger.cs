@@ -12,7 +12,7 @@ namespace C969.Controllers
     /// </summary>
     public static class LoginLogger
     {
-        //set the directory of Logs in Project/Bin/Debug and puts a file called Login_History.txt in it
+        //setting the directory of Logs in Project/Bin/Debug and puts a file called Login_History.txt in it
         private static readonly string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
         private static readonly string _logFilePath = Path.Combine(logDirectory, "Login_History.txt");
 
