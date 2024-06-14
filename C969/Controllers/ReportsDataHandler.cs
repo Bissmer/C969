@@ -68,33 +68,49 @@ namespace C969.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public List<AppointmentDetails> GetAppointmentsByUserId(int userId)
+        public List<UserSchedule> GetSchedulesByUser()
         {
             List<AppointmentDetails> appointments = new List<AppointmentDetails>();
-            TimeZoneInfo userTimeZone = UserSession.CurrentTimeZone;
+            List<User> users = GetAllUsers();
+
 
             using (var conn = new MySqlConnection(_connString))
             {
                 conn.Open();
-                string query = @"
-                SELECT appointmentId, customerId, userId, title, description, location, contact, type, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy
-                FROM appointment
-                WHERE userId = @userId";
+                string appointmentQuery = @"
+            SELECT appointmentId, customerId, userId, title, description, location, contact, type, url, start, end, createDate, createdBy, lastUpdate, lastUpdateBy
+            FROM appointment";
 
-                using (var cmd = new MySqlCommand(query, conn))
+                // Retrieve appointments
+                using (var cmd = new MySqlCommand(appointmentQuery, conn))
                 {
-                    cmd.Parameters.AddWithValue("@userId", userId);
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            appointments.Add(_customerAppointmentsDataHandler.MapReaderToAppointmentDetails(reader, userTimeZone));
+                            appointments.Add(_customerAppointmentsDataHandler.MapReaderToAppointmentDetails(reader, _userTimeZone));
                         }
                     }
                 }
             }
 
-            return appointments;
+            var userSchedules = users.GroupJoin(
+                    appointments,
+                    user => user.UserId,
+                    appointment => appointment.UserId,
+                    (user, userAppointments) => new { user.UserName, userAppointments })
+                .SelectMany( // Flatten the list of appointments for each user
+                    ua => ua.userAppointments,
+                    (ua, appointment) => new UserSchedule
+                    {
+                        UserName = ua.UserName,
+                        Title = appointment.Title,
+                        Start = appointment.Start,
+                        End = appointment.End
+                    })
+                .ToList();
+
+            return userSchedules;
         }
 
         /// <summary>
@@ -125,7 +141,7 @@ namespace C969.Controllers
                 }
             }
 
-            //Groups appointments by month and type
+            //Group appointments by month and type
             var groupedAppointments = appointments.GroupBy(app => new { app.Start.Month, AppointmentType = app.Type })
                 .Select(group => new AppointmentTypesByMonths
                 {
@@ -176,19 +192,6 @@ namespace C969.Controllers
 
             return customers;
         }
-
-     
-        /// <summary>
-        /// Get the Customer Name by its Id
-        /// </summary>
-        /// <param name="customerId"></param>
-        /// <returns></returns>
-        public string GetCustomerNameById(int customerId)
-        {
-            var customer = _customerAppointmentsDataHandler.GetCustomerDetails(customerId);
-            return customer != null ? customer.CustomerName : "Unknown";
-        }
-
 
         /// <summary>
         ///  Method to get the count of appointments by customer.

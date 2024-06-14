@@ -341,7 +341,8 @@ namespace C969.Forms
         /// </summary>
         private void DisplayCurrentUser()
         {
-            editAppointmentCurrentUserText.Text = UserSession.CurrentUser;
+            var appointmentDetails = _customerAppointmentsDataHandler.GetAppointmentById(_appointmentId);
+            editAppointmentCurrentUserText.Text = appointmentDetails.CreatedBy;
             editAppointmentCurrentUserText.ReadOnly = true;
         }
         #endregion

@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             this.reportsFormTitleLabel = new System.Windows.Forms.Label();
-            this.reportsFormUsersCombo = new System.Windows.Forms.ComboBox();
-            this.reportsFormUsersComboLabel = new System.Windows.Forms.Label();
             this.reportsFormDgvAppointmentsByUser = new System.Windows.Forms.DataGridView();
             this.reportsFormSchedulesByUserLabel = new System.Windows.Forms.Label();
             this.reportsFormDownloadSchedulesByUser = new System.Windows.Forms.Button();
@@ -39,7 +37,6 @@
             this.reportsFormDownloadAppointmentsByMonth = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.reportsFormDownloadCustomerCountByCountryCity = new System.Windows.Forms.Button();
-            this.reportsFormDisplaySchedulesByUser = new System.Windows.Forms.Button();
             this.reportsFormCustomerAppointmentsBreakdownLabel = new System.Windows.Forms.Label();
             this.reportsFormDgvAppointmentsByCustomer = new System.Windows.Forms.DataGridView();
             this.reportsFormQuitBtn = new System.Windows.Forms.Button();
@@ -59,23 +56,6 @@
             this.reportsFormTitleLabel.Size = new System.Drawing.Size(75, 24);
             this.reportsFormTitleLabel.TabIndex = 0;
             this.reportsFormTitleLabel.Text = "Reports";
-            // 
-            // reportsFormUsersCombo
-            // 
-            this.reportsFormUsersCombo.FormattingEnabled = true;
-            this.reportsFormUsersCombo.Location = new System.Drawing.Point(860, 103);
-            this.reportsFormUsersCombo.Name = "reportsFormUsersCombo";
-            this.reportsFormUsersCombo.Size = new System.Drawing.Size(121, 21);
-            this.reportsFormUsersCombo.TabIndex = 1;
-            // 
-            // reportsFormUsersComboLabel
-            // 
-            this.reportsFormUsersComboLabel.AutoSize = true;
-            this.reportsFormUsersComboLabel.Location = new System.Drawing.Point(736, 106);
-            this.reportsFormUsersComboLabel.Name = "reportsFormUsersComboLabel";
-            this.reportsFormUsersComboLabel.Size = new System.Drawing.Size(102, 13);
-            this.reportsFormUsersComboLabel.TabIndex = 2;
-            this.reportsFormUsersComboLabel.Text = "Please select a user";
             // 
             // reportsFormDgvAppointmentsByUser
             // 
@@ -155,16 +135,6 @@
             this.reportsFormDownloadCustomerCountByCountryCity.UseVisualStyleBackColor = true;
             this.reportsFormDownloadCustomerCountByCountryCity.Click += new System.EventHandler(this.reportsFormDownloadCustomerCountByCountryCity_Click);
             // 
-            // reportsFormDisplaySchedulesByUser
-            // 
-            this.reportsFormDisplaySchedulesByUser.Location = new System.Drawing.Point(739, 201);
-            this.reportsFormDisplaySchedulesByUser.Name = "reportsFormDisplaySchedulesByUser";
-            this.reportsFormDisplaySchedulesByUser.Size = new System.Drawing.Size(123, 23);
-            this.reportsFormDisplaySchedulesByUser.TabIndex = 16;
-            this.reportsFormDisplaySchedulesByUser.Text = "Display all schedules";
-            this.reportsFormDisplaySchedulesByUser.UseVisualStyleBackColor = true;
-            this.reportsFormDisplaySchedulesByUser.Click += new System.EventHandler(this.reportsFormDisplaySchedulesByUser_Click);
-            // 
             // reportsFormCustomerAppointmentsBreakdownLabel
             // 
             this.reportsFormCustomerAppointmentsBreakdownLabel.AutoSize = true;
@@ -223,7 +193,6 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.reportsFormQuitBtn);
-            this.Controls.Add(this.reportsFormDisplaySchedulesByUser);
             this.Controls.Add(this.reportsFormDownloadCustomerCountByCountryCity);
             this.Controls.Add(this.reportsFormDgvAppointmentsByCustomer);
             this.Controls.Add(this.reportsFormCustomerAppointmentsBreakdownLabel);
@@ -234,8 +203,6 @@
             this.Controls.Add(this.reportsFormDownloadSchedulesByUser);
             this.Controls.Add(this.reportsFormSchedulesByUserLabel);
             this.Controls.Add(this.reportsFormDgvAppointmentsByUser);
-            this.Controls.Add(this.reportsFormUsersComboLabel);
-            this.Controls.Add(this.reportsFormUsersCombo);
             this.Controls.Add(this.reportsFormTitleLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "ReportsForm";
@@ -251,8 +218,6 @@
         #endregion
 
         private System.Windows.Forms.Label reportsFormTitleLabel;
-        private System.Windows.Forms.ComboBox reportsFormUsersCombo;
-        private System.Windows.Forms.Label reportsFormUsersComboLabel;
         private System.Windows.Forms.DataGridView reportsFormDgvAppointmentsByUser;
         private System.Windows.Forms.Label reportsFormSchedulesByUserLabel;
         private System.Windows.Forms.Button reportsFormDownloadSchedulesByUser;
@@ -261,7 +226,6 @@
         private System.Windows.Forms.Button reportsFormDownloadAppointmentsByMonth;
         public System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button reportsFormDownloadCustomerCountByCountryCity;
-        private System.Windows.Forms.Button reportsFormDisplaySchedulesByUser;
         private System.Windows.Forms.Label reportsFormCustomerAppointmentsBreakdownLabel;
         private System.Windows.Forms.DataGridView reportsFormDgvAppointmentsByCustomer;
         private System.Windows.Forms.Button reportsFormQuitBtn;

@@ -36,85 +36,58 @@ namespace C969.Forms
             InitializeComponent();
             _reportsDataHandler = new ReportsDataHandler(_connString);
             this.Load += ReportsForm_Load;
-            reportsFormUsersCombo.SelectedIndexChanged += reportsFormUsersCombo_SelectedIndexChanged;
-            //reportsFormCountriesCombo.SelectedIndexChanged += reportsFormCountriesCombo_SelectedIndexChanged;
 
         }
 
         private void ReportsForm_Load(object sender, EventArgs e)
         {
-            LoadUsers();
             ConfigureAppointmentsDataGridView();
             ConfigureMonthlyReportDataGridView();
             ConfigureAppointmentsByCountryDataGridView();
-            LoadDefaultAppointments();
+            LoadSchedulesByUser();
             LoadMonthlyReport();
             LoadAppointmentCountsByCustomer();
         }
 
 
-        #region Report DataGridViews Columns Configuration
+        #region Report DataGridViews Custom Columns Configuration
 
         /// <summary>
         /// Method to configure tables in Schedules By User DGV
         /// </summary>
         private void ConfigureAppointmentsDataGridView()
         {
+            reportsFormDgvAppointmentsByUser.DataSource = null;
             reportsFormDgvAppointmentsByUser.AutoGenerateColumns = false;
+            reportsFormDgvAppointmentsByUser.Columns.Clear();
+            reportsFormDgvAppointmentsByUser.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
             reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "AppointmentId",
-                HeaderText = "ID",
-                ReadOnly = true
+                DataPropertyName = "UserName",
+                HeaderText = "User Name",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
 
             reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Title",
-                HeaderText = "Title"
-            });
-
-            reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Description",
-                HeaderText = "Description"
-            });
-
-            reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Location",
-                HeaderText = "Location"
-            });
-
-            reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Contact",
-                HeaderText = "Contact"
-            });
-
-            reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Type",
-                HeaderText = "Type"
+                HeaderText = "Appointment Title",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
 
             reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Start",
-                HeaderText = "Start Time"
+                HeaderText = "Start Time",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
 
             reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "End",
-                HeaderText = "End Time"
-            });
-
-            reportsFormDgvAppointmentsByUser.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "CustomerName",
-                HeaderText = "Customer Name"
+                HeaderText = "End Time",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             });
 
         }
@@ -212,75 +185,11 @@ namespace C969.Forms
 
         #region Schedules by User report controls and logic
 
-        /// <summary>
-        /// Method to load users data into the user combo box
-        /// </summary>
-        private void LoadUsers()
+        private void LoadSchedulesByUser()
         {
-            var users = _reportsDataHandler.GetAllUsers();
-            reportsFormUsersCombo.DataSource = users;
-            reportsFormUsersCombo.DisplayMember = "userName";
-            reportsFormUsersCombo.ValueMember = "userId";
-        }
-
-        /// <summary>
-        /// Handler to load Schedules by User when a user is selected from the combo box
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void reportsFormUsersCombo_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if (reportsFormUsersCombo.SelectedValue != null &&
-                    int.TryParse(reportsFormUsersCombo.SelectedValue.ToString(), out int selectedUserId))
-                {
-                    LoadAppointmentsByUser(selectedUserId);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Method to load appointments for a chosen user
-        /// </summary>
-        /// <param name="userId"></param>
-        private void LoadAppointmentsByUser(int userId)
-        {
-            var appointments = _reportsDataHandler.GetAppointmentsByUserId(userId);
-
-            var appointmentsInUserTimeZone = appointments.Select(a => new
-            {
-                AppointmentId = a.AppointmentId,
-                Title = a.Title,
-                Description = a.Description,
-                Location = a.Location,
-                Contact = a.Contact,
-                Type = a.Type,
-                Start = a.Start,
-                End = a.End,
-                CustomerName = _reportsDataHandler.GetCustomerNameById(a.CustomerId),
-            }).ToList();
-
-            reportsFormDgvAppointmentsByUser.DataSource = appointmentsInUserTimeZone;
+            var schedulesByUser = _reportsDataHandler.GetSchedulesByUser();
+            reportsFormDgvAppointmentsByUser.DataSource = schedulesByUser;
             reportsFormDgvAppointmentsByUser.Refresh();
-        }
-
-        /// <summary>
-        /// Load the default appointments for the first user in the combo box
-        /// </summary>
-        private void LoadDefaultAppointments()
-        {
-            if (reportsFormUsersCombo.Items.Count > 0)
-            {
-                reportsFormUsersCombo.SelectedIndex = 0;
-                int selectedUserId = (int)reportsFormUsersCombo.SelectedValue;
-                LoadAppointmentsByUser(selectedUserId);
-            }
         }
 
         /// <summary>
@@ -298,37 +207,10 @@ namespace C969.Forms
                 FileName = defaultFileName
             };
 
-
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 ExportReportsToCsv(reportsFormDgvAppointmentsByUser, saveFileDialog.FileName);
             }
-        }
-
-        private void reportsFormDisplaySchedulesByUser_Click(object sender, EventArgs e)
-        {
-            LoadAllAppointments();
-        }
-
-        private void LoadAllAppointments()
-        {
-            var appointments = _customerAppointmentsDataHandler.GetAllAppointments();
-
-            var appointmentsInUserTimeZone = appointments.Select(a => new
-            {
-                AppointmentId = a.AppointmentId,
-                Title = a.Title,
-                Description = a.Description,
-                Location = a.Location,
-                Contact = a.Contact,
-                Type = a.Type,
-                Start = a.Start,
-                End = a.End,
-                CustomerName = _reportsDataHandler.GetCustomerNameById(a.CustomerId),
-            }).ToList();
-
-            reportsFormDgvAppointmentsByUser.DataSource = appointmentsInUserTimeZone;
-            reportsFormDgvAppointmentsByUser.Refresh();
         }
 
         #endregion
@@ -363,17 +245,13 @@ namespace C969.Forms
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 ExportReportsToCsv(reportsFormDgvAppointmentsByMonth, saveFileDialog.FileName);
-            }
+            } 
         }
 
         #endregion
 
         #region Customer Appointments Breakdown report controls and logic
 
-
-        /// <summary>
-        /// Method to load the customer count by country report when the Report form is loaded
-        /// </summary>
 
         /// <summary>
         /// Method to load the appointments count by customer report when the Report form is loaded
@@ -403,7 +281,6 @@ namespace C969.Forms
                 ExportReportsToCsv(reportsFormDgvAppointmentsByCustomer, saveFileDialog.FileName);
             }
         }
-
 
         #endregion
 
